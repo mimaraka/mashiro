@@ -1,6 +1,6 @@
 # ***Mashiro***
 
-![mashiro_swimsuit_spr-04_0_waifu2x_2x_2n_png](https://github.com/mimaraka/mashiro/assets/106879397/c55498ea-a976-46ad-8abc-8c7b55d19e4f)
+![mashiro_swimsuit_spr-04_0_waifu2x_2x_2n_png](https://github.com/mimaraka/mashiro/assets/106879397/9d085f2d-8846-4f4b-b992-a2bbfef8c0ad)
 
 ***トリニティの正義実現委員会１年、マシロ。どんな場所でも、いついかなる状況でも、全力で先生のことを支援します。***
 
