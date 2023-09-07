@@ -38,7 +38,7 @@ async def get_message_from_url(mes_url: str, client: discord.Client) -> typing.O
 
 
 # メッセージから有効なURLを探す関数
-async def find_valid_urls(message: discord.Message, mimetypes_list) -> typing.Optional[typing.List[str]]:
+async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typing.Optional[typing.List[str]]:
     matches = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", message.content)
     urls = []
     valid_urls = []
@@ -47,9 +47,11 @@ async def find_valid_urls(message: discord.Message, mimetypes_list) -> typing.Op
         urls = [a.url for a in message.attachments]
     # メッセージの中にURLが含まれていた場合
     if matches:
-        urls += [m.group() for m in matches]
+        urls += [m for m in matches] # which is m str or match object?????
     for url in urls:
-        if await is_mimetype(url, mimetypes_list):
+        if mimetypes_list and not await is_mimetype(url, mimetypes_list):
+            continue
+        else:
             valid_urls.append(url)
     return valid_urls
 

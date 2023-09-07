@@ -118,7 +118,7 @@ class Player:
     
 
     # キューとプレイリストにソースを積む
-    async def register_tracks(self, inter: discord.Interaction, tracks: typing.List[Track], silent=False):
+    async def register_tracks(self, inter: discord.Interaction, tracks: typing.List[Track], silent=False, defer=False):
         self.__channel = inter.channel
         self.__playlist += tracks
         self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
@@ -134,8 +134,12 @@ class Player:
             await self.update_controller()
         else:
             if not silent:
-                await inter.response.send_message(embed=MyEmbed(notification_type="inactive", title="⏳ 処理中です……。"))
-                msg_proc = await inter.original_response()
+                embed = MyEmbed(notification_type="inactive", title="⏳ 処理中です……。")
+                if defer:
+                    msg_proc = await inter.followup.send(embed=embed)
+                else:
+                    await inter.response.send_message(embed=embed)
+                    msg_proc = await inter.original_response()
             else:
                 msg_proc = None
             await self.__play(msg_proc=msg_proc, silent=silent)

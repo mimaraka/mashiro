@@ -6,18 +6,19 @@ import modules.attachments as atc
 from discord.ext import commands
 from discord import app_commands
 from typing import Dict
+from modules.myembed import MyEmbed
 from modules.music.track import ytdl_create_tracks
 from modules.music.player import Player
-from modules.music.playerembed import PlayerEmbed
 from modules.music.errors import *
+from modules.attachments import find_valid_urls
 
 
-EMBED_BOT_NOT_CONNECTED = PlayerEmbed(notification_type="error", description="私はボイスチャンネルに接続していません。")
-EMBED_NOT_PLAYING = PlayerEmbed(notification_type="inactive", title="再生していません……。")
-EMBED_QUEUE_EMPTY = PlayerEmbed(notification_type="error", description="再生キューが空です。")
-EMBED_BOT_ANOTHER_VC = PlayerEmbed(notification_type="error", description="私は既に別のボイスチャンネルに接続しています。")
-EMBED_AUTHOR_NOT_CONNECTED = PlayerEmbed(notification_type="error", description="先生がボイスチャンネルに接続されていないようです。")
-EMBED_FAILED_TRACK_CREATION = PlayerEmbed(notification_type="error", description="トラックの生成に失敗しました。")
+EMBED_BOT_NOT_CONNECTED = MyEmbed(notification_type="error", description="私はボイスチャンネルに接続していません。")
+EMBED_NOT_PLAYING = MyEmbed(notification_type="inactive", title="再生していません……。")
+EMBED_QUEUE_EMPTY = MyEmbed(notification_type="error", description="再生キューが空です。")
+EMBED_BOT_ANOTHER_VC = MyEmbed(notification_type="error", description="私は既に別のボイスチャンネルに接続しています。")
+EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notification_type="error", description="先生がボイスチャンネルに接続されていないようです。")
+EMBED_FAILED_TRACK_CREATION = MyEmbed(notification_type="error", description="トラックの生成に失敗しました。")
 
 
 class Music(commands.Cog):
@@ -107,7 +108,7 @@ class Music(commands.Cog):
             # コマンドを送ったメンバーと同じボイスチャンネルにいる場合
             if inter.guild.voice_client.channel == member.voice.channel:
                 await inter.response.send_message(
-                    embed=PlayerEmbed(notification_type="error", description="既に接続しています。"),
+                    embed=MyEmbed(notification_type="error", description="既に接続しています。"),
                     ephemeral=True
                 )
             # 同じギルド内の他のボイスチャンネルに接続している場合
@@ -118,7 +119,7 @@ class Music(commands.Cog):
         # ボイスチャンネルに接続する
         player = await self.connect(member.voice.channel)
         await inter.response.send_message(
-            embed=PlayerEmbed(title=f"接続しました！ (🔊 {utils.escape_markdown(member.voice.channel.name)})"),
+            embed=MyEmbed(title=f"接続しました！ (🔊 {utils.escape_markdown(member.voice.channel.name)})"),
             delete_after=10
         )
         # 0.5秒後にランダムにボイスを再生する
@@ -140,7 +141,7 @@ class Music(commands.Cog):
             self.__time_bot_only.pop(key)
 
         await self.disconnect(inter.guild)
-        await inter.response.send_message(embed=PlayerEmbed(title="切断しました。"), delete_after=10)
+        await inter.response.send_message(embed=MyEmbed(title="切断しました。"), delete_after=10)
     
         
     # /play
@@ -178,7 +179,7 @@ class Music(commands.Cog):
         try:
             await player.abort()
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="inactive", title="再生を停止します。"),
+                embed=MyEmbed(notification_type="inactive", title="再生を停止します。"),
                 delete_after=10
             )
         except NotPlayingError:
@@ -195,12 +196,12 @@ class Music(commands.Cog):
 
         try:
             await player.pause()
-            await inter.response.send_message(embed=PlayerEmbed(notification_type="inactive", title="一時停止しました。"), delete_after=10)
+            await inter.response.send_message(embed=MyEmbed(notification_type="inactive", title="一時停止しました。"), delete_after=10)
         except NotPlayingError:
             await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
         except OperationError as e:
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="error", description=e),
+                embed=MyEmbed(notification_type="error", description=e),
                 ephemeral=True
             )
 
@@ -215,12 +216,12 @@ class Music(commands.Cog):
         
         try:
             await player.resume()
-            await inter.response.send_message(embed=PlayerEmbed(title="再生を一再開しました。"), delete_after=10)
+            await inter.response.send_message(embed=MyEmbed(title="再生を一再開しました。"), delete_after=10)
         except NotPlayingError:
             await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
         except OperationError as e:
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="error", description=e),
+                embed=MyEmbed(notification_type="error", description=e),
                 ephemeral=True
             )
 
@@ -250,7 +251,7 @@ class Music(commands.Cog):
             await inter.response.send_message(embed=EMBED_QUEUE_EMPTY, ephemeral=True)
         else:
             player.clear_queue()
-            await inter.response.send_message(embed=PlayerEmbed(title="再生キューをクリアしました。"), delete_after=10)
+            await inter.response.send_message(embed=MyEmbed(title="再生キューをクリアしました。"), delete_after=10)
 
 
     # /replay
@@ -265,7 +266,7 @@ class Music(commands.Cog):
             await player.replay()
         except PlayerError as e:
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="error", description=e)
+                embed=MyEmbed(notification_type="error", description=e)
             )
 
     
@@ -284,7 +285,11 @@ class Music(commands.Cog):
             return
         
         player.repeat = option.value
-        await inter.response.send_message(embed=PlayerEmbed(title="リピート再生の設定を変更しました。", description=option.name), delete_after=10)
+        await player.update_controller()
+        await inter.response.send_message(
+            embed=MyEmbed(title="リピート再生の設定を変更しました。", description=option.name),
+            delete_after=10
+        )
 
     
     # /volume
@@ -314,7 +319,7 @@ class Music(commands.Cog):
         else:
             remark = ""
         await inter.response.send_message(
-            embed=PlayerEmbed(title=f"{title}{remark}", description=description),
+            embed=MyEmbed(title=f"{title}{remark}", description=description),
             delete_after=10
         )
 
@@ -326,7 +331,7 @@ class Music(commands.Cog):
         if player is None:
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        await inter.response.send_message(embed=player.get_queue_embed())
+        await inter.response.send_message(embed=player.get_queue_embed(), ephemeral=True)
 
 
     # /player
@@ -351,9 +356,51 @@ class Music(commands.Cog):
         player.shuffle = onoff
         
         await inter.response.send_message(
-            embed=PlayerEmbed(title=f"🔀 シャッフル再生を{'オン' if onoff else 'オフ'}にしました。"),
+            embed=MyEmbed(title=f"🔀 シャッフル再生を{'オン' if onoff else 'オフ'}にしました。"),
             delete_after=10
         )
+
+
+    @app_commands.command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
+    @app_commands.describe(channel="URLを検索するチャンネル")
+    @app_commands.describe(n="検索するメッセージの件数(デフォルト: 20件)")
+    async def command_play_channel(self, inter: discord.Interaction, channel: discord.TextChannel, n: int=20):
+        author = inter.guild.get_member(inter.user.id)
+        # コマンドを送ったメンバーがボイスチャンネルに居ない場合
+        if author.voice is None:
+            await inter.response.send_message(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
+            return
+
+        player = self.__player.get(inter.guild.id) or await self.connect(author.voice.channel)
+        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
+        if inter.guild.voice_client.channel != author.voice.channel:
+            await inter.response.send_message(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+            return
+        
+        await inter.response.defer()
+        msg_proc = await inter.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 検索中です……。"))
+
+        tasks = []
+        async for message in channel.history(limit=n):
+            tasks += [ytdl_create_tracks(self.bot.loop, url) for url in await find_valid_urls(message)]
+
+        results = await asyncio.gather(*tasks)
+        tracks = []
+        for result in results:
+            if result:
+                tracks += result
+
+        await msg_proc.delete()
+
+        if not tracks:
+            await inter.followup.send(
+                embed=MyEmbed(notification_type="error", description="チャンネル内に有効なトラックが見つかりませんでした。"),
+                ephemeral=True
+            )
+            return
+        
+        await player.register_tracks(inter, tracks, defer=True)
+
 
 
     # /play-file
@@ -375,7 +422,7 @@ class Music(commands.Cog):
         # 添付ファイルの形式を調べる
         if not await atc.is_mimetype(attachment.url, atc.MIMETYPES_FFMPEG):
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="error", description="添付ファイルの形式が正しくありません。"),
+                embed=MyEmbed(notification_type="error", description="添付ファイルの形式が正しくありません。"),
                 ephemeral=True
             )
             return
@@ -383,7 +430,7 @@ class Music(commands.Cog):
         tracks = await ytdl_create_tracks(self.bot.loop, attachment.url)
         if not tracks:
             await inter.response.send_message(
-                embed=PlayerEmbed(notification_type="error", description="トラックの生成に失敗しました。"),
+                embed=MyEmbed(notification_type="error", description="トラックの生成に失敗しました。"),
                 ephemeral=True
             )
             return
