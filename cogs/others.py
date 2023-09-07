@@ -15,3 +15,12 @@ class Others(commands.Cog):
         # ミリ秒に変換して丸める
         ping = round(raw_ping * 1000, 2)
         await inter.response.send_message(embed=MyEmbed(title="お呼びですか、先生？", description=f"Ping値: `{ping}[ms]`"))
+
+
+    @app_commands.command(name="help", description="何かお困りですか？")
+    async def command_help(self, inter: discord.Interaction):
+        embed = MyEmbed(title="コマンド一覧")
+        for item in self.bot.tree.walk_commands():
+            if type(item) == app_commands.Command:
+                embed.add_field(name=f"/{item.name}", value=item.description, inline=False)
+        await inter.response.send_message(embed=embed)
