@@ -104,7 +104,7 @@ class Music(commands.Cog):
             return
         
         # 既に接続している場合
-        if inter.guild.voice_client:
+        if inter.guild.voice_client and inter.guild.voice_client.is_connected():
             # コマンドを送ったメンバーと同じボイスチャンネルにいる場合
             if inter.guild.voice_client.channel == member.voice.channel:
                 await inter.response.send_message(
@@ -132,7 +132,7 @@ class Music(commands.Cog):
     async def command_disconnect(self, inter: discord.Interaction):
         key = inter.guild.id
         # Botがボイスチャンネルに居ない場合
-        if inter.guild.voice_client is None:
+        if inter.guild.voice_client is None or not inter.guild.voice_client.is_connected():
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
         
