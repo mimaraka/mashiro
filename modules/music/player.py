@@ -6,8 +6,8 @@ import time
 import traceback
 import typing
 import modules.utils as utils
+from modules.myembed import MyEmbed
 from modules.music.track import Track, LocalTrack
-from modules.music.playerembed import PlayerEmbed
 from modules.music.playerview import PlayerView
 from modules.music.errors import *
 
@@ -130,11 +130,11 @@ class Player:
                 description = "\n".join([self.__track_text(s) for s in tracks][:5])
                 if len(tracks) > 5:
                     description += f"\n(他{len(tracks) - 5}曲)"
-                await inter.response.send_message(embed=PlayerEmbed(title="再生キューに追加しました！", description=description), delete_after=10)
+                await inter.response.send_message(embed=MyEmbed(title="再生キューに追加しました！", description=description), delete_after=10)
             await self.update_controller()
         else:
             if not silent:
-                await inter.response.send_message(embed=PlayerEmbed(notification_type="inactive", title="⏳ 処理中です……。"))
+                await inter.response.send_message(embed=MyEmbed(notification_type="inactive", title="⏳ 処理中です……。"))
                 msg_proc = await inter.original_response()
             else:
                 msg_proc = None
@@ -237,7 +237,7 @@ class Player:
                 notification_type = "inactive"
             title += f" (🔊 {utils.escape_markdown(self.__voice_client.channel.name)})"
             description = f"💿 {self.__track_text(self.__current_track, italic=True)}"
-            embed = PlayerEmbed(notification_type=notification_type, title=title, description=description)
+            embed = MyEmbed(notification_type=notification_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
                 next_track = self.__playlist[self.__queue_idcs[0]]
@@ -246,13 +246,15 @@ class Player:
                 embed.add_field(name=name, value=value, inline=False)
             # サムネイルを表示
             embed.set_image(url=self.__current_track.thumbnail)
+            
             # ボタンを表示
             view = PlayerView(self)
         # 停止中の場合
         else:
-            embed = PlayerEmbed(notification_type="inactive", title="再生していません……。")
+            embed = MyEmbed(notification_type="inactive", title="再生していません……。")
             view = None
 
+        embed.set_author(name="🎵 プレイヤー")
         return {
             "embed": embed,
             "view": view
@@ -269,16 +271,16 @@ class Player:
         if self.queue:
             track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}"]
             for i, track in enumerate(self.queue):
-                track_titles.append(f"{i + 1}. {self.track_text(track)}")
+                track_titles.append(f"{i + 1}. {self.__track_text(track)}")
             description = "\n".join(track_titles)
-            embed = PlayerEmbed(title=f"再生キュー ({len(self.queue)}曲)", description=description)
+            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲)", description=description)
         else:
-            embed = PlayerEmbed(notification_type="inactive", title="再生キューは空です。")
+            embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
         return embed
 
     
     # コントローラーを再生成
-    async def regenerate_controller(self, channel, inter: discord.Interaction=None):
+    async def regenerate_controller(self, channel: discord.TextChannel, inter: discord.Interaction=None):
         self.__channel = channel
         old_msg = self.__controller_msg
         if inter:
