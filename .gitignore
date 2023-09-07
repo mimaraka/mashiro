@@ -1,4 +1,3 @@
 *.bat
-env/config.ini
 __pycache__/
 .env

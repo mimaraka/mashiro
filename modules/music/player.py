@@ -130,8 +130,16 @@ class Player:
                 description = "\n".join([self.__track_text(s) for s in tracks][:5])
                 if len(tracks) > 5:
                     description += f"\n(他{len(tracks) - 5}曲)"
-                await inter.response.send_message(embed=MyEmbed(title="再生キューに追加しました！", description=description), delete_after=10)
+                embed = MyEmbed(title="再生キューに追加しました！", description=description)
+                message = None
+                if defer:
+                    message = await inter.followup.send(embed=embed)
+                else:
+                    await inter.response.send_message(embed=embed, delete_after=10)
             await self.update_controller()
+            await asyncio.sleep(10)
+            if message:
+                await message.delete()
         else:
             if not silent:
                 embed = MyEmbed(notification_type="inactive", title="⏳ 処理中です……。")

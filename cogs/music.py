@@ -177,7 +177,7 @@ class Music(commands.Cog):
             return
         
         try:
-            await player.abort()
+            await player.abort(clear=True)
             await inter.response.send_message(
                 embed=MyEmbed(notification_type="inactive", title="再生を停止します。"),
                 delete_after=10
@@ -400,7 +400,6 @@ class Music(commands.Cog):
             return
         
         await player.register_tracks(inter, tracks, defer=True)
-
 
 
     # /play-file
