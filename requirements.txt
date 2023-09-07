@@ -2,6 +2,7 @@ aiohttp==3.8.1
 discord.py[voice]==2.1.1
 ffmpeg-python==0.2.0
 jaconv==0.3.4
+niconico.py==1.2.4
 python-dotenv==1.0.0
 requests==2.31.0
 typing_extensions==4.7.1
