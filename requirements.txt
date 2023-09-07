@@ -1,5 +1,6 @@
 aiohttp==3.8.1
 discord.py[voice]==2.1.1
 ffmpeg-python==0.2.0
+jaconv==0.3.4
 python-dotenv==1.0.0
 yt-dlp==2023.7.6
