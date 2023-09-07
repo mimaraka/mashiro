@@ -40,7 +40,8 @@ class Music(commands.Cog):
         old_msg = self.__player[guild.id].controller_msg
         self.__player.pop(guild.id)
         try:
-            await old_msg.delete()
+            if old_msg:
+                await old_msg.delete()
         except discord.errors.NotFound:
             pass
         await guild.voice_client.disconnect()
@@ -295,7 +296,7 @@ class Music(commands.Cog):
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
         
-        if volume:
+        if volume is not None:
             title = "ボリュームを変更しました。"
             player.volume = volume / 100
         else:
@@ -308,7 +309,7 @@ class Music(commands.Cog):
         else:
             volume_icon = "🔊"
         description = f"{volume_icon} **{new_volume}**\n🔈 0 {'-' * (new_volume // 2)}●{'-' * (50 - new_volume // 2)} 🔊 100"
-        if not player.is_stopped and volume:
+        if not player.is_stopped and volume is not None:
             remark = " (次回再生時に適応されます)"
         else:
             remark = ""

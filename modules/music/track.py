@@ -92,22 +92,21 @@ class LocalTrack:
         self.duration = None
         
     async def create_source(self, volume):
-        if self.source is None:
-            self.source = discord.PCMVolumeTransformer(
-                original=discord.FFmpegPCMAudio(self.url),
-                volume=volume
-            )
+        self.source = discord.PCMVolumeTransformer(
+            original=discord.FFmpegPCMAudio(self.url),
+            volume=volume
+        )
 
 
 Track = Union[YTDLTrack, NicoNicoTrack, LocalTrack]
 
 
 def zfill_duration(duration_string: str):
-    hms = duration_string.split(":")
-    if len(hms) == 1:
-        return f"0:{hms[0]}"
-    else:
-        return duration_string
+    if duration_string is not None:
+        hms = duration_string.split(":")
+        if len(hms) == 1:
+            return f"0:{hms[0]}"
+    return duration_string
 
 
 # YTDLを用いてテキストからトラックのリストを生成

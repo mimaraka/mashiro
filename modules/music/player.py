@@ -3,6 +3,7 @@ import discord
 import glob
 import random
 import time
+import traceback
 import typing
 import modules.utils as utils
 from modules.music.track import Track, LocalTrack
@@ -154,9 +155,12 @@ class Player:
         # コントローラーの更新
         if not silent:
             if self.__controller_msg:
-                await self.__controller_msg.edit(**self.get_controller())
-            else:
-                self.__controller_msg = await self.__channel.send(**self.get_controller())
+                try:
+                    await self.__controller_msg.edit(**self.get_controller())
+                    return
+                except discord.errors.NotFound:
+                    pass
+            self.__controller_msg = await self.__channel.send(**self.get_controller())
 
 
     # 指定したトラックを強制的に再生
@@ -172,7 +176,8 @@ class Player:
     # 音楽再生後(及びエラー発生時)に呼ばれるコールバック
     async def __after_callback(self, error):
         if error:
-            print(f"An error occurred while playing.\n{error}")
+            print(f"An error occurred while playing.")
+            traceback.print_exception(error)
             return
         
         # 中断により停止された場合
