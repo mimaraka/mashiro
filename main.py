@@ -14,8 +14,8 @@ from cogs.others import Others
 
 bot = commands.Bot(command_prefix="$", intents=discord.Intents.all())
 
-# load_dotenv(verbose=True)
-# load_dotenv(os.path.dirname(__file__) + ".env")
+load_dotenv(verbose=True)
+load_dotenv(os.path.dirname(__file__) + ".env")
 
 
 # bot起動時のイベント
