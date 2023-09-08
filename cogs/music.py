@@ -346,7 +346,8 @@ class Music(commands.Cog):
         if player is None:
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        await inter.response.send_message(embed=player.get_queue_embed(), ephemeral=True)
+        await inter.response.defer()
+        await inter.followup.send(embed=player.get_queue_embed(), ephemeral=True)
 
 
     # /player
