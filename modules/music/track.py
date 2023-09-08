@@ -130,10 +130,12 @@ async def ytdl_create_tracks(loop, text: str, author: discord.Member) -> List[Tr
     # キー"entries"が存在すればプレイリスト
     info_list = info.get("entries") or [info]
 
-    result = [
-        NicoNicoTrack(i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), author)
-        if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url"))
-        else YTDLTrack(loop, i.get("url"), i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), author)
-        for i in info_list
-    ]
+    result = []
+    for i in info_list:
+        if i:
+            if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url")):
+                result.append(NicoNicoTrack(i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), author))
+            else:
+                result.append(YTDLTrack(loop, i.get("url"), i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), author))
+
     return result

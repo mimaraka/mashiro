@@ -370,7 +370,8 @@ class Player:
 
 
     # マシロのボイスをランダムで再生する
-    async def play_random_voice(self, inter: discord.Interaction, on_connect=False):        
+    async def play_random_voice(self, inter: discord.Interaction, on_connect=False):
+        author = inter.guild.get_member(inter.user.id)
         # 入室時のボイス
         if on_connect:
             voices = glob.glob("data/assets/voices/on_connect/*.*")
@@ -379,4 +380,4 @@ class Player:
 
         picked_voice = random.choice(voices)
         await inter.response.defer()
-        await self.register_tracks(inter, [LocalTrack(picked_voice)], silent=on_connect)
+        await self.register_tracks(inter, [LocalTrack(picked_voice, author)], silent=on_connect)
