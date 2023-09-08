@@ -115,7 +115,7 @@ async def ytdl_create_tracks(loop, text: str, author: discord.Member) -> List[Tr
         if duration_string is not None:
             hms = duration_string.split(":")
             if len(hms) == 1:
-                return f"0:{hms[0]}"
+                return f"0:{hms[0].zfill(2)}"
         return duration_string
     
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
