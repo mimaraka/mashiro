@@ -23,4 +23,4 @@ class Others(commands.Cog):
         for item in self.bot.tree.walk_commands():
             if type(item) == app_commands.Command:
                 embed.add_field(name=f"/{item.name}", value=item.description, inline=False)
-        await inter.response.send_message(embed=embed)
+        await inter.response.send_message(embed=embed, ephemeral=True)
