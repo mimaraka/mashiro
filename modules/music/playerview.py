@@ -16,7 +16,7 @@ class ButtonBack(discord.ui.Button):
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.author.id != inter.user.id:
-            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         if time.time() - self.__player.time_started > 5:
             await self.__player.replay()
@@ -36,7 +36,7 @@ class ButtonPlay(discord.ui.Button):
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.author.id != inter.user.id:
-            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         await self.__player.resume()
         await self.__player.update_controller(inter)
@@ -50,7 +50,7 @@ class ButtonPause(discord.ui.Button):
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.author.id != inter.user.id:
-            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         await self.__player.pause()
         await self.__player.update_controller(inter)
@@ -64,7 +64,7 @@ class ButtonSkip(discord.ui.Button):
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.author.id != inter.user.id:
-            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         self.__player.skip()
         # インタラクションの無視

@@ -275,10 +275,17 @@ class Player:
 
     def get_queue_embed(self):
         if self.queue:
-            track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}"]
-            for i, track in enumerate(self.queue):
-                track_titles.append(f"{i + 1}. {self.__track_text(track)}")
-            description = "\n".join(track_titles)
+            count = 0
+            while 1:
+                track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}"]
+                for i, track in enumerate(self.queue[:-count] if count else self.queue):
+                    track_titles.append(f"{i + 1}. {self.__track_text(track)}")
+                if count:
+                    track_titles.append(f"(他{count}曲)")
+                description = "\n".join(track_titles)
+                if len(description) < 4096:
+                    break
+                count += 1
             embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲)", description=description)
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
