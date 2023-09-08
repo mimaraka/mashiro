@@ -20,7 +20,11 @@ YTDL_FORMAT_OPTIONS = {
     "no_warnings": True,
     "default_search": "auto",                                   # 非URLのテキストが投げられたときにキーワード検索をしてくれる
     "source_address": "0.0.0.0",                                # bind to ipv4 since ipv6 addresses cause issues sometimes
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+}
+
+FFMPEG_OPTIONS = {
+    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 5",
+    "options": "-vn",
 }
 
 
@@ -49,7 +53,7 @@ class YTDLTrack:
                 )
                 self.url = info.get("url")
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.url),
+            original=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTIONS),
             volume=volume
         )
 
@@ -77,7 +81,7 @@ class NicoNicoTrack:
             with nc_client.video.get_video(self.original_url) as video:
                 self.url = video.download_link
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.url),
+            original=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTIONS),
             volume=volume
         )
 
@@ -94,7 +98,7 @@ class LocalTrack:
         
     async def create_source(self, volume):
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.url),
+            original=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTIONS),
             volume=volume
         )
 
