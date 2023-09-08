@@ -19,16 +19,16 @@ class Player:
         self.__playlist: typing.List[Track] = []
         self.__queue_idcs: typing.List[int] = []
         self.__history_idcs: typing.List[int] = []
-        self.__current_track: typing.Optional[Track] = None
+        self.__current_track: Track | None = None
         self.__current_index: int = 0
-        self.__last_track: typing.Optional[Track] = None
+        self.__last_track: Track | None = None
         self.__volume: float = 1
         self.__repeat: int = 0
         self.__shuffle: bool = False
         self.__flag_aborted: bool = False
-        self.__controller_msg: typing.Optional[discord.Message] = None
-        self.__channel: typing.Optional[discord.TextChannel] = None
-        self.__time_started: typing.Optional[float] = None
+        self.__controller_msg: discord.Message | None = None
+        self.__channel: discord.TextChannel | None = None
+        self.__time_started: float | None = None
 
     @property
     def current_track(self):

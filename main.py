@@ -1,8 +1,8 @@
 import discord
 import discord.app_commands
 from discord.ext import commands
-import os
 from dotenv import load_dotenv
+import os
 
 from modules.kotobagari import kotobagari_proc
 import constants as const

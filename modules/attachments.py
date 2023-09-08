@@ -23,7 +23,7 @@ async def is_mimetype(url, mimetypes_list) -> bool:
 
 
 # URLが有効ならメッセージのオブジェクトを返し、無効ならNoneを返す
-async def get_message_from_url(mes_url: str, client: discord.Client) -> typing.Optional[discord.Message]:
+async def get_message_from_url(mes_url: str, client: discord.Client) -> discord.Message | None:
     if re.fullmatch(r"^https://discord.com/channels/\d+/\d+/\d+$", mes_url):
         parts = mes_url.split("/")
         channel_id = int(parts[-2])
@@ -38,7 +38,7 @@ async def get_message_from_url(mes_url: str, client: discord.Client) -> typing.O
 
 
 # メッセージから有効なURLを探す関数
-async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typing.Optional[typing.List[str]]:
+async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typing.List[str] | None:
     matches = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", message.content)
     urls = []
     valid_urls = []

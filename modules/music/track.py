@@ -4,7 +4,7 @@ import os
 import re
 import yt_dlp
 import urllib.request, urllib.error
-from typing import Optional, Union, List
+from typing import List
 from niconico import NicoNico
 
 
@@ -24,15 +24,15 @@ YTDL_FORMAT_OPTIONS = {
 
 
 class YTDLTrack:
-    source: Optional[discord.PCMVolumeTransformer] = None
+    source: discord.PCMVolumeTransformer | None = None
 
     def __init__(self, loop, url, original_url, title, thumbnail, duration) -> None:
         self.loop: asyncio.AbstractEventLoop = loop
-        self.url: Optional[str] = url
-        self.original_url: Optional[str] = original_url
+        self.url: str | None = url
+        self.original_url: str | None = original_url
         self.title: str = title
-        self.thumbnail: Optional[str] = thumbnail
-        self.duration: Optional[str] = duration
+        self.thumbnail: str | None = thumbnail
+        self.duration: str | None = duration
 
     # 生成されたURLは一定時間後に無効になるため、この関数を再生直前に実行する
     async def create_source(self, volume):
@@ -54,14 +54,14 @@ class YTDLTrack:
 
 
 class NicoNicoTrack:
-    source: Optional[discord.PCMVolumeTransformer] = None
+    source: discord.PCMVolumeTransformer | None = None
 
     def __init__(self, original_url, title, thumbnail, duration) -> None:
-        self.url: Optional[str] = None
-        self.original_url: Optional[str] = original_url
+        self.url: str | None = None
+        self.original_url: str | None = original_url
         self.title: str = title
-        self.thumbnail: Optional[str] = thumbnail
-        self.duration: Optional[str] = duration
+        self.thumbnail: str | None = thumbnail
+        self.duration: str | None = duration
 
     # 生成されたURLは一定時間後に無効になるため、この関数を再生直前に実行する
     async def create_source(self, volume):
@@ -82,11 +82,11 @@ class NicoNicoTrack:
 
 
 class LocalTrack:
-    source: Optional[discord.PCMVolumeTransformer] = None
+    source: discord.PCMVolumeTransformer | None = None
 
     def __init__(self, filepath) -> None:
-        self.url: Optional[str] = filepath
-        self.original_url: Optional[str] = None
+        self.url: str | None = filepath
+        self.original_url: str | None = None
         self.title: str = os.path.splitext(os.path.basename(filepath))[0]
         self.thumbnail = None
         self.duration = None
@@ -98,19 +98,18 @@ class LocalTrack:
         )
 
 
-Track = Union[YTDLTrack, NicoNicoTrack, LocalTrack]
-
-
-def zfill_duration(duration_string: str):
-    if duration_string is not None:
-        hms = duration_string.split(":")
-        if len(hms) == 1:
-            return f"0:{hms[0]}"
-    return duration_string
+Track = YTDLTrack | NicoNicoTrack | LocalTrack
 
 
 # YTDLを用いてテキストからトラックのリストを生成
 async def ytdl_create_tracks(loop, text: str) -> List[Track]:
+    def zfill_duration(duration_string: str):
+        if duration_string is not None:
+            hms = duration_string.split(":")
+            if len(hms) == 1:
+                return f"0:{hms[0]}"
+        return duration_string
+    
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
         try:
             info = await loop.run_in_executor(

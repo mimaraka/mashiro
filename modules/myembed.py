@@ -2,7 +2,6 @@ import datetime
 import discord
 from discord.types.embed import EmbedType
 from typing import Any, Literal
-import constants as const
 
 
 EMBED_THUMBNAIL = {
