@@ -127,6 +127,9 @@ async def ytdl_create_tracks(loop, text: str, author: discord.Member) -> List[Tr
             print(e)
             return None
         
+    if not info:
+        return None
+        
     # キー"entries"が存在すればプレイリスト
     info_list = info.get("entries") or [info]
 
