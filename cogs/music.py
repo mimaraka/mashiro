@@ -32,29 +32,42 @@ class Music(commands.Cog):
     # マシロをプレーヤーとしてボイスチャンネルに接続させるときの共通処理
     async def connect(self, vc: discord.VoiceChannel):
         await vc.connect()
-        self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
+        # ここで処理が打ち切られることがたまにある(VCに接続はするがPlayerが作成されない)
+        if not vc.guild.id in self.__player:
+            self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         return self.__player[vc.guild.id]
 
 
     # マシロをボイスチャンネルから切断させるときの共通処理
     async def disconnect(self, guild: discord.Guild):
-        assert guild.id in self.__player
-        old_msg = self.__player[guild.id].controller_msg
-        self.__player.pop(guild.id)
-        try:
-            if old_msg:
-                await old_msg.delete()
-        except discord.errors.NotFound:
-            pass
+        if guild.id in self.__player:
+            old_msg = self.__player[guild.id].controller_msg
+            self.__player.pop(guild.id)
+            try:
+                if old_msg:
+                    await old_msg.delete()
+            except discord.errors.NotFound:
+                pass
         await guild.voice_client.disconnect()
 
 
     # メンバーのボイス状態が更新されたとき
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
-        # 自分自身のイベントの場合は無視
+        # 自分自身のイベントの場合
         if member.id == self.bot.user.id:
+            # 自分がボイスチャンネルに接続したとき
+            if after.channel is not None and before.channel is None:
+                # Playerが作成されていない場合は作成する
+                if not member.guild.id in self.__player:
+                    self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
+            # 自分がボイスチャンネルから切断した/されたとき
+            if after.channel is None and before.channel is not None:
+                # まだPlayerが残っていれば削除する
+                if member.guild.id in self.__player:
+                    self.__player.pop(member.guild.id)
             return
+        
         # マシロがボイスチャンネルに接続していない場合は無視する
         if member.guild.voice_client is None:
             return
@@ -342,7 +355,8 @@ class Music(commands.Cog):
         if player is None:
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        await player.regenerate_controller(inter.channel, inter)
+        await player.regenerate_controller(inter.channel)
+        await inter.response.send_message(embed=MyEmbed(title=f"プレイヤーを移動しました。"), delete_after=10)
 
 
     # /shuffle
@@ -362,6 +376,7 @@ class Music(commands.Cog):
         )
 
 
+    # /play-channel
     @app_commands.command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
     @app_commands.describe(channel="URLを検索するチャンネル")
     @app_commands.describe(n="検索するメッセージの件数(デフォルト: 20件)")

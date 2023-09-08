@@ -292,14 +292,10 @@ class Player:
 
     
     # コントローラーを再生成
-    async def regenerate_controller(self, channel: discord.TextChannel, inter: discord.Interaction=None):
+    async def regenerate_controller(self, channel: discord.TextChannel):
         self.__channel = channel
         old_msg = self.__controller_msg
-        if inter:
-            await inter.response.send_message(**self.get_controller())
-            self.__controller_msg = await inter.original_response()
-        else:
-            self.__controller_msg = await channel.send(**self.get_controller())
+        self.__controller_msg = await channel.send(**self.get_controller())
 
         if old_msg:
             try:
