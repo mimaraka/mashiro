@@ -118,36 +118,28 @@ class Player:
     
 
     # キューとプレイリストにソースを積む
-    async def register_tracks(self, inter: discord.Interaction, tracks: typing.List[Track], silent=False, defer=False):
+    async def register_tracks(self, inter: discord.Interaction, tracks: typing.List[Track], silent=False):
         self.__channel = inter.channel
         self.__playlist += tracks
         self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
         if self.__shuffle:
             random.shuffle(self.__queue_idcs)
 
+        # 停止していない場合
         if not self.is_stopped:
             if not silent:
                 description = "\n".join([self.__track_text(s) for s in tracks][:5])
                 if len(tracks) > 5:
                     description += f"\n(他{len(tracks) - 5}曲)"
                 embed = MyEmbed(title="再生キューに追加しました！", description=description)
-                message = None
-                if defer:
-                    message = await inter.followup.send(embed=embed)
-                else:
-                    await inter.response.send_message(embed=embed, delete_after=10)
+                message = await inter.followup.send(embed=embed)
             await self.update_controller()
             await asyncio.sleep(10)
-            if message:
-                await message.delete()
+            await message.delete()
         else:
             if not silent:
                 embed = MyEmbed(notification_type="inactive", title="⏳ 処理中です……。")
-                if defer:
-                    msg_proc = await inter.followup.send(embed=embed)
-                else:
-                    await inter.response.send_message(embed=embed)
-                    msg_proc = await inter.original_response()
+                msg_proc = await inter.followup.send(embed=embed)
             else:
                 msg_proc = None
             await self.__play(msg_proc=msg_proc, silent=silent)
@@ -267,6 +259,8 @@ class Player:
             view = None
 
         embed.set_author(name="🎵 プレイヤー")
+        author = self.__current_track.author
+        embed.set_footer(text=f"{author.display_name} さんが追加", icon_url=author.display_avatar.url)
         return {
             "embed": embed,
             "view": view
@@ -377,4 +371,5 @@ class Player:
             voices = glob.glob("data/assets/voices/**/*.*", recursive=True)
 
         picked_voice = random.choice(voices)
+        await inter.response.defer()
         await self.register_tracks(inter, [LocalTrack(picked_voice)], silent=on_connect)

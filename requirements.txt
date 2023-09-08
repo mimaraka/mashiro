@@ -1,5 +1,5 @@
 aiohttp==3.8.1
-discord.py[voice]==2.1.1
+discord.py[voice]==2.3.2
 ffmpeg-python==0.2.0
 jaconv==0.3.4
 niconico.py==1.2.4

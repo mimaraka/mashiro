@@ -175,9 +175,10 @@ class Music(commands.Cog):
             await inter.response.send_message(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
-        tracks = await ytdl_create_tracks(self.bot.loop, text)
+        await inter.response.defer()
+        tracks = await ytdl_create_tracks(self.bot.loop, text, author)
         if not tracks:
-            await inter.response.send_message(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
+            await inter.followup.send(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
             return
         await player.register_tracks(inter, tracks)
         
@@ -355,6 +356,10 @@ class Music(commands.Cog):
         if player is None:
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
+        
+        if player.is_stopped:
+            await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
+            return
         await player.regenerate_controller(inter.channel)
         await inter.response.send_message(embed=MyEmbed(title=f"プレイヤーを移動しました。"), delete_after=10)
 
@@ -398,7 +403,7 @@ class Music(commands.Cog):
 
         tasks = []
         async for message in channel.history(limit=n):
-            tasks += [ytdl_create_tracks(self.bot.loop, url) for url in await find_valid_urls(message)]
+            tasks += [ytdl_create_tracks(self.bot.loop, url, author) for url in await find_valid_urls(message)]
 
         results = await asyncio.gather(*tasks)
         tracks = []
@@ -415,7 +420,7 @@ class Music(commands.Cog):
             )
             return
         
-        await player.register_tracks(inter, tracks, defer=True)
+        await player.register_tracks(inter, tracks)
 
 
     # /play-file
@@ -442,7 +447,8 @@ class Music(commands.Cog):
             )
             return
         
-        tracks = await ytdl_create_tracks(self.bot.loop, attachment.url)
+        await inter.response.defer()
+        tracks = await ytdl_create_tracks(self.bot.loop, attachment.url, author)
         if not tracks:
             await inter.response.send_message(
                 embed=MyEmbed(notification_type="error", description="トラックの生成に失敗しました。"),

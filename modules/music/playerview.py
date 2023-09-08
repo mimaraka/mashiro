@@ -3,6 +3,9 @@ import discord
 import time
 from discord.enums import ButtonStyle
 from modules.music.errors import *
+from modules.myembed import MyEmbed
+
+EMBED_PERMISSON_DENIED = MyEmbed(notification_type="error", description="このトラックを追加したユーザー以外は操作できません。")
 
 
 # 前のトラックに戻るボタン
@@ -11,7 +14,10 @@ class ButtonBack(discord.ui.Button):
         self.__player = player
         super().__init__(style=ButtonStyle.primary, emoji="⏮️")
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
+        if self.__player.current_track.author.id != inter.user.id:
+            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            return
         if time.time() - self.__player.time_started > 5:
             await self.__player.replay()
         else:
@@ -19,7 +25,7 @@ class ButtonBack(discord.ui.Button):
                 await self.__player.back()
             except OperationError:
                 await self.__player.replay()
-        await self.__player.update_controller(interaction)
+        await self.__player.update_controller(inter)
     
 
 # 再生のボタン
@@ -28,9 +34,12 @@ class ButtonPlay(discord.ui.Button):
         self.__player = player
         super().__init__(style=ButtonStyle.primary, emoji="▶️")
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
+        if self.__player.current_track.author.id != inter.user.id:
+            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            return
         await self.__player.resume()
-        await self.__player.update_controller(interaction)
+        await self.__player.update_controller(inter)
     
 
 # 一時停止のボタン
@@ -39,9 +48,12 @@ class ButtonPause(discord.ui.Button):
         self.__player = player
         super().__init__(style=ButtonStyle.primary, emoji="⏸️")
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
+        if self.__player.current_track.author.id != inter.user.id:
+            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            return
         await self.__player.pause()
-        await self.__player.update_controller(interaction)
+        await self.__player.update_controller(inter)
     
 
 # 次のトラックに進むボタン
@@ -50,10 +62,13 @@ class ButtonSkip(discord.ui.Button):
         self.__player = player
         super().__init__(style=ButtonStyle.primary, emoji="⏭️")
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
+        if self.__player.current_track.author.id != inter.user.id:
+            inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
+            return
         self.__player.skip()
         # インタラクションの無視
-        await interaction.response.edit_message()
+        await inter.response.edit_message()
         
 
 # シャッフルのボタン
@@ -63,9 +78,9 @@ class ButtonShuffle(discord.ui.Button):
         style = ButtonStyle.primary if player.shuffle else ButtonStyle.secondary
         super().__init__(style=style, emoji="🔀")
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
         self.__player.shuffle = not self.__player.shuffle
-        await self.__player.update_controller(interaction)
+        await self.__player.update_controller(inter)
 
 
 # リピートのボタン
@@ -80,12 +95,12 @@ class ButtonRepeat(discord.ui.Button):
             style = ButtonStyle.secondary
         super().__init__(style=style, emoji=emoji)
 
-    async def callback(self, interaction: discord.Interaction) -> Any:
+    async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.repeat == 2:
             self.__player.repeat = 0
         else:
             self.__player.repeat += 1
-        await self.__player.update_controller(interaction)
+        await self.__player.update_controller(inter)
     
 
 class PlayerView(discord.ui.View):
