@@ -20,6 +20,7 @@ YTDL_FORMAT_OPTIONS = {
     "no_warnings": True,
     "default_search": "auto",                                   # 非URLのテキストが投げられたときにキーワード検索をしてくれる
     "source_address": "0.0.0.0",                                # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
 }
 
 
