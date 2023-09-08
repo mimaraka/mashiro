@@ -379,5 +379,6 @@ class Player:
             voices = glob.glob("data/assets/voices/**/*.*", recursive=True)
 
         picked_voice = random.choice(voices)
-        await inter.response.defer()
+        if not on_connect:
+            await inter.response.defer()
         await self.register_tracks(inter, [LocalTrack(picked_voice, author)], silent=on_connect)
