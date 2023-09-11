@@ -4,4 +4,4 @@ WORKDIR /bot
 COPY requirements.txt /bot/
 RUN pip3 install -r requirements.txt
 COPY . /bot
-CMD ["python3", "main.py"]
+CMD ["python3", "-u", "main.py"]
