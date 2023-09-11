@@ -36,7 +36,7 @@ class Music(commands.Cog):
         # ここで処理が打ち切られることがたまにある(VCに接続はするがPlayerが作成されない)
         if not vc.guild.id in self.__player:
             self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
-        mashilog("ボイスチャンネルに接続しました。")
+        mashilog("ボイスチャンネルに正常に接続しました。")
         return self.__player[vc.guild.id]
 
 
@@ -51,7 +51,7 @@ class Music(commands.Cog):
             except discord.errors.NotFound:
                 pass
         await guild.voice_client.disconnect()
-        mashilog("ボイスチャンネルから切断しました。")
+        mashilog("ボイスチャンネルから正常に切断しました。")
 
 
     # メンバーのボイス状態が更新されたとき
@@ -61,11 +61,13 @@ class Music(commands.Cog):
         if member.id == self.bot.user.id:
             # 自分がボイスチャンネルに接続したとき
             if after.channel is not None and before.channel is None:
+                mashilog(f"ボイスチャンネルに接続しました。", guild=member.guild, channel=after.channel)
                 # Playerが作成されていない場合は作成する
                 if not member.guild.id in self.__player:
                     self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
+                mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
                 # まだPlayerが残っていれば削除する
                 if member.guild.id in self.__player:
                     self.__player.pop(member.guild.id)
@@ -77,13 +79,13 @@ class Music(commands.Cog):
 
         # マシロが現在接続しているボイスチャンネルでメンバーが抜けた場合
         if member.guild.voice_client.channel == before.channel and member.guild.voice_client.channel != after.channel:
-            mashilog("私が接続しているボイスチャンネルから1人のメンバーが切断しました。")
+            mashilog(f"ボイスチャンネルから1人のメンバーが切断しました。", guild=member.guild, channel=before.channel)
             # 現在のボイスチャンネルにBotしかいないかどうか
             bot_only = all([m.bot for m in member.guild.voice_client.channel.members])
 
             # ボイスチャンネルにBotしかいない場合
             if bot_only:
-                mashilog("現在、ボイスチャンネルはBotのみです。")
+                mashilog(f"現在、ボイスチャンネルはBotのみです。", guild=member.guild, channel=before.channel)
                 # Unix時間を記録
                 self.__time_bot_only[member.guild.id] = time.time()
                 # 1分待つ
@@ -99,7 +101,7 @@ class Music(commands.Cog):
                             await self.disconnect(member.guild)
         # マシロが現在接続しているボイスチャンネルにメンバーが入った場合
         elif member.guild.voice_client.channel != before.channel and member.guild.voice_client.channel == after.channel:
-            mashilog("私が接続しているボイスチャンネルに1人のメンバーが接続しました。")
+            mashilog(f"ボイスチャンネルに1人のメンバーが接続しました。", guild=member.guild, channel=after.channel)
             # それまでボイスチャンネルにBotしかおらず、新たに入ったメンバーがBotでない場合
             if member.guild.id in self.__time_bot_only and not member.bot:
                 # 辞書を削除
@@ -110,7 +112,7 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         for player in self.__player.values():
-            mashilog("プレイヤーメッセージが削除されました。")
+            mashilog(f"プレイヤーメッセージが削除されました。", guild=message.guild)
             if player.controller_msg and message.id == player.controller_msg.id and not player.is_stopped:
                 await player.regenerate_controller(message.channel)
 
