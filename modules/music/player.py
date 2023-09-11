@@ -271,13 +271,37 @@ class Player:
             "view": view
         }
     
+
+    # コントローラーを更新
     async def update_controller(self, inter: discord.Interaction=None):
         if inter:
             await inter.response.edit_message(**self.get_controller())
         else:
             await self.__controller_msg.edit(**self.get_controller())
+
+
+    # コントローラーを再生成
+    async def regenerate_controller(self, channel: discord.TextChannel):
+        self.__channel = channel
+        old_msg = self.__controller_msg
+        self.__controller_msg = await channel.send(**self.get_controller())
+
+        if old_msg:
+            try:
+                await old_msg.delete()
+            except discord.errors.NotFound:
+                pass
+
+
+    async def delete_controller(self):
+        if self.__controller_msg:
+            try:
+                await self.__controller_msg.delete()
+            except discord.errors.NotFound:
+                pass
     
 
+    # 再生キューのEmbedを取得
     def get_queue_embed(self):
         if self.queue:
             count = 0
@@ -295,19 +319,6 @@ class Player:
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
         return embed
-
-    
-    # コントローラーを再生成
-    async def regenerate_controller(self, channel: discord.TextChannel):
-        self.__channel = channel
-        old_msg = self.__controller_msg
-        self.__controller_msg = await channel.send(**self.get_controller())
-
-        if old_msg:
-            try:
-                await old_msg.delete()
-            except discord.errors.NotFound:
-                pass
 
 
     # 1つ前の曲に戻る

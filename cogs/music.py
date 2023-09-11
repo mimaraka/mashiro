@@ -32,10 +32,8 @@ class Music(commands.Cog):
 
     # マシロをプレーヤーとしてボイスチャンネルに接続させるときの共通処理
     async def connect(self, vc: discord.VoiceChannel):
+        self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         await vc.connect()
-        # ここで処理が打ち切られることがたまにある(VCに接続はするがPlayerが作成されない)
-        if not vc.guild.id in self.__player:
-            self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         mashilog("ボイスチャンネルに正常に接続しました。")
         return self.__player[vc.guild.id]
 
