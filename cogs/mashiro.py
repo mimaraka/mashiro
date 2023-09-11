@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import random
+from modules.myembed import MyEmbed
 
 
 MASHIRO_QUOTES_BIRTHDAY = [
@@ -69,6 +70,8 @@ class Mashiro(commands.Cog):
     # マシロのセリフをランダムに送信
     @app_commands.command(name="mashiro", description="私に何かご用ですか？")
     async def mashiro(self, itrc: discord.Interaction, n: int = 1):
+        if n > 99:
+            await itrc.response.send_message(embed=MyEmbed(notification_type="error", description="リクエスト数が多すぎます。(最大リクエスト数は99です)"), ephemeral=True)
         for _ in range(n):
             mashiro_quote = self.get_mashiro_quote()
             try:

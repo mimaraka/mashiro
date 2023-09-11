@@ -7,6 +7,7 @@ import traceback
 import typing
 import modules.utils as utils
 from modules.myembed import MyEmbed
+from modules.mashilog import mashilog
 from modules.music.track import Track, LocalTrack
 from modules.music.playerview import PlayerView
 from modules.music.errors import *
@@ -179,6 +180,8 @@ class Player:
 
     # 音楽再生後(及びエラー発生時)に呼ばれるコールバック
     async def __after_callback(self, error):
+        await self.__current_track.release_source()
+
         if error:
             print(f"An error occurred while playing.")
             traceback.print_exception(error)
@@ -277,7 +280,7 @@ class Player:
         if self.queue:
             count = 0
             while 1:
-                track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}"]
+                track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}\n"]
                 for i, track in enumerate(self.queue[:-count] if count else self.queue):
                     track_titles.append(f"{i + 1}. {self.__track_text(track)}")
                 if count:
