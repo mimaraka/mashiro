@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 
 from modules.kotobagari import kotobagari_proc
+from modules.mashilog import mashilog
 import constants as const
 
 from cogs.mashiro import Mashiro
@@ -21,9 +22,7 @@ load_dotenv(os.path.dirname(__file__) + ".env")
 # bot起動時のイベント
 @bot.event
 async def on_ready():
-    print("*" * 64)
-    print(const.STR_ON_READY)
-    print("*" * 64)
+    mashilog("ようこそ、先生。今日も一緒に、正義のために頑張りましょう。")
     await bot.tree.sync()
     activity = discord.Activity(name="/play", type=discord.ActivityType.listening)
     await bot.change_presence(activity=activity)
