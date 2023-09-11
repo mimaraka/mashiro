@@ -30,8 +30,8 @@ class Music(discord.Cog):
 
     # マシロをプレーヤーとしてボイスチャンネルに接続させるときの共通処理
     async def connect(self, vc: discord.VoiceChannel):
-        self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         await vc.connect()
+        self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         mashilog("ボイスチャンネルに正常に接続しました。")
         return self.__player[vc.guild.id]
 
@@ -59,9 +59,10 @@ class Music(discord.Cog):
             if after.channel is not None and before.channel is None:
                 mashilog(f"ボイスチャンネルに接続しました。", guild=member.guild, channel=after.channel)
                 # Playerが作成されていない場合は作成する
+                asyncio.sleep(1)
                 if not member.guild.id in self.__player:
                     self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
-                    mashilog("playerオブジェクトが存在しないため、作成しました。")
+                    mashilog("playerオブジェクトが作成されていないため、作成しました。")
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)

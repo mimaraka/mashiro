@@ -69,7 +69,7 @@ class Mashiro(discord.Cog):
     @discord.option("n", description="送信する回数(1~99)", min_value=1, max_value=99, default=1, required=False)
     async def mashiro(self, ctx: discord.ApplicationContext, n: int):
         for _ in range(n):
-            ctx.respond(self.get_mashiro_quote())
+            await ctx.respond(self.get_mashiro_quote())
 
 
     # メンションされたとき
