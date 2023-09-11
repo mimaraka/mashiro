@@ -262,8 +262,8 @@ class Player:
             view = None
 
         embed.set_author(name="🎵 プレイヤー")
-        author = self.__current_track.author
-        embed.set_footer(text=f"{author.display_name} 先生が追加", icon_url=author.display_avatar.url)
+        member = self.__current_track.member
+        embed.set_footer(text=f"{member.display_name} 先生が追加", icon_url=member.display_avatar.url)
         return {
             "embed": embed,
             "view": view
