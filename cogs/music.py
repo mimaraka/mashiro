@@ -59,7 +59,7 @@ class Music(discord.Cog):
             if after.channel is not None and before.channel is None:
                 mashilog(f"ボイスチャンネルに接続しました。", guild=member.guild, channel=after.channel)
                 # Playerが作成されていない場合は作成する
-                asyncio.sleep(1)
+                await asyncio.sleep(1)
                 if not member.guild.id in self.__player:
                     self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
                     mashilog("playerオブジェクトが作成されていないため、作成しました。")
