@@ -15,7 +15,7 @@ class ButtonBack(discord.ui.Button):
         super().__init__(style=ButtonStyle.primary, emoji="⏮️")
 
     async def callback(self, inter: discord.Interaction) -> Any:
-        if self.__player.current_track.author.id != inter.user.id:
+        if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         if time.time() - self.__player.time_started > 5:
@@ -35,7 +35,7 @@ class ButtonPlay(discord.ui.Button):
         super().__init__(style=ButtonStyle.primary, emoji="▶️")
 
     async def callback(self, inter: discord.Interaction) -> Any:
-        if self.__player.current_track.author.id != inter.user.id:
+        if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         await self.__player.resume()
@@ -49,7 +49,7 @@ class ButtonPause(discord.ui.Button):
         super().__init__(style=ButtonStyle.primary, emoji="⏸️")
 
     async def callback(self, inter: discord.Interaction) -> Any:
-        if self.__player.current_track.author.id != inter.user.id:
+        if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         await self.__player.pause()
@@ -63,7 +63,7 @@ class ButtonSkip(discord.ui.Button):
         super().__init__(style=ButtonStyle.primary, emoji="⏭️")
 
     async def callback(self, inter: discord.Interaction) -> Any:
-        if self.__player.current_track.author.id != inter.user.id:
+        if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
         self.__player.skip()
