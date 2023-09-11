@@ -65,12 +65,14 @@ class Music(commands.Cog):
                 # Playerが作成されていない場合は作成する
                 if not member.guild.id in self.__player:
                     self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
+                    mashilog("playerオブジェクトが存在しないため、作成しました。")
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
                 # まだPlayerが残っていれば削除する
                 if member.guild.id in self.__player:
                     self.__player.pop(member.guild.id)
+                    mashilog("playerオブジェクトが残っていたため、削除しました。")
             return
         
         # マシロがボイスチャンネルに接続していない場合は無視する
@@ -112,8 +114,8 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         for player in self.__player.values():
-            mashilog(f"プレイヤーメッセージが削除されました。", guild=message.guild)
             if player.controller_msg and message.id == player.controller_msg.id and not player.is_stopped:
+                mashilog(f"プレイヤーメッセージが削除されました。再生成します。", guild=message.guild)
                 await player.regenerate_controller(message.channel)
 
 
@@ -376,17 +378,16 @@ class Music(commands.Cog):
 
     # /shuffle
     @app_commands.command(name="shuffle", description="シャッフル再生のオン/オフを変更します。")
-    @app_commands.describe(onoff="シャッフル再生のオン/オフ(True/False)")
-    @app_commands.rename(onoff="on-off")
-    async def command_shuffle(self, inter: discord.Interaction, onoff: bool):
+    @app_commands.describe(switch="シャッフル再生のオン/オフ(True/False)")
+    async def command_shuffle(self, inter: discord.Interaction, switch: bool):
         player = self.__player.get(inter.guild.id)
         if player is None:
             await inter.response.send_message(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        player.shuffle = onoff
+        player.shuffle = switch
         
         await inter.response.send_message(
-            embed=MyEmbed(title=f"🔀 シャッフル再生を{'オン' if onoff else 'オフ'}にしました。"),
+            embed=MyEmbed(title=f"🔀 シャッフル再生を{'オン' if switch else 'オフ'}にしました。"),
             delete_after=10
         )
 

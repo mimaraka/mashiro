@@ -65,9 +65,9 @@ class Player:
         return self.__shuffle
     
     @shuffle.setter
-    def shuffle(self, onoff: bool):
-        self.__shuffle = onoff
-        if onoff:
+    def shuffle(self, switch: bool):
+        self.__shuffle = switch
+        if switch:
             random.shuffle(self.__queue_idcs)
         else:
             self.__queue_idcs = [i for i in range(self.__current_index + 1, len(self.__playlist))]
@@ -189,6 +189,7 @@ class Player:
         
         # 中断により停止された場合
         if self.__flag_aborted:
+            mashilog("再生を中断しました。", guild=self.__voice_client.guild)
             self.__flag_aborted = False
             return
         
@@ -225,6 +226,7 @@ class Player:
         self.__current_track = None
         await self.__controller_msg.delete()
         self.__controller_msg = None
+        mashilog("再生情報をリセットしました。", guild=self.__voice_client.guild)
 
 
     # キューを空にする

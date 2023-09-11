@@ -17,10 +17,10 @@ def mashilog(content, *, log_type: LogType="info", guild: discord.Guild=None, ch
     print(log_text)
 
     if guild:
-        print(f"\t\t\t\t \033[1;33mGuild:\033[m {guild.name} ({guild.id})")
+        print(f"\t\t\t\t \033[1;33mguild:\033[m {guild.name} ({guild.id})")
     if channel:
-        print(f"\t\t\t\t \033[1;33mChannel:\033[m {channel.name} ({channel.id})")
+        print(f"\t\t\t\t \033[1;33mchannel:\033[m {channel.name} ({channel.id})")
     if member:
-        print(f"\t\t\t\t \033[1;33mMember:\033[m {member.name} ({member.id})")
+        print(f"\t\t\t\t \033[1;33mmember:\033[m {member.name} ({member.id})")
     for key in options:
         print(f"\t\t\t\t \033[1;33m{key}:\033[m {options[key]}")
