@@ -11,4 +11,9 @@
 [こちらのリンク](https://discord.com/api/oauth2/authorize?client_id=1105880759857860709&permissions=4915795037248&scope=bot%20applications.commands)からサーバーに導入してください。
 
 ## 使い方
+`/play [URL/キーワード]`で、URLやキーワードから音楽を再生することができます。  
+YouTube、ニコニコ動画、SoundCloud、BiliBiliなど多数の動画・音楽サイトに対応しています。
+
+また、`/play-file`コマンドで、ローカルの音声ファイルをアップロードして再生することもできます。
+
 詳細は`/help`コマンドからご確認ください。
