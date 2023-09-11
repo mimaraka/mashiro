@@ -119,8 +119,8 @@ class Player:
     
 
     # キューとプレイリストにソースを積む
-    async def register_tracks(self, inter: discord.Interaction, tracks: typing.List[Track], silent=False):
-        self.__channel = inter.channel
+    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], silent=False):
+        self.__channel = ctx.channel
         self.__playlist += tracks
         self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
         if self.__shuffle:
@@ -133,14 +133,12 @@ class Player:
                 if len(tracks) > 5:
                     description += f"\n(他{len(tracks) - 5}曲)"
                 embed = MyEmbed(title="再生キューに追加しました！", description=description)
-                message = await inter.followup.send(embed=embed)
+                await ctx.respond(embed=embed, delete_after=10)
             await self.update_controller()
-            await asyncio.sleep(10)
-            await message.delete()
         else:
             if not silent:
                 embed = MyEmbed(notification_type="inactive", title="⏳ 処理中です……。")
-                msg_proc = await inter.followup.send(embed=embed)
+                msg_proc = await ctx.respond(embed=embed)
             else:
                 msg_proc = None
             await self.__play(msg_proc=msg_proc, silent=silent)
@@ -386,8 +384,7 @@ class Player:
 
 
     # マシロのボイスをランダムで再生する
-    async def play_random_voice(self, inter: discord.Interaction, on_connect=False):
-        author = inter.guild.get_member(inter.user.id)
+    async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False):
         # 入室時のボイス
         if on_connect:
             voices = glob.glob("data/assets/voices/on_connect/*.*")
@@ -396,5 +393,5 @@ class Player:
 
         picked_voice = random.choice(voices)
         if not on_connect:
-            await inter.response.defer()
-        await self.register_tracks(inter, [LocalTrack(picked_voice, author)], silent=on_connect)
+            await ctx.defer()
+        await self.register_tracks(ctx, [LocalTrack(picked_voice, ctx.author)], silent=on_connect)

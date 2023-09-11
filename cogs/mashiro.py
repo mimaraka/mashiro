@@ -2,10 +2,7 @@ import asyncio
 import csv
 import datetime
 import discord
-from discord.ext import commands
-from discord import app_commands
 import random
-from modules.myembed import MyEmbed
 
 
 MASHIRO_QUOTES_BIRTHDAY = [
@@ -28,9 +25,9 @@ MASHIRO_QUOTES_NEWYEAR = [
 ]
 
 
-class Mashiro(commands.Cog):
+class Mashiro(discord.Cog):
     def __init__(self, bot) -> None:
-        self.bot = bot
+        self.bot: discord.Bot = bot
 
 
     # ランダムでマシロのセリフを返す関数
@@ -68,21 +65,16 @@ class Mashiro(commands.Cog):
 
 
     # マシロのセリフをランダムに送信
-    @app_commands.command(name="mashiro", description="私に何かご用ですか？")
-    async def mashiro(self, itrc: discord.Interaction, n: int = 1):
-        if n > 99:
-            await itrc.response.send_message(embed=MyEmbed(notification_type="error", description="リクエスト数が多すぎます。(最大リクエスト数は99です)"), ephemeral=True)
+    @discord.slash_command(name="mashiro", description="私に何かご用ですか？")
+    @discord.option("n", description="送信する回数(1~99)", min_value=1, max_value=99, default=1, required=False)
+    async def mashiro(self, ctx: discord.ApplicationContext, n: int):
         for _ in range(n):
-            mashiro_quote = self.get_mashiro_quote()
-            try:
-                await itrc.response.send_message(mashiro_quote)
-            except discord.InteractionResponded:
-                await itrc.channel.send(mashiro_quote)
+            ctx.respond(self.get_mashiro_quote())
 
 
     # メンションされたとき
-    @commands.Cog.listener()
-    async def on_message(self, message):
+    @discord.Cog.listener()
+    async def on_message(self, message: discord.Message):
         if self.bot.user.mentioned_in(message):
             # 自撮りを送る
             if "自撮り" in message.content:

@@ -23,12 +23,12 @@ async def is_mimetype(url, mimetypes_list) -> bool:
 
 
 # URLが有効ならメッセージのオブジェクトを返し、無効ならNoneを返す
-async def get_message_from_url(mes_url: str, client: discord.Client) -> discord.Message | None:
+async def get_message_from_url(mes_url: str, bot: discord.Bot) -> discord.Message | None:
     if re.fullmatch(r"^https://discord.com/channels/\d+/\d+/\d+$", mes_url):
         parts = mes_url.split("/")
         channel_id = int(parts[-2])
         message_id = int(parts[-1])
-        channel = client.get_channel(channel_id)
+        channel = bot.get_channel(channel_id)
         if type(channel) is discord.TextChannel:
             try:
                 return await channel.fetch_message(message_id)
@@ -84,7 +84,7 @@ MIMETYPES_FFMPEG = [
 ]
 
 # 添付ファイルを取得する関数
-async def get_attachments(itrc: discord.Interaction, mimetypes, message_url: str=None, return_url=False):
+async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_url: str=None, return_url=False):
     # media_mime = {
     #     "image":            ["image/png", "image/pjpeg", "image/jpeg", "image/x-icon", "image/bmp"],
     #     "gif":              ["image/gif"],
@@ -99,24 +99,32 @@ async def get_attachments(itrc: discord.Interaction, mimetypes, message_url: str
 
     # メッセージURLが指定されている場合
     if message_url:
-        message = await get_message_from_url(message_url, itrc.client)
+        message = await get_message_from_url(message_url, ctx.bot)
         # メッセージURLが無効の場合
         if not message:
-            await itrc.response.send_message(
-                embed=MyEmbed(notification_type="error", description="リンクからのメッセージの取得に失敗しました。")
+            await ctx.respond(
+                embed=MyEmbed(
+                    notification_type="error",
+                    description="リンクからのメッセージの取得に失敗しました。"
+                ),
+                ephemeral=True
             )
             return None
         valid_urls = await find_valid_urls(message, mimetypes)
         # リンク先のメッセージにファイルやURLが添付されていなかった場合
         if not valid_urls:
-            await itrc.response.send_message(
-                embed=MyEmbed(notification_type="error", description="リンク先のメッセージにファイルやURLが添付されていないようです。")
+            await ctx.respond(
+                embed=MyEmbed(
+                    notification_type="error",
+                    description="リンク先のメッセージにファイルやURLが添付されていないようです。"
+                ),
+                ephemeral=True
             )
             return None
 
     else:
         #直近10件のメッセージの添付ファイル・URLの取得を試みる
-        async for message in itrc.channel.history(limit=10):
+        async for message in ctx.channel.history(limit=10):
             valid_urls = await find_valid_urls(message, mimetypes)
             # 有効なURLが存在すればループを抜ける
             if valid_urls:
@@ -127,7 +135,7 @@ async def get_attachments(itrc: discord.Interaction, mimetypes, message_url: str
                 notification_type="error",
                 description="ファイルやURLが添付されたメッセージの近くでコマンドを実行するか、メッセージのリンクを指定してください。"
             )
-            await itrc.response.send_message(embed=embed)
+            await ctx.respond(embed=embed, ephemeral=True)
             return None
 
     # URLのリストを返す

@@ -1,6 +1,4 @@
 import discord
-from discord import app_commands
-from discord.ext import commands
 import json
 from modules.myembed import MyEmbed
 
@@ -116,12 +114,12 @@ class NickChanger:
 
 
 
-class NickChanger(commands.Cog):
+class NickChanger(discord.Cog):
     DATA_PATH = "data/old_nicks.json"
 
     # コンストラクタ
     def __init__(self, bot) -> None:
-        self.bot: commands.Bot = bot
+        self.bot: discord.Bot = bot
 
 
     # 全メンバーの元のニックネームが格納された辞書をjsonファイルから取得する
@@ -199,7 +197,7 @@ class NickChanger(commands.Cog):
 
 
     # Bot起動時
-    @commands.Cog.listener()
+    @discord.Cog.listener()
     async def on_ready(self):
         data = self.__get_json()
         guilds = [self.bot.get_guild(int(key)) for key in data.keys()]
@@ -210,7 +208,7 @@ class NickChanger(commands.Cog):
             self.__change_nick(guild, nick)
 
 
-    @commands.Cog.listener()
+    @discord.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         # ニックネームがBotによって変更されたユーザーの場合
         nc = NickChanger(after.guild)
@@ -218,7 +216,7 @@ class NickChanger(commands.Cog):
             await nc.change_nick()
 
         
-    @commands.Cog.listener()
+    @discord.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         if self.__guild_is_nick_changed(member.guild):
             self.__change_member_nick(member, self.__get_guild_replaced_nick(member.guild))
@@ -226,24 +224,30 @@ class NickChanger(commands.Cog):
 
 
     # ギルドメンバー全員のニックネームを変更するコマンド
-    @app_commands.command(name="change-nick", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)")
-    @app_commands.checks.has_permissions(administrator=True)
-    @app_commands.checks.bot_has_permissions(manage_nicknames=True)
-    async def change_nick(self, itrc: discord.Interaction, nick: str):
+    @discord.slash_command(name="change-nick", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)")
+    async def change_nick(self, ctx: discord.ApplicationContext, nick: str):
+        if ctx.guild is None:
+            ctx.respond(embed=MyEmbed(notification_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
+            return
+        elif not ctx.me.top_role.permissions.manage_nicknames:
+            ctx.respond(embed=MyEmbed(notification_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
+            return
+        elif not ctx.author.top_role.permissions.administrator and ctx.author != ctx.guild.owner:
+            ctx.respond(embed=MyEmbed(notification_type="error", description="管理者権限のないメンバーは実行できません。"))
+            return
+        
         # このコマンドがすでに実行されている場合
-        if self.__guild_is_nick_changed(itrc.guild):
-            itrc.response.send_message(embed=MyEmbed(notification_type="error", description="このコマンドはすでに実行されているようです。"))
+        if self.__guild_is_nick_changed(ctx.guild):
+            ctx.respond(embed=MyEmbed(notification_type="error", description="このコマンドはすでに実行されているようです。"))
             return
         # 警告ダイアログ
-        self.__save_guild_replaced_nick(itrc.guild, nick)
-        for member in itrc.guild.members:
+        self.__save_guild_replaced_nick(ctx.guild, nick)
+        for member in ctx.guild.members:
             self.__save_member_old_nick(member)
             self.__change_member_nick(member, nick)
 
 
     # ギルドメンバー全員のニックネームを元に戻すコマンド
-    @app_commands.command(name="restore-nick", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)")
-    @app_commands.checks.has_permissions(administrator=True)
-    @app_commands.checks.bot_has_permissions(manage_nicknames=True)
-    async def restore_nick(self, itrc: discord.Interaction):
+    @discord.slash_command(name="restore-nick", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)")
+    async def restore_nick(self, ctx: discord.ApplicationContext):
         pass
