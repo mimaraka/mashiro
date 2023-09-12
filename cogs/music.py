@@ -413,8 +413,11 @@ class Music(discord.Cog):
         tasks = []
         async for message in channel.history(limit=n):
             tasks += [ytdl_create_tracks(self.bot.loop, url, ctx.author) for url in await find_valid_urls(message)]
+            mashilog("[play-channel]メッセージを取得しました。")
 
+        mashilog("[play-channel]処理を開始します。", guild=ctx.guild)
         results = await asyncio.gather(*tasks)
+        mashilog("[play-channel]処理が終了しました。", guild=ctx.guild)
         tracks = []
         for result in results:
             if result:
