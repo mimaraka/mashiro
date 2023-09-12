@@ -416,7 +416,7 @@ class Music(discord.Cog):
         # await asyncio.gather()で同時処理しようとすると重すぎて(通信量が多すぎて？)再生が途切れ途切れになってしまう
 
         tracks = []
-        async for i, message in enumerate(channel.history(limit=n)):
+        for i, message in enumerate(await channel.history(limit=n)):
             async for url in find_valid_urls(message):
                 if response := await ytdl_create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{i + 1} / {n}**\n\n"
@@ -435,7 +435,7 @@ class Music(discord.Cog):
             return
         
         msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。"))
-        
+
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
