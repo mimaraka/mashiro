@@ -420,7 +420,7 @@ class Music(discord.Cog):
         async for message in channel.history(limit=n):
             for url in await find_valid_urls(message):
                 if response := await ytdl_create_tracks(self.bot.loop, url, ctx.author):
-                    description = f"メッセージ : **{message_count} / {n}**\n\n"
+                    description = f"メッセージ : **{message_count}** / {n}\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
                     embed.description = description
                     tracks += response
