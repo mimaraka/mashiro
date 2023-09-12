@@ -418,7 +418,7 @@ class Music(discord.Cog):
         tracks = []
         message_count = 1
         async for message in channel.history(limit=n):
-            async for url in find_valid_urls(message):
+            for url in await find_valid_urls(message):
                 if response := await ytdl_create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count} / {n}**\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
