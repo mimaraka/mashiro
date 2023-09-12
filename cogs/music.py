@@ -195,7 +195,9 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
-        await ctx.defer()
+        inter = await ctx.respond()
+        msg_proc = inter.original_response()
+
         tracks = await ytdl_create_tracks(self.bot.loop, text, ctx.author)
         if not tracks:
             await ctx.respond(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
@@ -408,36 +410,22 @@ class Music(discord.Cog):
             return
         
         await ctx.defer()
-        msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 1. 検索中です……。"))
+        embed = MyEmbed(notification_type="inactive", title="⏳ 1. 検索中です……。")
+        msg_search = await ctx.channel.send(embed=embed)
 
-        tasks = []
-        async for message in channel.history(limit=n):
-            tasks += [ytdl_create_tracks(self.bot.loop, url, ctx.author) for url in await find_valid_urls(message)]
-            mashilog("メッセージを取得しました。", ctx)
+        # await asyncio.gather()で同時処理しようとすると重すぎて(通信量が多すぎて？)再生が途切れ途切れになってしまう
 
-        embed = MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。")
-        await msg_proc.edit(embed=embed)
-
-        count = 1
         tracks = []
-        mashilog("処理を開始します。", ctx, guild=ctx.guild)
-        #results = await asyncio.gather(*tasks)
-        for task in tasks:
-            if response := await task:
-                for track in response:
-                    tracks.append(track)
-                    embed.description = f"{count}. {player.track_text(track)}"
-                    await msg_proc.edit(embed=embed)
-                    mashilog(f"{count}曲のトラックを処理しました")
-                    count += 1
+        async for i, message in enumerate(channel.history(limit=n)):
+            async for url in find_valid_urls(message):
+                if response := await ytdl_create_tracks(self.bot.loop, url, ctx.author):
+                    description = f"メッセージ : **{i + 1} / {n}**\n\n"
+                    description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
+                    embed.description = description
+                    tracks += response
+                    await msg_search.edit(embed=embed)
 
-        mashilog("処理が終了しました。", ctx, guild=ctx.guild)
-        # tracks = []
-        # for result in results:
-        #     if result:
-        #         tracks += result
-
-        await msg_proc.delete()
+        await msg_search.delete()
 
         if not tracks:
             await ctx.respond(
@@ -446,7 +434,9 @@ class Music(discord.Cog):
             )
             return
         
-        await player.register_tracks(ctx, tracks)
+        msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。"))
+        
+        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
     # /play-file

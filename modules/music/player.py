@@ -117,9 +117,26 @@ class Player:
             result += f" ({track.duration})"
         return result
     
+    # 複数のトラック情報のテキストを生成
+    def tracks_text(self, tracks: typing.List[Track], start_index: int=1, max_length: int=4096):
+        view_count = 10
+        while True:
+            track_text_list = []
+            for i, track in enumerate(tracks[:view_count]):
+                track_text_list.append(f"{i + start_index}. {self.track_text(track)}")
+                if len(tracks) - view_count > 0:
+                    track_text_list.append(f"他{len(tracks) - view_count}曲")
+            result = "\n".join(track_text_list)
+            if len(result) <= max_length:
+                break
+            view_count -= 1
+            if not view_count:
+                return ""
+        return result
+    
 
     # キューとプレイリストにソースを積む
-    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], silent=False):
+    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], msg_proc: discord.Message=None, silent=False):
         self.__channel = ctx.channel
         self.__playlist += tracks
         self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
@@ -129,18 +146,12 @@ class Player:
         # 停止していない場合
         if not self.is_stopped:
             if not silent:
-                description = "\n".join([self.track_text(t) for t in tracks][:5])
-                if len(tracks) > 5:
-                    description += f"\n(他{len(tracks) - 5}曲)"
-                embed = MyEmbed(title="再生キューに追加しました！", description=description)
+                if msg_proc:
+                    await msg_proc.delete()
+                embed = MyEmbed(title="再生キューに追加しました！", description=self.tracks_text(tracks))
                 await ctx.respond(embed=embed, delete_after=10)
             await self.update_controller()
         else:
-            if not silent:
-                embed = MyEmbed(notification_type="inactive", title="⏳ 処理中です……。")
-                msg_proc = await ctx.respond(embed=embed)
-            else:
-                msg_proc = None
             await self.__play(msg_proc=msg_proc, silent=silent)
 
 
@@ -302,17 +313,8 @@ class Player:
     # 再生キューのEmbedを取得
     def get_queue_embed(self):
         if self.queue:
-            count = 0
-            while 1:
-                track_titles = [f"▶️ {self.track_text(self.current_track, italic=True)}\n"]
-                for i, track in enumerate(self.queue[:-count] if count else self.queue):
-                    track_titles.append(f"{i + 1}. {self.track_text(track)}")
-                if count:
-                    track_titles.append(f"(他{count}曲)")
-                description = "\n".join(track_titles)
-                if len(description) < 4096:
-                    break
-                count += 1
+            description = f"▶️ {self.track_text(self.current_track, italic=True)}\n\n"
+            description += self.tracks_text(self.queue, max_length=4096 - len(description))
             embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲)", description=description)
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
