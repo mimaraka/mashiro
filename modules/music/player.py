@@ -124,8 +124,8 @@ class Player:
             track_text_list = []
             for i, track in enumerate(tracks[:view_count]):
                 track_text_list.append(f"{i + start_index}. {self.track_text(track)}")
-                if len(tracks) - view_count > 0:
-                    track_text_list.append(f"他{len(tracks) - view_count}曲")
+            if len(tracks) - view_count > 0:
+                track_text_list.append(f"(他{len(tracks) - view_count}曲)")
             result = "\n".join(track_text_list)
             if len(result) <= max_length:
                 break
