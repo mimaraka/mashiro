@@ -6,4 +6,5 @@ niconico.py==1.2.4
 python-dotenv==1.0.0
 requests==2.31.0
 typing_extensions==4.7.1
+youtube-search-python==1.6.6
 yt-dlp==2023.7.6

@@ -2,6 +2,7 @@ import asyncio
 import discord
 import time
 from typing import Dict
+from youtubesearchpython import VideosSearch
 
 import modules.utils as utils
 import modules.attachments as atc
@@ -19,6 +20,15 @@ EMBED_QUEUE_EMPTY = MyEmbed(notification_type="error", description="再生キュ
 EMBED_BOT_ANOTHER_VC = MyEmbed(notification_type="error", description="私は既に別のボイスチャンネルに接続しています。")
 EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notification_type="error", description="先生がボイスチャンネルに接続されていないようです。")
 EMBED_FAILED_TRACK_CREATION = MyEmbed(notification_type="error", description="トラックの生成に失敗しました。")
+
+
+async def yt_title_autocomplete(ctx: discord.AutocompleteContext):
+    if not ctx.value:
+        return []
+    search_result = await ctx.bot.loop.run_in_executor(
+        None, lambda: VideosSearch(ctx.value, limit=6)
+    )
+    return [info.get("title") for info in search_result.result().get("result")]
 
 
 class Music(discord.Cog):
@@ -167,10 +177,13 @@ class Music(discord.Cog):
         
     # /play
     @discord.slash_command(name="play", description="指定されたURLまたはキーワードの曲を再生します。")
-    async def command_play(self,
-                           ctx: discord.ApplicationContext,
-                           text: discord.Option(str, name="url-or-keyword", description="再生したい曲のURL、またはYouTube上で検索するキーワード", )
-    ):
+    @discord.option(
+        parameter_name="text",
+        name="input",
+        description="再生したい曲のURL、またはYouTube上で検索するタイトル",
+        autocomplete=yt_title_autocomplete
+    )
+    async def command_play(self, ctx: discord.ApplicationContext, text: str):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
