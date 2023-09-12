@@ -195,7 +195,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
-        inter = await ctx.respond()
+        inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
         msg_proc = inter.original_response()
 
         tracks = await ytdl_create_tracks(self.bot.loop, text, ctx.author)
