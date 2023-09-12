@@ -202,7 +202,7 @@ class Music(discord.Cog):
         if not tracks:
             await ctx.respond(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
             return
-        await player.register_tracks(ctx, tracks)
+        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
         
 
     # /stop
