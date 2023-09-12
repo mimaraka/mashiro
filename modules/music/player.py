@@ -106,7 +106,7 @@ class Player:
 
     # トラック情報のテキストを生成
     @staticmethod
-    def __track_text(track: Track, italic=False):
+    def track_text(track: Track, italic=False):
         if track.original_url is not None:
             result = f"[{utils.escape_markdown(track.title)}]({track.original_url})"
         else:
@@ -129,7 +129,7 @@ class Player:
         # 停止していない場合
         if not self.is_stopped:
             if not silent:
-                description = "\n".join([self.__track_text(s) for s in tracks][:5])
+                description = "\n".join([self.track_text(t) for t in tracks][:5])
                 if len(tracks) > 5:
                     description += f"\n(他{len(tracks) - 5}曲)"
                 embed = MyEmbed(title="再生キューに追加しました！", description=description)
@@ -243,13 +243,13 @@ class Player:
                 title = "⏸️ 一時停止中です……。"
                 notification_type = "inactive"
             title += f" (🔊 {utils.escape_markdown(self.__voice_client.channel.name)})"
-            description = f"💿 {self.__track_text(self.__current_track, italic=True)}"
+            description = f"💿 {self.track_text(self.__current_track, italic=True)}"
             embed = MyEmbed(notification_type=notification_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
                 next_track = self.__playlist[self.__queue_idcs[0]]
                 name = f"再生キュー ({len(self.__queue_idcs)}曲)"
-                value = f"次に再生 : {self.__track_text(next_track)}"
+                value = f"次に再生 : {self.track_text(next_track)}"
                 embed.add_field(name=name, value=value, inline=False)
             # サムネイルを表示
             embed.set_image(url=self.__current_track.thumbnail)
@@ -304,9 +304,9 @@ class Player:
         if self.queue:
             count = 0
             while 1:
-                track_titles = [f"▶️ {self.__track_text(self.current_track, italic=True)}\n"]
+                track_titles = [f"▶️ {self.track_text(self.current_track, italic=True)}\n"]
                 for i, track in enumerate(self.queue[:-count] if count else self.queue):
-                    track_titles.append(f"{i + 1}. {self.__track_text(track)}")
+                    track_titles.append(f"{i + 1}. {self.track_text(track)}")
                 if count:
                     track_titles.append(f"(他{count}曲)")
                 description = "\n".join(track_titles)

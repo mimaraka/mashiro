@@ -408,20 +408,34 @@ class Music(discord.Cog):
             return
         
         await ctx.defer()
-        msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 検索中です……。"))
+        msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 1. 検索中です……。"))
 
         tasks = []
         async for message in channel.history(limit=n):
             tasks += [ytdl_create_tracks(self.bot.loop, url, ctx.author) for url in await find_valid_urls(message)]
-            mashilog("[play-channel]メッセージを取得しました。")
+            mashilog("メッセージを取得しました。", ctx)
 
-        mashilog("[play-channel]処理を開始します。", guild=ctx.guild)
-        results = await asyncio.gather(*tasks)
-        mashilog("[play-channel]処理が終了しました。", guild=ctx.guild)
+        embed = MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。")
+        await msg_proc.edit(embed=embed)
+
+        count = 1
         tracks = []
-        for result in results:
-            if result:
-                tracks += result
+        mashilog("処理を開始します。", ctx, guild=ctx.guild)
+        #results = await asyncio.gather(*tasks)
+        for task in tasks:
+            track = await task
+            if track:
+                tracks.append(track)
+                embed.description = f"{count}. {player.track_text(track)}"
+                await msg_proc.edit(embed=embed)
+                mashilog(f"{count}曲のトラックを処理しました")
+                count += 1
+
+        mashilog("処理が終了しました。", ctx, guild=ctx.guild)
+        # tracks = []
+        # for result in results:
+        #     if result:
+        #         tracks += result
 
         await msg_proc.delete()
 
