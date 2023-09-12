@@ -423,13 +423,13 @@ class Music(discord.Cog):
         mashilog("処理を開始します。", ctx, guild=ctx.guild)
         #results = await asyncio.gather(*tasks)
         for task in tasks:
-            track = await task
-            if track:
-                tracks.append(track)
-                embed.description = f"{count}. {player.track_text(track)}"
-                await msg_proc.edit(embed=embed)
-                mashilog(f"{count}曲のトラックを処理しました")
-                count += 1
+            if response := await task:
+                for track in response:
+                    tracks.append(track)
+                    embed.description = f"{count}. {player.track_text(track)}"
+                    await msg_proc.edit(embed=embed)
+                    mashilog(f"{count}曲のトラックを処理しました")
+                    count += 1
 
         mashilog("処理が終了しました。", ctx, guild=ctx.guild)
         # tracks = []
