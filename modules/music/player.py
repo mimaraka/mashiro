@@ -308,6 +308,31 @@ class Player:
                 await self.__controller_msg.delete()
             except discord.errors.NotFound:
                 pass
+
+
+    def get_queue_duration(self):
+        def text_to_sec(text: str):
+            hms = text.split(":")
+            result = 0
+            for i, s in enumerate(hms[::-1]):
+                result += int(s) * (60 ** i)
+            return result
+        
+        def sec_to_text(sec: int):
+            h = sec // 3600
+            m = (sec - h * 3600) // 60
+            s = sec % 60
+            if h:
+                result = f"{h}:{str(m).zfill(2)}:{str(s).zfill(2)}"
+            else:
+                result = f"{m}:{str(s).zfill(2)}"
+            return result
+        
+        sum = 0
+        for track in self.queue:
+            if track.duration is not None:
+                sum += text_to_sec(track.duration)
+        return sec_to_text(sum)
     
 
     # 再生キューのEmbedを取得
@@ -315,7 +340,7 @@ class Player:
         if self.queue:
             description = f"▶️ {self.track_text(self.current_track, italic=True)}\n\n"
             description += self.tracks_text(self.queue, max_length=4096 - len(description))
-            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲)", description=description)
+            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 - {self.get_queue_duration()})", description=description)
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
         return embed
