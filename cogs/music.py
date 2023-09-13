@@ -68,7 +68,7 @@ class Music(discord.Cog):
             # 自分がボイスチャンネルに接続したとき
             if after.channel is not None and before.channel is None:
                 mashilog(f"ボイスチャンネルに接続しました。", guild=member.guild, channel=after.channel)
-                # Playerが作成されていない場合は作成する
+                # 1秒経ってもPlayerが作成されていない場合は作成する
                 await asyncio.sleep(1)
                 if not member.guild.id in self.__player:
                     self.__player[member.guild.id] = Player(self.bot.loop, member.guild.voice_client)
@@ -76,7 +76,8 @@ class Music(discord.Cog):
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
-                # まだPlayerが残っていれば削除する
+                # 5秒経ってまだPlayerが残っていれば削除する
+                await asyncio.sleep(5)
                 if member.guild.id in self.__player:
                     self.__player.pop(member.guild.id)
                     mashilog("playerオブジェクトが残っていたため、削除しました。")
