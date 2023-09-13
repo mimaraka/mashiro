@@ -183,7 +183,8 @@ class Music(discord.Cog):
         description="再生したい曲のURL、またはYouTube上で検索するタイトル",
         autocomplete=yt_title_autocomplete
     )
-    async def command_play(self, ctx: discord.ApplicationContext, text: str):
+    @discord.option("interrupt", description="キューを無視して割り込み再生をさせるかどうか", required=False, default=False)
+    async def command_play(self, ctx: discord.ApplicationContext, text: str, interrupt: bool):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
