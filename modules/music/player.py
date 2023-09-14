@@ -180,9 +180,6 @@ class Player:
                     pass
             self.__controller_msg = await self.__channel.send(**controller)
 
-            if file := controller.get("file"):
-                os.remove(file.fp.name)
-
 
     # 指定したトラックを強制的に再生
     async def __play_track(self, track: Track):
@@ -242,6 +239,9 @@ class Player:
         self.__current_track = None
         await self.__controller_msg.delete()
         self.__controller_msg = None
+
+        for f in glob.glob(f"data/temp/cover_{self.__voice_client.guild.id}_*.*"):
+            os.remove(f)
         mashilog("再生情報をリセットしました。", guild=self.__voice_client.guild)
 
 
@@ -278,6 +278,7 @@ class Player:
                     embed.set_image(url=thumbnail)
                 # ローカルファイルのパスの場合
                 else:
+                    os.listdir("data/temp")
                     local_thumbnail = True
                     filename = "thumbnail" + os.path.splitext(thumbnail)[-1]
                     file = discord.File(fp=thumbnail, filename=filename)
@@ -312,19 +313,12 @@ class Player:
         else:
             await self.__controller_msg.edit(**controller)
 
-        if file := controller.get("file"):
-            os.remove(file.fp.name)
-
 
     # コントローラーを再生成
     async def regenerate_controller(self, channel: discord.TextChannel):
         self.__channel = channel
         old_msg = self.__controller_msg
-        controller = self.get_controller()
-        self.__controller_msg = await channel.send(**controller)
-
-        if file := controller.get("file"):
-            os.remove(file.fp.name)
+        self.__controller_msg = await channel.send(**self.get_controller())
 
         if old_msg:
             try:

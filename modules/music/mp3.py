@@ -1,4 +1,5 @@
 import aiohttp
+import discord
 import modules.utils as utils
 from modules.file import make_filename_by_seq
 from functools import reduce
@@ -25,7 +26,7 @@ async def is_id3v2(url: str):
             return data.startswith(b"ID3")
     
 
-async def get_id3v2_info(url: str):
+async def get_id3v2_info(url: str, guild: discord.Guild):
     async with aiohttp.ClientSession() as session:
         if (size_data := await get_range_data(session, url, 0, 10)) is None:
             return None
@@ -42,7 +43,7 @@ async def get_id3v2_info(url: str):
     
     if (apic := audio.tags.get("APIC:")) is not None:
         img = Image.open(BytesIO(apic.data))
-        filepath = make_filename_by_seq("data/temp/cover." + apic.mime.split("/")[-1])
+        filepath = make_filename_by_seq(f"data/temp/cover_{guild.id}.{apic.mime.split('/')[-1]}")
         img.save(filepath)
     else:
         filepath = None
