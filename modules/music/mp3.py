@@ -1,4 +1,5 @@
 import aiohttp
+import os
 import modules.utils as utils
 from modules.file import make_filename_by_seq
 from functools import reduce
@@ -43,6 +44,7 @@ async def get_id3v2_info(url: str):
     if (apic := audio.tags.get("APIC:")) is not None:
         img = Image.open(BytesIO(apic.data))
         filepath = make_filename_by_seq("data/temp/cover." + apic.mime.split("/")[-1])
+        print(os.listdir())
         img.save(filepath)
     else:
         filepath = None
