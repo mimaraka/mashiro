@@ -44,7 +44,6 @@ async def get_id3v2_info(url: str):
     if (apic := audio.tags.get("APIC:")) is not None:
         img = Image.open(BytesIO(apic.data))
         filepath = make_filename_by_seq("data/temp/cover." + apic.mime.split("/")[-1])
-        print(os.listdir("data"))
         img.save(filepath)
     else:
         filepath = None
