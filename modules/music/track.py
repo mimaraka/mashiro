@@ -6,6 +6,8 @@ import yt_dlp
 import urllib.request, urllib.error
 from typing import List
 from niconico import NicoNico
+from modules.music.mp3 import is_id3v2, get_id3v2_info
+from modules.attachments import is_mimetype
 from modules.mashilog import mashilog
 
 
@@ -119,7 +121,7 @@ Track = YTDLTrack | NicoNicoTrack | LocalTrack
 
 
 # YTDLを用いてテキストからトラックのリストを生成
-async def ytdl_create_tracks(loop, text: str, member: discord.Member) -> List[Track]:
+async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
     def zfill_duration(duration_string: str):
         if duration_string is not None:
             hms = duration_string.split(":")
@@ -145,9 +147,43 @@ async def ytdl_create_tracks(loop, text: str, member: discord.Member) -> List[Tr
     result = []
     for i in info_list:
         if i:
+            # ニコニコの場合
             if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url")):
-                result.append(NicoNicoTrack(i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), member))
+                result.append(
+                    NicoNicoTrack(
+                        i.get("original_url"),
+                        i.get("title"),
+                        i.get("thumbnail"),
+                        zfill_duration(i.get("duration_string")),
+                        member
+                    )
+                )
+            # MP3直リンクの場合
+            elif await is_mimetype(i.get("original_url", ["audio/mpeg"])) and await is_id3v2(i.get("original_url")):
+                if (data := await get_id3v2_info(i.get("original_url"))) is not None:
+                    result.append(
+                        YTDLTrack(
+                            loop,
+                            i.get("url"),
+                            i.get("original_url"),
+                            data.get("title") or i.get("title"),
+                            data.get("thumbnail"),
+                            data.get("duration"),
+                            member
+                        )
+                    )
+            # その他
             else:
-                result.append(YTDLTrack(loop, i.get("url"), i.get("original_url"), i.get("title"), i.get("thumbnail"), zfill_duration(i.get("duration_string")), member))
+                result.append(
+                    YTDLTrack(
+                        loop,
+                        i.get("url"),
+                        i.get("original_url"),
+                        i.get("title"),
+                        i.get("thumbnail"),
+                        zfill_duration(i.get("duration_string")),
+                        member
+                    )
+                )
 
     return result

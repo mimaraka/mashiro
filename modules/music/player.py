@@ -1,11 +1,14 @@
 import asyncio
 import discord
 import glob
+import os
 import random
+import re
 import time
 import traceback
 import typing
 import modules.utils as utils
+import constants as const
 from modules.myembed import MyEmbed
 from modules.mashilog import mashilog
 from modules.music.track import Track, LocalTrack
@@ -168,13 +171,17 @@ class Player:
             await msg_proc.delete()
         # コントローラーの更新
         if not silent:
+            controller = self.get_controller()
             if self.__controller_msg:
                 try:
-                    await self.__controller_msg.edit(**self.get_controller())
+                    await self.__controller_msg.edit(**controller)
                     return
                 except discord.errors.NotFound:
                     pass
-            self.__controller_msg = await self.__channel.send(**self.get_controller())
+            self.__controller_msg = await self.__channel.send(**controller)
+
+            if file := controller.get("file"):
+                os.remove(file.fp)
 
 
     # 指定したトラックを強制的に再生
@@ -245,6 +252,7 @@ class Player:
 
     # コントローラーを取得
     def get_controller(self):
+        local_thumbnail = False
         # 再生中または一時停止中の場合
         if self.is_playing or self.is_paused:
             if self.is_playing:
@@ -262,8 +270,18 @@ class Player:
                 name = f"再生キュー ({len(self.__queue_idcs)}曲)"
                 value = f"次に再生 : {self.track_text(next_track)}"
                 embed.add_field(name=name, value=value, inline=False)
+            
             # サムネイルを表示
-            embed.set_image(url=self.__current_track.thumbnail)
+            if thumbnail := self.__current_track.thumbnail:
+                # URLの場合
+                if re.fullmatch(const.RE_URL_PATTERN, thumbnail):
+                    embed.set_image(url=thumbnail)
+                # ローカルファイルのパスの場合
+                else:
+                    local_thumbnail = True
+                    filename = "thumbnail" + os.path.splitext(thumbnail)
+                    file = discord.File(fp=thumbnail, filename=filename)
+                    embed.set_image(url=f"attachment://{thumbnail}")
             
             # ボタンを表示
             view = PlayerView(self)
@@ -275,25 +293,38 @@ class Player:
         embed.set_author(name="🎵 プレイヤー")
         member = self.__current_track.member
         embed.set_footer(text=f"{member.display_name} 先生が追加", icon_url=member.display_avatar.url)
-        return {
+
+        result = {
             "embed": embed,
             "view": view
         }
+        if local_thumbnail:
+            result["file"] = file
+
+        return result
     
 
     # コントローラーを更新
     async def update_controller(self, inter: discord.Interaction=None):
+        controller = self.get_controller()
         if inter:
-            await inter.response.edit_message(**self.get_controller())
+            await inter.response.edit_message(**controller)
         else:
-            await self.__controller_msg.edit(**self.get_controller())
+            await self.__controller_msg.edit(**controller)
+
+        if file := controller.get("file"):
+            os.remove(file.fp)
 
 
     # コントローラーを再生成
     async def regenerate_controller(self, channel: discord.TextChannel):
         self.__channel = channel
         old_msg = self.__controller_msg
-        self.__controller_msg = await channel.send(**self.get_controller())
+        controller = self.get_controller()
+        self.__controller_msg = await channel.send(**controller)
+
+        if file := controller.get("file"):
+            os.remove(file.fp)
 
         if old_msg:
             try:
@@ -310,29 +341,12 @@ class Player:
                 pass
 
 
-    def get_queue_duration(self):
-        def text_to_sec(text: str):
-            hms = text.split(":")
-            result = 0
-            for i, s in enumerate(hms[::-1]):
-                result += int(s) * (60 ** i)
-            return result
-        
-        def sec_to_text(sec: int):
-            h = sec // 3600
-            m = (sec - h * 3600) // 60
-            s = sec % 60
-            if h:
-                result = f"{h}:{str(m).zfill(2)}:{str(s).zfill(2)}"
-            else:
-                result = f"{m}:{str(s).zfill(2)}"
-            return result
-        
+    def get_queue_duration(self):        
         sum = 0
         for track in self.queue:
             if track.duration is not None:
-                sum += text_to_sec(track.duration)
-        return sec_to_text(sum)
+                sum += utils.text_to_sec(track.duration)
+        return utils.sec_to_text(sum)
     
 
     # 再生キューのEmbedを取得
