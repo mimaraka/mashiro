@@ -181,7 +181,7 @@ class Player:
             self.__controller_msg = await self.__channel.send(**controller)
 
             if file := controller.get("file"):
-                os.remove(file.fp)
+                os.remove(str(file.fp))
 
 
     # 指定したトラックを強制的に再生
@@ -281,7 +281,7 @@ class Player:
                     local_thumbnail = True
                     filename = "thumbnail" + os.path.splitext(thumbnail)[-1]
                     file = discord.File(fp=thumbnail, filename=filename)
-                    embed.set_image(url=f"attachment://{thumbnail}")
+                    embed.set_image(url=f"attachment://{filename}")
             
             # ボタンを表示
             view = PlayerView(self)
@@ -313,7 +313,7 @@ class Player:
             await self.__controller_msg.edit(**controller)
 
         if file := controller.get("file"):
-            os.remove(file.fp)
+            os.remove(str(file.fp))
 
 
     # コントローラーを再生成
@@ -324,7 +324,7 @@ class Player:
         self.__controller_msg = await channel.send(**controller)
 
         if file := controller.get("file"):
-            os.remove(file.fp)
+            os.remove(str(file.fp))
 
         if old_msg:
             try:
