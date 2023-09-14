@@ -160,7 +160,7 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
                 )
             # MP3直リンクの場合
             elif await is_mimetype(i.get("original_url"), ["audio/mpeg"]) and await is_id3v2(i.get("original_url")):
-                if (data := await get_id3v2_info(i.get("original_url"))) is not None:
+                if (data := await get_id3v2_info(i.get("original_url"), member.guild)) is not None:
                     result.append(
                         YTDLTrack(
                             loop,
