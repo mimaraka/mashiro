@@ -1,5 +1,4 @@
 import aiohttp
-import os
 import modules.utils as utils
 from modules.file import make_filename_by_seq
 from functools import reduce

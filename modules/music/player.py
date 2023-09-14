@@ -279,7 +279,7 @@ class Player:
                 # ローカルファイルのパスの場合
                 else:
                     local_thumbnail = True
-                    filename = "thumbnail" + os.path.splitext(thumbnail)
+                    filename = "thumbnail" + os.path.splitext(thumbnail)[-1]
                     file = discord.File(fp=thumbnail, filename=filename)
                     embed.set_image(url=f"attachment://{thumbnail}")
             
