@@ -15,7 +15,7 @@ def make_filename_by_seq(filepath, seq_digit=5):
 
     max_seq = -1
     for f in files:
-        m = prog.match(os.path.basename(f))
+        m = prog.match(f)
         if m:
             max_seq = max(max_seq, int(m.group(1)))
     
