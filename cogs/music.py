@@ -412,9 +412,9 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        await ctx.defer()
         embed = MyEmbed(notification_type="inactive", title="⏳ 1. 検索中です……。")
-        msg_search = await ctx.channel.send(embed=embed)
+        inter = await ctx.respond(embed=embed)
+        msg_proc = await inter.original_response()
 
         # await asyncio.gather()で同時処理しようとすると重すぎて(通信量が多すぎて？)再生が途切れ途切れになってしまう
 
@@ -427,21 +427,19 @@ class Music(discord.Cog):
                     description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
                     embed.description = description
                     tracks += response
-                    await msg_search.edit(embed=embed)
+                    await msg_proc.edit(embed=embed)
             message_count += 1
         del message_count
 
-        await msg_search.delete()
-
         if not tracks:
+            await msg_proc.delete()
             await ctx.respond(
                 embed=MyEmbed(notification_type="error", description="チャンネル内に有効なトラックが見つかりませんでした。"),
                 ephemeral=True
             )
             return
         
-        msg_proc = await ctx.channel.send(embed=MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。"))
-
+        await msg_proc.edit(embed=MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。"))
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
