@@ -202,6 +202,7 @@ class Music(discord.Cog):
 
         tracks = await ytdl_create_tracks(self.bot.loop, text, ctx.author)
         if not tracks:
+            await msg_proc.delete()
             await ctx.respond(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
             return
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
@@ -467,15 +468,18 @@ class Music(discord.Cog):
             )
             return
         
-        await ctx.defer()
+        inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
+        msg_proc = await inter.original_response()
+
         tracks = await ytdl_create_tracks(self.bot.loop, attachment.url, ctx.author)
         if not tracks:
+            await msg_proc.delete()
             await ctx.respond(
                 embed=MyEmbed(notification_type="error", description="トラックの生成に失敗しました。"),
                 ephemeral=True
             )
             return
-        await player.register_tracks(ctx, tracks)
+        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
     # /voice
