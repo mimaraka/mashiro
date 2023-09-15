@@ -1,3 +1,4 @@
+import aiohttp
 import asyncio
 import discord
 import os
@@ -47,10 +48,11 @@ class YTDLTrack:
     async def create_source(self, volume):
         # 以前に生成したURLがまだ使えるか試してみる
         try:
-            r = urllib.request.urlopen(self.url)
-            r.close()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.url) as resp:
+                    resp.raise_for_status()
         # URLが切れている場合、再生成
-        except urllib.error.HTTPError:
+        except aiohttp.ClientResponseError:
             mashilog("YTDLSourceを再度生成します。")
             with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
                 info = await self.loop.run_in_executor(

@@ -12,13 +12,13 @@ async def is_mimetype(url, mimetypes_list) -> bool:
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                if resp.status == 200:
-                    mime = resp.headers.get("Content-type", "").lower()
-                    if any([mime == x for x in mimetypes_list]):
-                        return True
-                    else:
-                        return False
-    except:
+                resp.raise_for_status()
+                mime = resp.headers.get("Content-type", "").lower()
+                if any([mime == x for x in mimetypes_list]):
+                    return True
+                else:
+                    return False
+    except aiohttp.ClientResponseError:
         return False
 
 

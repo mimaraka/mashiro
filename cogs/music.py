@@ -363,7 +363,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
         await ctx.defer()
-        await ctx.respond(embed=player.get_queue_embed(), ephemeral=True)
+        await ctx.respond(embed=player.get_queue_embed(), ephemeral=True, delete_after=20)
 
 
     # /player

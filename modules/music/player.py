@@ -252,7 +252,7 @@ class Player:
 
     # コントローラーを取得
     def get_controller(self):
-        local_thumbnail = False
+        file = None
         # 再生中または一時停止中の場合
         if self.is_playing or self.is_paused:
             if self.is_playing:
@@ -278,7 +278,6 @@ class Player:
                     embed.set_image(url=thumbnail)
                 # ローカルファイルのパスの場合
                 else:
-                    local_thumbnail = True
                     filename = "thumbnail" + os.path.splitext(thumbnail)[-1]
                     file = discord.File(fp=thumbnail, filename=filename)
                     embed.set_image(url=f"attachment://{filename}")
@@ -294,14 +293,11 @@ class Player:
         member = self.__current_track.member
         embed.set_footer(text=f"{member.display_name} 先生が追加", icon_url=member.display_avatar.url)
 
-        result = {
+        return {
             "embed": embed,
-            "view": view
+            "view": view,
+            "file": file
         }
-        if local_thumbnail:
-            result["file"] = file
-
-        return result
     
 
     # コントローラーを更新
