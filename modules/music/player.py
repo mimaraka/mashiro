@@ -174,7 +174,7 @@ class Player:
             controller = self.get_controller()
             if self.__controller_msg:
                 try:
-                    await self.__controller_msg.edit(**controller)
+                    await self.__controller_msg.edit(**controller, attachments=[])
                     return
                 except discord.errors.NotFound:
                     pass
@@ -293,20 +293,23 @@ class Player:
         member = self.__current_track.member
         embed.set_footer(text=f"{member.display_name} 先生が追加", icon_url=member.display_avatar.url)
 
-        return {
+        result = {
             "embed": embed,
-            "view": view,
-            "file": file
+            "view": view
         }
+        if file is not None:
+            result["file"] = file
+
+        return result
     
 
     # コントローラーを更新
     async def update_controller(self, inter: discord.Interaction=None):
         controller = self.get_controller()
         if inter:
-            await inter.response.edit_message(**controller)
+            await inter.response.edit_message(**controller, attachments=[])
         else:
-            await self.__controller_msg.edit(**controller)
+            await self.__controller_msg.edit(**controller, attachments=[])
 
 
     # コントローラーを再生成

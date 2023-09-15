@@ -24,6 +24,7 @@ async def is_id3v2(url: str):
     async with aiohttp.ClientSession() as session:
         if (data := await get_range_data(session, url, 0, 2)) is not None:
             return data.startswith(b"ID3")
+        return False
     
 
 async def get_id3v2_info(url: str, guild: discord.Guild):
