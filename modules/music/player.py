@@ -116,8 +116,8 @@ class Player:
             result = utils.escape_markdown(track.title)
         decoration = "***" if italic else "**"
         result = f"{decoration}{result}{decoration}"
-        if track.duration:
-            result += f" ({track.duration})"
+        if track.duration is not None:
+            result += f" ({utils.make_duration_text(track.duration)})"
         return result
     
     # 複数のトラック情報のテキストを生成
@@ -331,14 +331,6 @@ class Player:
                 await self.__controller_msg.delete()
             except discord.errors.NotFound:
                 pass
-
-
-    def get_queue_duration(self):        
-        sum = 0
-        for track in self.queue:
-            if track.duration is not None:
-                sum += utils.text_to_sec(track.duration)
-        return utils.sec_to_text(sum)
     
 
     # 再生キューのEmbedを取得
@@ -346,7 +338,8 @@ class Player:
         if self.queue:
             description = f"▶️ {self.track_text(self.current_track, italic=True)}\n\n"
             description += self.tracks_text(self.queue, max_length=4096 - len(description))
-            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 - {self.get_queue_duration()})", description=description)
+            duration_sum = sum([track.duration for track in self.queue])
+            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 - {utils.make_duration_text(duration_sum)})", description=description)
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
         return embed

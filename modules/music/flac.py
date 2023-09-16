@@ -1,7 +1,6 @@
 import aiohttp
 import discord
 import re
-import modules.utils as utils
 from io import BytesIO
 from PIL import Image
 from modules.http import get_range_data
@@ -52,7 +51,7 @@ async def get_flac_info(url: str, guild: discord.Guild):
             sample_rate = int.from_bytes(data[10:13], "big") // 0x10
             n_samples = int.from_bytes(data[13:18], "big") & 0xFFFFFFFFF
             if sample_rate and n_samples:
-                duration = utils.sec_to_text(n_samples // sample_rate)
+                duration = n_samples // sample_rate
         elif block["type"] == "VORBIS_COMMENT":
             vendor_length = int.from_bytes(data[:4], "little")
 

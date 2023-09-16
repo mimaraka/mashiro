@@ -42,7 +42,7 @@ class YTDLTrack:
         self.original_url: str | None = original_url
         self.title: str = title
         self.thumbnail: str | None = thumbnail
-        self.duration: str | None = duration
+        self.duration: int | None = duration
         self.member: discord.Member = member
 
     # 生成されたURLは一定時間後に無効になるため、この関数を再生直前に実行する
@@ -77,7 +77,7 @@ class NicoNicoTrack:
         self.original_url: str | None = original_url
         self.title: str = title
         self.thumbnail: str | None = thumbnail
-        self.duration: str | None = duration
+        self.duration: int | None = duration
         self.member: discord.Member = member
         self.__video = None
 
@@ -107,7 +107,7 @@ class LocalTrack:
         self.original_url: str | None = None
         self.title: str = os.path.splitext(os.path.basename(filepath))[0]
         self.thumbnail : str | None = None
-        self.duration : str | None = None
+        self.duration : int | None = None
         self.member: discord.Member = member
         
     async def create_source(self, volume):
@@ -125,13 +125,6 @@ Track = YTDLTrack | NicoNicoTrack | LocalTrack
 
 # YTDLを用いてテキストからトラックのリストを生成
 async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
-    def zfill_duration(duration_string: str):
-        if duration_string is not None:
-            hms = duration_string.split(":")
-            if len(hms) == 1:
-                return f"0:{hms[0].zfill(2)}"
-        return duration_string
-    
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
         try:
             info = await loop.run_in_executor(
@@ -160,7 +153,7 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
                         i.get("original_url"),
                         i.get("title"),
                         i.get("thumbnail"),
-                        zfill_duration(i.get("duration_string")),
+                        i.get("duration"),
                         member
                     )
                 )
@@ -172,7 +165,7 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
                 # FLACの場合
                 else:
                     data = await get_flac_info(i.get("original_url"), member.guild)
-                    
+
                 if data is not None:
                     result.append(
                         YTDLTrack(
@@ -194,7 +187,7 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
                         i.get("original_url"),
                         i.get("title"),
                         i.get("thumbnail"),
-                        zfill_duration(i.get("duration_string")),
+                        i.get("duration"),
                         member
                     )
                 )

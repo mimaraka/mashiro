@@ -1,6 +1,5 @@
 import aiohttp
 import discord
-import modules.utils as utils
 from modules.file import make_filename_by_seq
 from functools import reduce
 from io import BytesIO
@@ -37,13 +36,14 @@ async def get_id3v2_info(url: str, guild: discord.Guild):
     
     if (apic := audio.tags.get("APIC:")) is not None:
         img = Image.open(BytesIO(apic.data))
-        filepath = make_filename_by_seq(f"data/temp/cover_{guild.id}.{apic.mime.split('/')[-1]}")
+        ext = apic.mime.split('/')[-1] if apic.mime else "jpeg"
+        filepath = make_filename_by_seq(f"data/temp/cover_{guild.id}.{ext}")
         img.save(filepath)
     else:
         filepath = None
 
     return {
         "title": audio.tags.get("TIT2"),
-        "duration": utils.sec_to_text(int(audio.info.length)),
+        "duration": int(audio.info.length),
         "thumbnail": filepath
     }
