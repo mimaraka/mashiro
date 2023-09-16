@@ -18,13 +18,6 @@ async def get_range_data(session: aiohttp.ClientSession, url: str, start: int, e
             return await response.read()
         except aiohttp.ClientResponseError:
             return None
-        
-
-async def is_id3v2(url: str):
-    async with aiohttp.ClientSession() as session:
-        if (data := await get_range_data(session, url, 0, 2)) is not None:
-            return data.startswith(b"ID3")
-        return False
     
 
 async def get_id3v2_info(url: str, guild: discord.Guild):
@@ -51,6 +44,6 @@ async def get_id3v2_info(url: str, guild: discord.Guild):
 
     return {
         "title": audio.tags.get("TIT2"),
-        "duration": utils.sec_to_text(round(audio.info.length)),
+        "duration": utils.sec_to_text(int(audio.info.length)),
         "thumbnail": filepath
     }

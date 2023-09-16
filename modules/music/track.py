@@ -4,11 +4,12 @@ import discord
 import os
 import re
 import yt_dlp
-import urllib.request, urllib.error
 from typing import List
 from niconico import NicoNico
-from modules.music.mp3 import is_id3v2, get_id3v2_info
-from modules.attachments import is_mimetype
+from modules.http import bin_startswith
+from modules.music.mp3 import get_id3v2_info
+from modules.music.flac import get_flac_info
+from modules.http import get_mimetype
 from modules.mashilog import mashilog
 
 
@@ -149,6 +150,9 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
     result = []
     for i in info_list:
         if i:
+            is_id3 = await get_mimetype(i.get("original_url")) == "audio/mpeg" and await bin_startswith(i.get("original_url"), b"ID3")
+            is_flac = await get_mimetype(i.get("original_url")) == "audio/flac" and await bin_startswith(i.get("original_url"), b"fLaC")
+
             # ニコニコの場合
             if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url")):
                 result.append(
@@ -160,9 +164,16 @@ async def ytdl_create_tracks(loop: asyncio.AbstractEventLoop, text: str, member:
                         member
                     )
                 )
-            # MP3直リンクの場合
-            elif await is_mimetype(i.get("original_url"), ["audio/mpeg"]) and await is_id3v2(i.get("original_url")):
-                if (data := await get_id3v2_info(i.get("original_url"), member.guild)) is not None:
+            # MP3またはFLACの直リンクの場合
+            elif is_id3 or is_flac:
+                # MP3の場合
+                if is_id3:
+                    data = await get_id3v2_info(i.get("original_url"), member.guild)
+                # FLACの場合
+                else:
+                    data = await get_flac_info(i.get("original_url"), member.guild)
+                    
+                if data is not None:
                     result.append(
                         YTDLTrack(
                             loop,
