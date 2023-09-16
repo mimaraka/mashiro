@@ -135,6 +135,8 @@ class Mashiro(discord.Cog):
                         # 会話を記録
                         g_conversations[message.channel.id] = conversation
 
-                async with message.channel.typing():
-                    await asyncio.sleep(4)
-                    await message.channel.send(self.get_mashiro_quote())
+                else:
+                    # マシロのセリフをランダムで送信
+                    async with message.channel.typing():
+                        await asyncio.sleep(4)
+                        await message.channel.send(self.get_mashiro_quote())
