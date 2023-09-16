@@ -385,6 +385,9 @@ class Player:
         if clear:
             self.__last_track = self.__current_track
             await self.__clear_data()
+            # __after_callback()が呼ばれるより__clear_data()が呼ばれる方が先なのかもしれない
+            # ので__flag_abortedを元に戻しておく
+            self.__flag_aborted = False
 
 
     # 再生を一時停止する

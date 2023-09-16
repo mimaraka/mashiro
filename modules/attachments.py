@@ -4,22 +4,7 @@ import re
 import requests
 import typing
 from modules.myembed import MyEmbed
-
-
-
-# URL先のファイルが指定したmimetypeであるかどうかを判定する関数
-async def is_mimetype(url, mimetypes_list) -> bool:
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                resp.raise_for_status()
-                mime = resp.headers.get("Content-type", "").lower()
-                if any([mime == x for x in mimetypes_list]):
-                    return True
-                else:
-                    return False
-    except aiohttp.ClientResponseError:
-        return False
+from modules.http import get_mimetype
 
 
 # URLが有効ならメッセージのオブジェクトを返し、無効ならNoneを返す
@@ -44,12 +29,12 @@ async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typi
     valid_urls = []
     # リンク先のメッセージにファイルが添付されていた場合
     if message.attachments:
-        urls = [a.url for a in message.attachments]
+        urls += [a.url for a in message.attachments]
     # メッセージの中にURLが含まれていた場合
     if matches:
         urls += [m for m in matches] # which is m str or match object?????
     for url in urls:
-        if mimetypes_list and not await is_mimetype(url, mimetypes_list):
+        if mimetypes_list and await get_mimetype(url) not in mimetypes_list:
             continue
         else:
             valid_urls.append(url)

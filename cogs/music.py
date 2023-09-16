@@ -5,13 +5,14 @@ from typing import Dict
 from youtubesearchpython import VideosSearch
 
 import modules.utils as utils
-import modules.attachments as atc
+from modules.attachments import MIMETYPES_FFMPEG
 from modules.myembed import MyEmbed
 from modules.music.track import ytdl_create_tracks
 from modules.music.player import Player
 from modules.music.errors import *
 from modules.attachments import find_valid_urls
 from modules.mashilog import mashilog
+from modules.http import get_mimetype
 
 
 EMBED_BOT_NOT_CONNECTED = MyEmbed(notification_type="error", description="私はボイスチャンネルに接続していません。")
@@ -459,7 +460,7 @@ class Music(discord.Cog):
             return
         
         # 添付ファイルの形式を調べる
-        if not await atc.is_mimetype(attachment.url, atc.MIMETYPES_FFMPEG):
+        if await get_mimetype(attachment.url) not in MIMETYPES_FFMPEG:
             await ctx.respond(
                 embed=MyEmbed(notification_type="error", description="添付ファイルの形式が正しくありません。"),
                 ephemeral=True
