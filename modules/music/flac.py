@@ -15,7 +15,7 @@ async def get_metadata_blocks(url: str):
         blocks = []
         while True:
             header = await get_range_data(session, url, current_idx, current_idx + 3)
-            ids = int.from_bytes(header[0], "big")
+            ids = header[0]
             size = int.from_bytes(header[1:], "big")
             data_types = [
                 "STREAMINFO",
@@ -44,7 +44,7 @@ async def get_flac_info(url: str, guild: discord.Guild):
     title = None
     duration = None
     thumbnail = None
-    
+
     blocks = await get_metadata_blocks(url)
     for block in blocks:
         data = block["data"]
