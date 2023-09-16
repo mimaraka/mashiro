@@ -71,7 +71,8 @@ async def get_flac_info(url: str, guild: discord.Guild):
             image_size = int.from_bytes(data[28 + mimetype_length + description_length:32 + mimetype_length + description_length], "big")
             image_data = data[32 + mimetype_length + description_length:32 + mimetype_length + description_length + image_size]
             img = Image.open(BytesIO(image_data))
-            thumbnail = make_filename_by_seq(f"data/temp/cover_{guild.id}.{mimetype.split('/')[-1]}")
+            ext = mimetype.split('/')[-1] if mimetype else "jpeg"
+            thumbnail = make_filename_by_seq(f"data/temp/cover_{guild.id}.{ext}")
             img.save(thumbnail)
 
     return {
