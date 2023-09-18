@@ -425,4 +425,4 @@ class Player:
         picked_voice = random.choice(voices)
         if not on_connect:
             await ctx.defer()
-        await self.register_tracks(ctx, [LocalTrack(picked_voice, ctx.author)], silent=on_connect)
+        await self.register_tracks(ctx, [LocalTrack(member=ctx.author, filepath=picked_voice)], silent=on_connect)

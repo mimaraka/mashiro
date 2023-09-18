@@ -37,12 +37,12 @@ class ID3V2Track(BaseTrack):
 
         filename = os.path.splitext(original_url.split("/")[-1])[0]
         return cls(
-            original_url,
-            original_url,
-            audio.tags.get("TIT2") or filename,
-            audio.tags.get("TPE1"),
-            audio.tags.get("TALB"),
-            thumbnail,
-            int(audio.info.length),
-            member
+            member=member,
+            title=audio.tags.get("TIT2") or filename,
+            url=original_url,
+            original_url=original_url,
+            duration=int(audio.info.length),
+            artist=audio.tags.get("TPE1"),
+            album=audio.tags.get("TALB"),
+            thumbnail=thumbnail
         )

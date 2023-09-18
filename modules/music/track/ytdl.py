@@ -8,9 +8,28 @@ from modules.music.track.base import BaseTrack
 
 
 class YTDLTrack(BaseTrack):
-    def __init__(self, loop: asyncio.AbstractEventLoop, original_url: str, url: str, title: str, artist: str, thumbnail: str, duration: int, member: discord.Member) -> None:
+    def __init__(
+            self,
+            loop: asyncio.AbstractEventLoop,
+            member: discord.Member,
+            title: str,
+            url: str,
+            original_url: str,
+            duration: int | None=None,
+            artist: str | None=None,
+            thumbnail: str | None=None
+    ) -> None:
         self.loop: asyncio.AbstractEventLoop = loop
-        super().__init__(original_url, url, title, artist, None, thumbnail, duration, member)
+        super().__init__(
+            member=member,
+            title=title,
+            url=url,
+            original_url=original_url,
+            duration=duration,
+            artist=artist,
+            album=None,
+            thumbnail=thumbnail
+        )
 
     # 生成されたURLは一定時間後に無効になるため、この関数を再生直前に実行する
     async def create_source(self, volume: int):

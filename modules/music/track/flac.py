@@ -85,12 +85,12 @@ class FLACTrack(BaseTrack):
         
         filename = os.path.splitext(original_url.split("/")[-1])[0]
         return cls(
-            original_url,
-            original_url,
-            tags.get("title") or filename,
-            tags.get("artist"),
-            tags.get("album"),
-            thumbnail,
-            duration,
-            member
+            member=member,
+            title=tags.get("title") or filename,
+            url=original_url,
+            original_url=original_url,
+            duration=duration,
+            artist=tags.get("artist"),
+            album=tags.get("album"),
+            thumbnail=thumbnail
         )

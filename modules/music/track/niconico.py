@@ -5,9 +5,27 @@ from .base import BaseTrack
 
 
 class NicoNicoTrack(BaseTrack):
-    def __init__(self, original_url: str, title: str, artist: str, thumbnail: str, duration: int, member: discord.Member) -> None:
+    def __init__(
+            self,
+            member: discord.Member,
+            title: str,
+            original_url: str,
+            duration: int | None=None,
+            artist: str | None=None,
+            album: str | None=None,
+            thumbnail: str | None=None
+    ) -> None:
         self.__video = None
-        super().__init__(original_url, None, title, artist, None, thumbnail, duration, member)
+        super().__init__(
+            member=member,
+            title=title,
+            url=None,
+            original_url=original_url,
+            duration=duration,
+            artist=artist,
+            album=album,
+            thumbnail=thumbnail
+        )
         
     # video.connect() ~ video.close_connection()の間のみURLが有効？
     async def create_source(self, volume: int):
