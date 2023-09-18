@@ -49,10 +49,10 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
             # ニコニコの場合
             if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url")):
                 result.append(
-                    NicoNicoTrack(i.get("original_url"), i.get("title"), i.get("uploader"), i.get("thumbnail"), i.get("duration"), member)
+                    NicoNicoTrack(i.get("original_url"), i.get("title"), i.get("uploader"), i.get("thumbnail"), int(i.get("duration")), member)
                 )
             else:
                 result.append(
-                    YTDLTrack(loop, i.get("original_url"), i.get("url"), i.get("title"), i.get("uploader"), i.get("thumbnail"), i.get("duration"), member)
+                    YTDLTrack(loop, i.get("original_url"), i.get("url"), i.get("title"), i.get("uploader"), i.get("thumbnail"), int(i.get("duration")), member)
                 )
     return result
