@@ -44,11 +44,9 @@ async def get_metadata_blocks(original_url: str):
 class FLACTrack(BaseTrack):
     @classmethod
     async def from_url(cls, original_url: str, member: discord.Member):
-        title = None
-        artist = None
-        album = None
         duration = None
         thumbnail = None
+        tags = {}
 
         blocks = await get_metadata_blocks(original_url)
         # メタデータブロック毎に処理
@@ -69,15 +67,9 @@ class FLACTrack(BaseTrack):
                 for _ in range(n_comments):
                     comment_length = int.from_bytes(data[current_idx:current_idx + 4], "little")
                     comment = data[current_idx + 4:current_idx + 4 + comment_length].decode()
-                    attribute = comment[len(match_obj.group()):]
+                    # コメントがXXXX=YYYYの形式である場合
                     if match_obj := re.match(r"\w+=", comment):
-                        tag_name = match_obj.group().lower()[:-1]
-                        if tag_name == "title":
-                            title = attribute
-                        elif tag_name == "artist":
-                            artist = attribute
-                        elif tag_name == "album":
-                            album = attribute
+                        tags[match_obj.group().lower()[:-1]] = comment[len(match_obj.group()):]
                     current_idx += 4 + comment_length
             # PICTURE(アートワーク)の場合
             elif block["type"] == "PICTURE":
@@ -95,9 +87,9 @@ class FLACTrack(BaseTrack):
         return cls(
             original_url,
             original_url,
-            title or filename,
-            artist,
-            album,
+            tags.get("title") or filename,
+            tags.get("artist"),
+            tags.get("album"),
             thumbnail,
             duration,
             member
