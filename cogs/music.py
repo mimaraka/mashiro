@@ -79,9 +79,10 @@ class Music(discord.Cog):
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
                 # 5秒経ってまだPlayerが残っていれば削除する
                 await asyncio.sleep(5)
-                if member.guild.id in self.__player:
-                    self.__player.pop(member.guild.id)
-                    mashilog("playerオブジェクトが残っていたため、削除しました。")
+                if not member.guild.voice_client or not member.guild.voice_client.is_connected():
+                    if member.guild.id in self.__player:
+                        self.__player.pop(member.guild.id)
+                        mashilog("playerオブジェクトが残っていたため、削除しました。")
             return
         
         # マシロがボイスチャンネルに接続していない場合は無視する
