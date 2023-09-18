@@ -1,3 +1,6 @@
+import re
+
+
 # Discordの文字装飾のエスケープ
 def escape_markdown(text: str):
     result = ""
@@ -17,3 +20,7 @@ def make_duration_text(sec: int):
     else:
         result = f"{m}:{str(s).zfill(2)}"
     return result
+
+
+def is_url(text: str):
+    return re.match(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text)

@@ -1,4 +1,3 @@
-import aiohttp
 import discord
 import re
 import requests

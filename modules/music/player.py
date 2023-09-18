@@ -11,9 +11,9 @@ import modules.utils as utils
 import constants as const
 from modules.myembed import MyEmbed
 from modules.mashilog import mashilog
-from modules.music.track import Track, LocalTrack
-from modules.music.playerview import PlayerView
-from modules.music.errors import *
+from .track.track import Track, LocalTrack
+from .playerview import PlayerView
+from .errors import *
 
 
 class Player:
@@ -262,7 +262,9 @@ class Player:
                 title = "⏸️ 一時停止中です……。"
                 notification_type = "inactive"
             title += f" (🔊 {utils.escape_markdown(self.__voice_client.channel.name)})"
-            description = f"💿 {self.track_text(self.__current_track, italic=True)}"
+            description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
+            description += f"👤 {self.__current_track.artist or '-'}\n"
+            description += f"💿 {self.__current_track.album or '-'}"
             embed = MyEmbed(notification_type=notification_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:

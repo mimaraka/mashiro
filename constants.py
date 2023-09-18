@@ -10,3 +10,22 @@ RE_URL_PATTERN = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 GUILD_ID_OTOBLUEARCHIVE = 911795089355964438
 # ぼっち鯖のギルドID
 GUILD_ID_BOCCHI = 1134922279051075724
+
+# yt_dlp
+YTDL_FORMAT_OPTIONS = {
+    "format": "bestaudio/best*[acodec=aac]",
+    "restrictfilenames": True,
+    "noplaylist": True,
+    "nocheckcertificate": True,
+    "ignoreerrors": True,
+    "logtostderr": False,
+    "quiet": True,
+    "no_warnings": True,
+    "default_search": "auto",                                   # 非URLのテキストが投げられたときにキーワード検索をしてくれる
+    "source_address": "0.0.0.0",                                # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
+
+FFMPEG_OPTIONS = {
+    "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3",
+    "options": "-vn",
+}

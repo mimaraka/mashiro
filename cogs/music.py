@@ -7,7 +7,7 @@ from youtubesearchpython import VideosSearch
 import modules.utils as utils
 from modules.attachments import MIMETYPES_FFMPEG
 from modules.myembed import MyEmbed
-from modules.music.track import ytdl_create_tracks
+from modules.music.track.track import create_tracks
 from modules.music.player import Player
 from modules.music.errors import *
 from modules.attachments import find_valid_urls
@@ -201,7 +201,7 @@ class Music(discord.Cog):
         inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
         msg_proc = await inter.original_response()
 
-        tracks = await ytdl_create_tracks(self.bot.loop, text, ctx.author)
+        tracks = await create_tracks(self.bot.loop, text, ctx.author)
         if not tracks:
             await msg_proc.delete()
             await ctx.respond(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
@@ -423,7 +423,7 @@ class Music(discord.Cog):
         message_count = 1
         async for message in channel.history(limit=n):
             for url in await find_valid_urls(message):
-                if response := await ytdl_create_tracks(self.bot.loop, url, ctx.author):
+                if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
                     embed.description = description
@@ -470,7 +470,7 @@ class Music(discord.Cog):
         inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
         msg_proc = await inter.original_response()
 
-        tracks = await ytdl_create_tracks(self.bot.loop, attachment.url, ctx.author)
+        tracks = await create_tracks(self.bot.loop, attachment.url, ctx.author)
         if not tracks:
             await msg_proc.delete()
             await ctx.respond(
