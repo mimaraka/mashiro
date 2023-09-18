@@ -12,9 +12,9 @@ def escape_markdown(text: str):
 
 
 def make_duration_text(sec: int):
-    h = sec // 3600
-    m = (sec - h * 3600) // 60
-    s = sec % 60
+    h = int(sec) // 3600
+    m = (int(sec) - h * 3600) // 60
+    s = int(sec) % 60
     if h:
         result = f"{h}:{str(m).zfill(2)}:{str(s).zfill(2)}"
     else:

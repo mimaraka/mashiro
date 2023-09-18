@@ -414,7 +414,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        embed = MyEmbed(notification_type="inactive", title="⏳ 1. 検索中です……。")
+        embed = MyEmbed(notification_type="inactive", title="🔎 1. 検索中です……。")
         inter = await ctx.respond(embed=embed)
         msg_proc = await inter.original_response()
 
