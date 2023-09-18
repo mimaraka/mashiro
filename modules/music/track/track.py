@@ -4,7 +4,7 @@ import re
 import yt_dlp
 import modules.utils as utils
 from constants import YTDL_FORMAT_OPTIONS
-from typing import Union, List
+from typing import List
 from .id3v2 import ID3V2Track
 from .flac import FLACTrack
 from .ytdl import YTDLTrack
@@ -14,7 +14,7 @@ from modules.http import bin_startswith
 from modules.http import get_mimetype
 
 
-Track = Union[ID3V2Track, FLACTrack, YTDLTrack, NicoNicoTrack, LocalTrack]
+Track = ID3V2Track | FLACTrack | YTDLTrack | NicoNicoTrack | LocalTrack
 
 
 async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
@@ -22,10 +22,10 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
     if utils.is_url(text):
         # ID3V2直リンクの場合
         if await get_mimetype(text) == "audio/mpeg" and await bin_startswith(text, b"ID3"):
-            return await ID3V2Track.from_url(text, member)
+            return [await ID3V2Track.from_url(text, member)]
         # FLAC直リンクの場合
         elif await get_mimetype(text) == "audio/flac" and await bin_startswith(text, b"fLaC"):
-            return await FLACTrack.from_url(text, member)
+            return [await FLACTrack.from_url(text, member)]
 
     # その他はyt-dlpで処理
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
