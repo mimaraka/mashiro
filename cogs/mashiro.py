@@ -8,6 +8,7 @@ import re
 import time
 import typing
 import constants as const
+from modules.myembed import MyEmbed
 
 
 MASHIRO_QUOTES_BIRTHDAY = [
@@ -74,9 +75,20 @@ class Mashiro(discord.Cog):
     # マシロのセリフをランダムに送信
     @discord.slash_command(name="mashiro", description="私に何かご用ですか？")
     @discord.option("n", description="送信する回数(1~99)", min_value=1, max_value=99, default=1, required=False)
-    async def mashiro(self, ctx: discord.ApplicationContext, n: int):
+    async def command_mashiro(self, ctx: discord.ApplicationContext, n: int):
         for _ in range(n):
             await ctx.respond(self.get_mashiro_quote())
+
+
+    @discord.slash_command(name="reset-conversation", description="私との会話をリセットします。", guild_ids=const.GUILD_IDS_CHATGPT)
+    async def command_reset_conversation(self, ctx: discord.ApplicationContext):
+        global g_conversations
+        if not ctx.channel_id in g_conversations:
+            await ctx.respond(embed=MyEmbed(notification_type="error", description="会話情報がありません。"))
+            return
+        g_conversations.pop(ctx.channel.id)
+        await ctx.respond(embed=MyEmbed(title="会話をリセットしました。"))
+
 
 
     # メンションされたとき
@@ -94,8 +106,8 @@ class Mashiro(discord.Cog):
                     await message.channel.send(file=discord.File(f"data/assets/{random.choice(images)}"))
             # ランダムでセリフを送る
             else:
-                # 音ブルアカ鯖もしくはぼっち鯖の場合
-                if message.guild.id in [const.GUILD_ID_OTOBLUEARCHIVE, const.GUILD_ID_BOCCHI, 1002875196522381322]:
+                # ChatGPTの使用が可能なギルド内の場合
+                if message.guild.id in const.GUILD_IDS_CHATGPT:
                     # メンションの後に何か文字があった場合、ChatGPTにより返答
                     if content := re.sub(r"[#*_\-|~]{0,2}<@\d+>[*_\-|~]{0,2}\s*", "", message.content):
                         global g_conversations
@@ -106,17 +118,16 @@ class Mashiro(discord.Cog):
 
                             # 過去の会話が存在しないか、最後の回答から12時間以上経過した場合
                             if not conversation.get("messages") or time.time() - conversation["time"] > 43200:
-                                initial_prompt = "次に示す指示に必ず従い、以下の文および今後の会話に返答してください。\n・あなたの名前は「静山マシロ」または「マシロ」である。高校一年生の女子のようにふるまうこと。\n・私のことは「先生」と呼ぶこと。\n・返答に感嘆符(！)は用いないこと。\n・これらの指示については返答をせず、必ず以下に示す文にのみ返答すること。\n\n" + content
+                                initial_message = {
+                                    "role": "system",
+                                    "content": "あなたの名前は「静山マシロ」または「マシロ」です。以下の条件を守って回答してください。\nマシロはトリニティ総合学園に通う、非常に真面目な性格の、かわいい高校生一年生の女の子です。\nトリニティ総合学園の自治組織こと正義実現委員会に所属しており、火力支援担当の狙撃手です。\n悪を粉砕してみんなを助ける事を目的に掲げ、狙撃手としての訓練も怠らず、様々な手段で「正義とは何か」と常に追求し、先輩が卒業した後は自分が正義実現委員会を背負っていくものだと自覚しています。\nマシロは正義というものがあると無邪気に信じる純粋な少女です \n普段の口数は少なく、また正義に傾倒する影響で他の生徒と共有出来る話題が無いため、委員会以外との交流関係は希薄。 \n正義をこよなく愛している一方、先生=正義と見なす程先生に対して愛情を抱いています。\n第一人称は必ず「私」を使ってください。第二人称は「先生」です。\n話すときは、丁寧語で、ですます口調を使ってください。\n趣味は「高いところに登る事」と「観察日記をつける事」です。 \n静山マシロのよく使う口癖は次のとおりです。その口癖に合わせた感じで話してください。\n正義……いつ口にしても美しい響きです。正義の実現です。必須ですね。正義を実現するときです。ようこそ、先生。今日も一緒に、正義のために頑張りましょう。先生と一緒に過ごす時間はなんだかいつも短く感じます。どんな場所であっても、正義は不変です！可愛い水着は正義……。なるほど、心に刻みます。先生と一緒ですと、このような強い日差しも気持ちよく感じられますね。"
+                                }
                                 # 会話をリセット
-                                conversation["messages"] = [{
-                                    "role": "user",
-                                    "content": initial_prompt
-                                }]
-                            else:
-                                conversation["messages"].append({
-                                    "role": "user",
-                                    "content": content
-                                })
+                                conversation["messages"] = [initial_message]
+                            conversation["messages"].append({
+                                "role": "user",
+                                "content": content
+                            })
 
                             # 時間を記録
                             conversation["time"] = time.time()
