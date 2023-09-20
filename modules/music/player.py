@@ -141,15 +141,25 @@ class Player:
     
 
     # キューとプレイリストにソースを積む
-    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], msg_proc: discord.Message=None, silent=False):
+    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], msg_proc: discord.Message=None, interrupt=False, silent=False):
         self.__channel = ctx.channel
-        self.__playlist += tracks
-        self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
-        if self.__shuffle:
-            random.shuffle(self.__queue_idcs)
+
+        if interrupt:
+            self.__playlist[self.__current_index + 1:self.__current_index + 1] = tracks
+            self.__queue_idcs = [i + len(tracks) if i > self.__current_index else i for i in self.__queue_idcs]
+            self.__queue_idcs[0:0] = [i for i in range(self.__current_index + 1, self.__current_index + 5)]
+        else:
+            self.__playlist += tracks
+            self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
+            if self.__shuffle:
+                random.shuffle(self.__queue_idcs)
 
         # 停止していない場合
         if not self.is_stopped:
+            if interrupt:
+                await self.abort()
+                await self.__play(msg_proc=msg_proc, silent=silent)
+                return
             if not silent:
                 if msg_proc:
                     await msg_proc.delete()

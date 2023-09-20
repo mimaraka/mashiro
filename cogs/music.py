@@ -386,17 +386,24 @@ class Music(discord.Cog):
 
     # /shuffle
     @discord.slash_command(name="shuffle", description="シャッフル再生のオン/オフを変更します。")
-    @discord.option("switch", description="シャッフル再生のオン/オフ(True/False)")
-    async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool):
+    @discord.option("switch", description="シャッフル再生のオン/オフ(True/False)。シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます。", required=False)
+    async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool=None):
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        player.shuffle = switch
+        PREFIX = "🔀"
+
+        if switch is None:
+            player.shuffle = player.shuffle
+            if player.shuffle:
+                embed=MyEmbed(title=f"{PREFIX} 再生キューをシャッフルしました。")
+            else:
+                embed=MyEmbed(title=f"{PREFIX} シャッフル再生はオフです。")
+        else:
+            player.shuffle = switch
+            embed=MyEmbed(title=f"{PREFIX} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
         
-        await ctx.respond(
-            embed=MyEmbed(title=f"🔀 シャッフル再生を{'オン' if switch else 'オフ'}にしました。"),
-            delete_after=10
-        )
+        await ctx.respond(embed=embed, delete_after=10)
 
 
     # /play-channel
