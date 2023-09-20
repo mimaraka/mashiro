@@ -64,7 +64,8 @@ class Music(discord.Cog):
 
     # 処理中のEmbedを取得
     def get_proc_embed(self, guild: discord.Guild, prefix=""):
-        if guild.me.top_role.permissions.external_emojis:
+        external_emojis = any([role.permissions.external_emojis for role in guild.me.roles])
+        if external_emojis:
             emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
         else:
             emoji = "⌛"
