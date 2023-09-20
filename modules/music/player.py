@@ -1,12 +1,14 @@
 import asyncio
 import discord
 import glob
+import math
 import os
 import random
 import re
 import time
 import traceback
 import typing
+
 import modules.utils as utils
 import constants as const
 from modules.myembed import MyEmbed
@@ -109,32 +111,32 @@ class Player:
 
     # トラック情報のテキストを生成
     @staticmethod
-    def track_text(track: Track, italic=False):
+    def track_text(track: Track, italic: bool=False, queue: bool=False):
+        max_title = 40 if queue else 200
+        title = utils.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.replace("*", "∗")), max_title)
         if track.original_url is not None:
-            result = f"[{utils.escape_markdown(track.title)}]({track.original_url})"
+            max_title_url = 145 if queue else 1000
+            if len(title) + len(track.original_url) > max_title_url:
+                url = utils.shorten_url(track.original_url)
+            else:
+                url = track.original_url
+            result = f"[{title}]({url})"
         else:
-            result = utils.escape_markdown(track.title)
+            result = title
         decoration = "***" if italic else "**"
         result = f"{decoration}{result}{decoration}"
         if track.duration is not None:
-            result += f" ({utils.make_duration_text(track.duration)})"
+            result += f" | {utils.make_duration_text(track.duration)}"
         return result
     
-    # 複数のトラック情報のテキストを生成
-    def tracks_text(self, tracks: typing.List[Track], start_index: int=1, max_length: int=4096):
-        view_count = 10
-        while True:
-            track_text_list = []
-            for i, track in enumerate(tracks[:view_count]):
-                track_text_list.append(f"{i + start_index}. {self.track_text(track)}")
-            if len(tracks) - view_count > 0:
-                track_text_list.append(f"(他{len(tracks) - view_count}曲)")
-            result = "\n".join(track_text_list)
-            if len(result) <= max_length:
-                break
-            view_count -= 1
-            if not view_count:
-                return ""
+    # 複数のトラック情報のテキストを生成(最大10件まで表示)
+    def tracks_text(self, tracks: typing.List[Track], start_index: int=1):
+        track_text_list = []
+        for i, track in enumerate(tracks[:10]):
+            track_text_list.append(f"{i + start_index}. {self.track_text(track, queue=True)}")
+        if len(tracks) > 10:
+            track_text_list.append(f"(他{len(tracks) - 10}曲)")
+        result = "\n".join(track_text_list)
         return result
     
 
@@ -261,10 +263,10 @@ class Player:
             elif self.is_paused:
                 title = "⏸️ 一時停止中です……。"
                 notification_type = "inactive"
-            title += f" (🔊 {utils.escape_markdown(self.__voice_client.channel.name)})"
+            title += f" (🔊 {self.__voice_client.channel.name})"
             description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
-            description += f"👤 {self.__current_track.artist or '-'}\n"
-            description += f"💿 {self.__current_track.album or '-'}"
+            description += f"👤 {utils.limit_text_length(self.__current_track.artist, 500) or '-'}\n"
+            description += f"💿 {utils.limit_text_length(self.__current_track.album, 500) or '-'}"
             embed = MyEmbed(notification_type=notification_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
@@ -336,15 +338,45 @@ class Player:
     
 
     # 再生キューのEmbedを取得
-    def get_queue_embed(self):
+    def get_queue_msg(self, page: int=1):
+        n_pages = math.ceil(len(self.queue) / 10)
+
+        class ButtonPreviousPage(discord.ui.Button):
+            def __init__(btn_self, page: int):
+                btn_self.page: int = page
+                super().__init__(style=discord.enums.ButtonStyle.primary, disabled=page <= 1, emoji="⬅️")
+            
+            async def callback(btn_self, interaction: discord.Interaction):
+                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page - 1))
+
+        class ButtonNextPage(discord.ui.Button):
+            def __init__(btn_self, page: int):
+                btn_self.page: int = page
+                super().__init__(style=discord.enums.ButtonStyle.primary, disabled=page >= n_pages, emoji="➡️")
+            
+            async def callback(btn_self, interaction: discord.Interaction):
+                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page + 1))
+
         if self.queue:
-            description = f"▶️ {self.track_text(self.current_track, italic=True)}\n\n"
-            description += self.tracks_text(self.queue, max_length=4096 - len(description))
+            start_index = (page - 1) * 10
+            description = f"▶️ {self.track_text(self.current_track, italic=True, queue=True)}\n\n"
+            description += self.tracks_text(self.queue[start_index:start_index + 10], start_index=start_index + 1)
+            if len(self.queue) > 10:
+                description += f"\n\n**{page}** / {n_pages}ページ"
+                view = discord.ui.View(timeout=None)
+                view.add_item(ButtonPreviousPage(page))
+                view.add_item(ButtonNextPage(page))
+            else:
+                view = None
             duration_sum = sum([track.duration for track in self.queue])
-            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 - {utils.make_duration_text(duration_sum)})", description=description)
+            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 | {utils.make_duration_text(duration_sum)})", description=description)
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
-        return embed
+            view = None
+        return {
+            "embed": embed,
+            "view": view
+        }
 
 
     # 1つ前の曲に戻る

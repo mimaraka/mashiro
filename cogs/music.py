@@ -272,9 +272,10 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
         try:
-            await player.skip()
+            player.skip()
         except NotPlayingError:
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
+        await ctx.respond(embed=MyEmbed(title="再生中の曲をスキップしました。"))
 
 
     # /clear
@@ -365,8 +366,8 @@ class Music(discord.Cog):
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        await ctx.defer()
-        await ctx.respond(embed=player.get_queue_embed(), ephemeral=True, delete_after=20)
+        await ctx.defer(ephemeral=True)
+        await ctx.respond(ephemeral=True, **player.get_queue_msg(page=1))
 
 
     # /player
