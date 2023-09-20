@@ -358,6 +358,7 @@ class Player:
                 await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page + 1))
 
         if self.queue:
+            page = min(max(page, 1), n_pages)
             start_index = (page - 1) * 10
             description = f"▶️ {self.track_text(self.current_track, italic=True, queue=True)}\n\n"
             description += self.tracks_text(self.queue[start_index:start_index + 10], start_index=start_index + 1)
