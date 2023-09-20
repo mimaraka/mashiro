@@ -4,6 +4,7 @@ import time
 from typing import Dict
 from youtubesearchpython import VideosSearch
 
+import constants as const
 import modules.utils as utils
 from modules.attachments import MIMETYPES_FFMPEG
 from modules.myembed import MyEmbed
@@ -59,6 +60,16 @@ class Music(discord.Cog):
                 pass
         await guild.voice_client.disconnect()
         mashilog("ボイスチャンネルから正常に切断しました。")
+
+
+    # 処理中のEmbedを取得
+    def get_proc_embed(self, guild: discord.Guild, prefix=""):
+        if guild.me.top_role.permissions.external_emojis:
+            emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
+        else:
+            emoji = "⌛"
+        embed=MyEmbed(notification_type="inactive", title=f"{emoji} {prefix}処理中です……。")
+        return embed
 
 
     # メンバーのボイス状態が更新されたとき
@@ -199,7 +210,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
-        inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.guild))
         msg_proc = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, text, ctx.author)
@@ -207,7 +218,7 @@ class Music(discord.Cog):
             await msg_proc.delete()
             await ctx.respond(embed=EMBED_FAILED_TRACK_CREATION, ephemeral=True)
             return
-        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
+        await player.register_tracks(ctx, tracks, msg_proc=msg_proc, interrupt=interrupt)
         
 
     # /stop
@@ -275,7 +286,7 @@ class Music(discord.Cog):
             player.skip()
         except NotPlayingError:
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
-        await ctx.respond(embed=MyEmbed(title="再生中の曲をスキップしました。"))
+        await ctx.respond(embed=MyEmbed(title="⏭️ 再生中の曲をスキップしました。"), delete_after=10)
 
 
     # /clear
@@ -301,32 +312,39 @@ class Music(discord.Cog):
         
         try:
             await player.replay()
+            await ctx.respond(embed=MyEmbed(title="🔄 リプレイを開始しました。"), delete_after=10)
         except PlayerError as e:
-            await ctx.respond(
-                embed=MyEmbed(notification_type="error", description=e)
-            )
+            await ctx.respond(embed=MyEmbed(notification_type="error", description=e), ephemeral=True)
 
     
     # /repeat
     @discord.slash_command(name="repeat", description="リピート再生の設定を変更します。")
-    @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"])
-    async def command_repeat(self, ctx: discord.ApplicationContext, option: str): 
+    @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"], required=False)
+    async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
         
-        if option == "プレイリスト":
-            player.repeat = 1
-        elif option == "トラック":
-            player.repeat = 2
-        else:
-            player.repeat = 0
+        ICON = "🔁"
         
-        await player.update_controller()
-        await ctx.respond(
-            embed=MyEmbed(title="リピート再生の設定を変更しました。", description=option),
-            delete_after=10
-        )
+        if option is None:
+            if player.repeat == 1:
+                description = "プレイリスト"
+            elif player.repeat == 2:
+                description = "トラック"
+            else:
+                description = "オフ"
+            embed = MyEmbed(title=f"{ICON} 現在のリピート再生の設定", description=description)
+        else:
+            if option == "プレイリスト":
+                player.repeat = 1
+            elif option == "トラック":
+                player.repeat = 2
+            else:
+                player.repeat = 0
+            embed = MyEmbed(title=f"{ICON} リピート再生の設定を変更しました。", description=option)
+            await player.update_controller()
+        await ctx.respond(embed=embed, delete_after=10)
 
     
     # /volume
@@ -338,7 +356,7 @@ class Music(discord.Cog):
             return
         
         if volume is not None:
-            title = "ボリュームを変更しました。"
+            title = "🔊 ボリュームを変更しました。"
             player.volume = volume / 100
         else:
             title = "現在のボリューム"
@@ -391,17 +409,17 @@ class Music(discord.Cog):
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
-        PREFIX = "🔀"
+        ICON = "🔀"
 
         if switch is None:
             player.shuffle = player.shuffle
             if player.shuffle:
-                embed=MyEmbed(title=f"{PREFIX} 再生キューをシャッフルしました。")
+                embed=MyEmbed(title=f"{ICON} 再生キューをシャッフルしました。")
             else:
-                embed=MyEmbed(title=f"{PREFIX} シャッフル再生はオフです。")
+                embed=MyEmbed(title=f"{ICON} シャッフル再生はオフです。")
         else:
             player.shuffle = switch
-            embed=MyEmbed(title=f"{PREFIX} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
+            embed=MyEmbed(title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
         
         await ctx.respond(embed=embed, delete_after=10)
 
@@ -449,7 +467,7 @@ class Music(discord.Cog):
             )
             return
         
-        await msg_proc.edit(embed=MyEmbed(notification_type="inactive", title="⏳ 2. 処理中です……。"))
+        await msg_proc.edit(embed=self.get_proc_embed(ctx.guild, prefix="2. "))
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
@@ -476,7 +494,7 @@ class Music(discord.Cog):
             )
             return
         
-        inter = await ctx.respond(embed=MyEmbed(notification_type="inactive", title="⌛ 処理中です……。"))
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.guild))
         msg_proc = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, attachment.url, ctx.author)
