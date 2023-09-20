@@ -265,8 +265,8 @@ class Player:
                 notification_type = "inactive"
             title += f" (🔊 {self.__voice_client.channel.name})"
             description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
-            description += f"👤 {utils.limit_text_length(self.__current_track.artist, 500) or '-'}\n"
-            description += f"💿 {utils.limit_text_length(self.__current_track.album, 500) or '-'}"
+            description += f"👤 {utils.limit_text_length(self.__current_track.artist or '-', 500)}\n"
+            description += f"💿 {utils.limit_text_length(self.__current_track.album or '-', 500)}"
             embed = MyEmbed(notification_type=notification_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
