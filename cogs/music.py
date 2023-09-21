@@ -63,8 +63,8 @@ class Music(discord.Cog):
 
 
     # 処理中のEmbedを取得
-    def get_proc_embed(self, guild: discord.Guild, prefix=""):
-        external_emojis = any([role.permissions.external_emojis for role in guild.me.roles])
+    def get_proc_embed(self, channel: discord.TextChannel, prefix=""):
+        external_emojis = channel.permissions_for(channel.guild.me).external_emojis
         if external_emojis:
             emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
         else:
@@ -211,7 +211,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.guild))
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
         msg_proc = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, text, ctx.author)
@@ -453,7 +453,7 @@ class Music(discord.Cog):
             for url in await find_valid_urls(message):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
-                    description += player.tracks_text(response, start_index=len(tracks) + 1, max_length=4096 - len(description))
+                    description += player.tracks_text(response, start_index=len(tracks) + 1)
                     embed.description = description
                     tracks += response
                     await msg_proc.edit(embed=embed)
@@ -468,7 +468,7 @@ class Music(discord.Cog):
             )
             return
         
-        await msg_proc.edit(embed=self.get_proc_embed(ctx.guild, prefix="2. "))
+        await msg_proc.edit(embed=self.get_proc_embed(ctx.channel, prefix="2. "))
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
@@ -495,7 +495,7 @@ class Music(discord.Cog):
             )
             return
         
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.guild))
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
         msg_proc = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, attachment.url, ctx.author)

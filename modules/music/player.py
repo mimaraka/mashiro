@@ -140,7 +140,7 @@ class Player:
         return result
     
 
-    # キューとプレイリストにソースを積む
+    # キューとプレイリストにトラックを積む
     async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], msg_proc: discord.Message=None, interrupt=False, silent=False):
         self.__channel = ctx.channel
 
@@ -157,6 +157,7 @@ class Player:
         # 停止していない場合
         if not self.is_stopped:
             if interrupt:
+                self.__history_idcs.append(self.__current_index)
                 await self.abort()
                 await self.__play(msg_proc=msg_proc, silent=silent)
                 return
@@ -395,7 +396,7 @@ class Player:
         if self.is_stopped:
             raise NotPlayingError("再生していません。")
         
-        # 現在の曲をキューに戻す
+        # 現在のトラック及び一つ前のトラックをキューに戻す
         if self.__history_idcs:
             self.__queue_idcs.insert(0, self.__current_index)
             self.__queue_idcs.insert(0, self.__history_idcs.pop(-1))
