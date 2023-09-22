@@ -39,7 +39,7 @@ class ID3V2Track(BaseTrack):
         return cls(
             member=member,
             title=str(audio.tags.get("TIT2")) or filename,
-            url=original_url,
+            source_url=original_url,
             original_url=original_url,
             duration=int(audio.info.length),
             artist=str(audio.tags.get("TPE1")),

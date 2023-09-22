@@ -19,7 +19,7 @@ class NicoNicoTrack(BaseTrack):
         super().__init__(
             member=member,
             title=title,
-            url=None,
+            source_url=None,
             original_url=original_url,
             duration=duration,
             artist=artist,
@@ -32,9 +32,9 @@ class NicoNicoTrack(BaseTrack):
         nc_client = NicoNico()
         self.__video = nc_client.video.get_video(self.original_url)
         self.__video.connect()
-        self.url = self.__video.download_link
+        self.source_url = self.__video.download_link
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTIONS),
+            original=discord.FFmpegPCMAudio(self.source_url, **FFMPEG_OPTIONS),
             volume=volume
         )
 
@@ -42,4 +42,4 @@ class NicoNicoTrack(BaseTrack):
         self.__video.close()
         self.__video = None
         self.source = None
-        self.url = None
+        self.source_url = None

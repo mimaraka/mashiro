@@ -13,7 +13,7 @@ class YTDLTrack(BaseTrack):
             loop: asyncio.AbstractEventLoop,
             member: discord.Member,
             title: str,
-            url: str,
+            source_url: str,
             original_url: str,
             duration: int | None=None,
             artist: str | None=None,
@@ -23,7 +23,7 @@ class YTDLTrack(BaseTrack):
         super().__init__(
             member=member,
             title=title,
-            url=url,
+            source_url=source_url,
             original_url=original_url,
             duration=duration,
             artist=artist,
@@ -36,7 +36,7 @@ class YTDLTrack(BaseTrack):
         # 以前に生成したURLがまだ使えるか試してみる
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(self.url) as resp:
+                async with session.get(self.source_url) as resp:
                     resp.raise_for_status()
         # URLが切れている場合、再生成
         except aiohttp.ClientResponseError:
@@ -45,8 +45,8 @@ class YTDLTrack(BaseTrack):
                 info = await self.loop.run_in_executor(
                     None, lambda: ytdl.extract_info(self.original_url, download=False)
                 )
-                self.url = info.get("url")
+                self.source_url = info.get("url")
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.url, **FFMPEG_OPTIONS),
+            original=discord.FFmpegPCMAudio(self.source_url, **FFMPEG_OPTIONS),
             volume=volume
         )

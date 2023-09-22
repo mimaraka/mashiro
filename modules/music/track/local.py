@@ -9,7 +9,7 @@ class LocalTrack(BaseTrack):
         super().__init__(
             member=member,
             title=title,
-            url=filepath,
+            source_url=filepath,
             original_url=None,
             duration=None,
             artist=None,

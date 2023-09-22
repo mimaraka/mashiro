@@ -56,7 +56,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
                     NicoNicoTrack(
                         member=member,
                         title=i.get("title"),
-                        original_url=i.get("original_url"),
+                        original_url=i.get("webpage_url") or i.get("original_url"),
                         duration=int(i.get("duration")),
                         artist=i.get("uploader"),
                         album=series_title,
@@ -69,8 +69,8 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
                         loop,
                         member=member,
                         title=i.get("title"),
-                        url=i.get("url"),
-                        original_url=i.get("original_url"),
+                        source_url=i.get("url"),
+                        original_url=i.get("webpage_url") or i.get("original_url"),
                         duration=int(i.get("duration")),
                         artist=i.get("uploader"),
                         thumbnail=i.get("thumbnail")

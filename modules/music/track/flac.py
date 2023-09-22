@@ -87,7 +87,7 @@ class FLACTrack(BaseTrack):
         return cls(
             member=member,
             title=tags.get("title") or filename,
-            url=original_url,
+            source_url=original_url,
             original_url=original_url,
             duration=duration,
             artist=tags.get("artist"),
