@@ -416,12 +416,14 @@ class Music(discord.Cog):
             player.shuffle = player.shuffle
             if player.shuffle:
                 embed=MyEmbed(title=f"{ICON} 再生キューをシャッフルしました。")
+                await player.update_controller()
             else:
                 embed=MyEmbed(title=f"{ICON} シャッフル再生はオフです。")
         else:
             player.shuffle = switch
             embed=MyEmbed(title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
-        
+            await player.update_controller()
+
         await ctx.respond(embed=embed, delete_after=10)
 
 
