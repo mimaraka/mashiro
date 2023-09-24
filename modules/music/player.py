@@ -462,7 +462,7 @@ class Player:
 
 
     # マシロのボイスをランダムで再生する
-    async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False):
+    async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False, msg_proc: discord.Message=None):
         # 入室時のボイス
         if on_connect:
             voices = glob.glob("data/assets/voices/on_connect/*.*")
@@ -470,4 +470,4 @@ class Player:
             voices = glob.glob("data/assets/voices/**/*.*", recursive=True)
 
         picked_voice = random.choice(voices)
-        await self.register_tracks(ctx, [LocalTrack(member=ctx.author, filepath=picked_voice)], silent=on_connect)
+        await self.register_tracks(ctx, [LocalTrack(member=ctx.author, filepath=picked_voice)], silent=on_connect, msg_proc=msg_proc)

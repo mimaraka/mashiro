@@ -526,4 +526,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        await player.play_random_voice(ctx)
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
+        msg_proc = await inter.original_response()
+        
+        await player.play_random_voice(ctx, msg_proc=msg_proc)
