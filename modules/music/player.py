@@ -380,7 +380,7 @@ class Player:
                 view.add_item(ButtonNextPage(page))
             else:
                 view = None
-            duration_sum = sum([track.duration for track in self.queue])
+            duration_sum = sum([track.duration if track.duration is not None else 0 for track in self.queue])
             embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 | {utils.make_duration_text(duration_sum)})", description=description)
         else:
             embed = MyEmbed(notif_type="inactive", title="再生キューは空です。")
