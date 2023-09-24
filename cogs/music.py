@@ -16,12 +16,12 @@ from modules.mashilog import mashilog
 from modules.http import get_mimetype
 
 
-EMBED_BOT_NOT_CONNECTED = MyEmbed(notification_type="error", description="私はボイスチャンネルに接続していません。")
-EMBED_NOT_PLAYING = MyEmbed(notification_type="inactive", title="再生していません……。")
-EMBED_QUEUE_EMPTY = MyEmbed(notification_type="error", description="再生キューが空です。")
-EMBED_BOT_ANOTHER_VC = MyEmbed(notification_type="error", description="私は既に別のボイスチャンネルに接続しています。")
-EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notification_type="error", description="先生がボイスチャンネルに接続されていないようです。")
-EMBED_FAILED_TRACK_CREATION = MyEmbed(notification_type="error", description="トラックの生成に失敗しました。")
+EMBED_BOT_NOT_CONNECTED = MyEmbed(notif_type="error", description="私はボイスチャンネルに接続していません。")
+EMBED_NOT_PLAYING = MyEmbed(notif_type="inactive", title="再生していません……。")
+EMBED_QUEUE_EMPTY = MyEmbed(notif_type="error", description="再生キューが空です。")
+EMBED_BOT_ANOTHER_VC = MyEmbed(notif_type="error", description="私は既に別のボイスチャンネルに接続しています。")
+EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notif_type="error", description="先生がボイスチャンネルに接続されていないようです。")
+EMBED_FAILED_TRACK_CREATION = MyEmbed(notif_type="error", description="トラックの生成に失敗しました。")
 
 
 async def yt_title_autocomplete(ctx: discord.AutocompleteContext):
@@ -69,7 +69,7 @@ class Music(discord.Cog):
             emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
         else:
             emoji = "⌛"
-        embed=MyEmbed(notification_type="inactive", title=f"{emoji} {prefix}処理中です……。")
+        embed=MyEmbed(notif_type="inactive", title=f"{emoji} {prefix}処理中です……。")
         return embed
 
 
@@ -154,7 +154,7 @@ class Music(discord.Cog):
             # コマンドを送ったメンバーと同じボイスチャンネルにいる場合
             if ctx.voice_client.channel == ctx.author.voice.channel:
                 await ctx.respond(
-                    embed=MyEmbed(notification_type="error", description="既に接続しています。"),
+                    embed=MyEmbed(notif_type="error", description="既に接続しています。"),
                     ephemeral=True
                 )
             # 同じギルド内の他のボイスチャンネルに接続している場合
@@ -165,7 +165,7 @@ class Music(discord.Cog):
         # ボイスチャンネルに接続する
         player = await self.connect(ctx.author.voice.channel)
         await ctx.respond(
-            embed=MyEmbed(title=f"接続しました！ (🔊 {utils.escape_markdown(ctx.author.voice.channel.name)})"),
+            embed=MyEmbed(notif_type="succeed", title=f"接続しました！ (🔊 {utils.escape_markdown(ctx.author.voice.channel.name)})"),
             delete_after=10
         )
         # 0.5秒後にランダムにボイスを再生する
@@ -232,7 +232,7 @@ class Music(discord.Cog):
         try:
             await player.abort(clear=True)
             await ctx.respond(
-                embed=MyEmbed(notification_type="inactive", title="再生を停止します。"),
+                embed=MyEmbed(notif_type="inactive", title="再生を停止します。"),
                 delete_after=10
             )
         except NotPlayingError:
@@ -248,12 +248,12 @@ class Music(discord.Cog):
 
         try:
             await player.pause()
-            await ctx.respond(embed=MyEmbed(notification_type="inactive", title="一時停止しました。"), delete_after=10)
+            await ctx.respond(embed=MyEmbed(notif_type="inactive", title="一時停止しました。"), delete_after=10)
         except NotPlayingError:
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
         except OperationError as e:
             await ctx.respond(
-                embed=MyEmbed(notification_type="error", description=e),
+                embed=MyEmbed(notif_type="error", description=e),
                 ephemeral=True
             )
 
@@ -272,7 +272,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
         except OperationError as e:
             await ctx.respond(
-                embed=MyEmbed(notification_type="error", description=e),
+                embed=MyEmbed(notif_type="error", description=e),
                 ephemeral=True
             )
 
@@ -315,7 +315,7 @@ class Music(discord.Cog):
             await player.replay()
             await ctx.respond(embed=MyEmbed(title="🔄 リプレイを開始しました。"), delete_after=10)
         except PlayerError as e:
-            await ctx.respond(embed=MyEmbed(notification_type="error", description=e), ephemeral=True)
+            await ctx.respond(embed=MyEmbed(notif_type="error", description=e), ephemeral=True)
 
     
     # /repeat
@@ -374,7 +374,7 @@ class Music(discord.Cog):
         else:
             remark = ""
         await ctx.respond(
-            embed=MyEmbed(title=f"{title}{remark}", description=description),
+            embed=MyEmbed(notif_type="succeed", title=f"{title}{remark}", description=description),
             delete_after=10
         )
 
@@ -400,7 +400,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
             return
         await player.regenerate_controller(ctx.channel)
-        await ctx.respond(embed=MyEmbed(title=f"プレイヤーを移動しました。"), delete_after=10)
+        await ctx.respond(embed=MyEmbed(notif_type="succeed", title=f"プレイヤーを移動しました。"), delete_after=10)
 
 
     # /shuffle
@@ -443,7 +443,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        embed = MyEmbed(notification_type="inactive", title="🔎 1. 検索中です……。")
+        embed = MyEmbed(notif_type="inactive", title="🔎 1. 検索中です……。")
         inter = await ctx.respond(embed=embed)
         msg_proc = await inter.original_response()
 
@@ -465,7 +465,7 @@ class Music(discord.Cog):
         if not tracks:
             await msg_proc.delete()
             await ctx.respond(
-                embed=MyEmbed(notification_type="error", description="チャンネル内に有効なトラックが見つかりませんでした。"),
+                embed=MyEmbed(notif_type="error", description="チャンネル内に有効なトラックが見つかりませんでした。"),
                 ephemeral=True
             )
             return
@@ -492,7 +492,7 @@ class Music(discord.Cog):
         # 添付ファイルの形式を調べる
         if await get_mimetype(attachment.url) not in MIMETYPES_FFMPEG:
             await ctx.respond(
-                embed=MyEmbed(notification_type="error", description="添付ファイルの形式が正しくありません。"),
+                embed=MyEmbed(notif_type="error", description="添付ファイルの形式が正しくありません。"),
                 ephemeral=True
             )
             return
@@ -504,7 +504,7 @@ class Music(discord.Cog):
         if not tracks:
             await msg_proc.delete()
             await ctx.respond(
-                embed=MyEmbed(notification_type="error", description="トラックの生成に失敗しました。"),
+                embed=MyEmbed(notif_type="error", description="トラックの生成に失敗しました。"),
                 ephemeral=True
             )
             return

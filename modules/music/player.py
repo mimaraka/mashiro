@@ -164,7 +164,7 @@ class Player:
             if not silent:
                 if msg_proc:
                     await msg_proc.delete()
-                embed = MyEmbed(title="再生キューに追加しました！", description=self.tracks_text(tracks))
+                embed = MyEmbed(notif_type="succeed", title="再生キューに追加しました！", description=self.tracks_text(tracks))
                 await ctx.respond(embed=embed, delete_after=10)
             await self.update_controller()
         else:
@@ -270,15 +270,15 @@ class Player:
         if self.is_playing or self.is_paused:
             if self.is_playing:
                 title = "▶️ 再生中です！"
-                notification_type = "normal"
+                notif_type = "normal"
             elif self.is_paused:
                 title = "⏸️ 一時停止中です……。"
-                notification_type = "inactive"
+                notif_type = "inactive"
             title += f" (🔊 {self.__voice_client.channel.name})"
             description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
             description += f"👤 {utils.limit_text_length(self.__current_track.artist or '-', 500)}\n"
             description += f"💿 {utils.limit_text_length(self.__current_track.album or '-', 500)}"
-            embed = MyEmbed(notification_type=notification_type, title=title, description=description)
+            embed = MyEmbed(notif_type=notif_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
                 next_track = self.__playlist[self.__queue_idcs[0]]
@@ -301,7 +301,7 @@ class Player:
             view = PlayerView(self)
         # 停止中の場合
         else:
-            embed = MyEmbed(notification_type="inactive", title="再生していません……。")
+            embed = MyEmbed(notif_type="inactive", title="再生していません……。")
             view = None
 
         embed.set_author(name="🎵 プレイヤー")
@@ -383,7 +383,7 @@ class Player:
             duration_sum = sum([track.duration for track in self.queue])
             embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 | {utils.make_duration_text(duration_sum)})", description=description)
         else:
-            embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
+            embed = MyEmbed(notif_type="inactive", title="再生キューは空です。")
             view = None
         result = {
             "embed": embed

@@ -84,7 +84,7 @@ class Mashiro(discord.Cog):
     async def command_reset_conversation(self, ctx: discord.ApplicationContext):
         global g_conversations
         if not ctx.channel_id in g_conversations:
-            await ctx.respond(embed=MyEmbed(notification_type="error", description="会話情報がありません。"), ephemeral=True)
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="会話情報がありません。"), ephemeral=True)
             return
         g_conversations.pop(ctx.channel.id)
         await ctx.respond(embed=MyEmbed(title="会話をリセットしました。"), delete_after=10)

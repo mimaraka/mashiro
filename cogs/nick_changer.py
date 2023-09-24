@@ -227,18 +227,18 @@ class NickChanger(discord.Cog):
     @discord.slash_command(name="change-nick", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)")
     async def change_nick(self, ctx: discord.ApplicationContext, nick: str):
         if ctx.guild is None:
-            ctx.respond(embed=MyEmbed(notification_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
+            ctx.respond(embed=MyEmbed(notif_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
             return
         elif not ctx.me.top_role.permissions.manage_nicknames:
-            ctx.respond(embed=MyEmbed(notification_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
+            ctx.respond(embed=MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
             return
         elif not ctx.author.top_role.permissions.administrator and ctx.author != ctx.guild.owner:
-            ctx.respond(embed=MyEmbed(notification_type="error", description="管理者権限のないメンバーは実行できません。"))
+            ctx.respond(embed=MyEmbed(notif_type="error", description="管理者権限のないメンバーは実行できません。"))
             return
         
         # このコマンドがすでに実行されている場合
         if self.__guild_is_nick_changed(ctx.guild):
-            ctx.respond(embed=MyEmbed(notification_type="error", description="このコマンドはすでに実行されているようです。"))
+            ctx.respond(embed=MyEmbed(notif_type="error", description="このコマンドはすでに実行されているようです。"))
             return
         # 警告ダイアログ
         self.__save_guild_replaced_nick(ctx.guild, nick)

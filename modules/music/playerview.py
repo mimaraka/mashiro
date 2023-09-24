@@ -5,7 +5,7 @@ from discord.enums import ButtonStyle
 from modules.music.errors import *
 from modules.myembed import MyEmbed
 
-EMBED_PERMISSON_DENIED = MyEmbed(notification_type="error", description="このトラックを追加したユーザー以外は操作できません。")
+EMBED_PERMISSON_DENIED = MyEmbed(notif_type="error", description="このトラックを追加したユーザー以外は操作できません。")
 
 
 # 前のトラックに戻るボタン

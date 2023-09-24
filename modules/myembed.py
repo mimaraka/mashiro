@@ -19,28 +19,28 @@ EMBED_COLOR = {
     "inactive": 0x858585,
     "warning": 0xfbf65f,
     "question": 0x2eb2ff,
-    "succeed": 0x3ae20c
+    "succeed": 0x18db66
 }
 
 NotificationType = Literal["normal", "error", "warning", "inactive", "question", "succeed"]
 
 # オリジナルの埋め込みクラス
 class MyEmbed(discord.Embed):
-    def __init__(self, *, notification_type: NotificationType = "normal", custom_color: int | None = None, custom_icon: NotificationType | None = None, title: Any | None = None, type: EmbedType = 'rich', url: Any | None = None, description: Any | None = None, timestamp: datetime.datetime | None = None, image: str = None):
+    def __init__(self, *, notif_type: NotificationType = "normal", custom_color: int | None = None, custom_icon: NotificationType | None = None, title: Any | None = None, type: EmbedType = 'rich', url: Any | None = None, description: Any | None = None, timestamp: datetime.datetime | None = None, image: str = None):
         title_ = None
         # 通知タイプ毎のカラー・タイトルの設定
-        if notification_type == "error":
+        if notif_type == "error":
             title_ = "❌ エラーが発生しました……"
-        elif notification_type == "warning":
+        elif notif_type == "warning":
             title_ = "⚠️ 警告です！"
 
         # カスタムカラー・タイトルの設定
-        color = custom_color or EMBED_COLOR[notification_type]
+        color = custom_color or EMBED_COLOR[notif_type]
         title_ = title or title_
         
         # 基底クラスの初期化
         super().__init__(colour=color, color=color, title=title_, type=type, url=url, description=description, timestamp=timestamp)
 
-        self.set_thumbnail(url=EMBED_THUMBNAIL[custom_icon or notification_type])
+        self.set_thumbnail(url=EMBED_THUMBNAIL[custom_icon or notif_type])
         if image:
             self.set_image(image)
