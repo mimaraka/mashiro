@@ -301,6 +301,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_QUEUE_EMPTY, ephemeral=True)
         else:
             player.clear_queue()
+            player.update_controller()
             await ctx.respond(embed=MyEmbed(title="再生キューをクリアしました。"), delete_after=10)
 
 
@@ -313,7 +314,7 @@ class Music(discord.Cog):
         
         try:
             await player.replay()
-            await ctx.respond(embed=MyEmbed(title="🔄 リプレイを開始しました。"), delete_after=10)
+            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="🔄 リプレイを開始しました！"), delete_after=10)
         except PlayerError as e:
             await ctx.respond(embed=MyEmbed(notif_type="error", description=e), ephemeral=True)
 
@@ -343,7 +344,7 @@ class Music(discord.Cog):
                 player.repeat = 2
             else:
                 player.repeat = 0
-            embed = MyEmbed(title=f"{ICON} リピート再生の設定を変更しました。", description=option)
+            embed = MyEmbed(notif_type="succeed", title=f"{ICON} リピート再生の設定を変更しました。", description=option)
             await player.update_controller()
         await ctx.respond(embed=embed, delete_after=10)
 
@@ -421,7 +422,7 @@ class Music(discord.Cog):
                 embed=MyEmbed(title=f"{ICON} シャッフル再生はオフです。")
         else:
             player.shuffle = switch
-            embed=MyEmbed(title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
+            embed=MyEmbed(notif_type="succeed", title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
             await player.update_controller()
 
         await ctx.respond(embed=embed, delete_after=10)

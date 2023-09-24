@@ -198,6 +198,7 @@ class Player:
     async def __play_track(self, track: Track):
         if not self.is_stopped:
             await self.abort()
+        self.__current_track = track
         await track.create_source(self.__volume)
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(track.source, after=after)
