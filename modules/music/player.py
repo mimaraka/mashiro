@@ -349,7 +349,7 @@ class Player:
     
 
     # 再生キューのEmbedを取得
-    def get_queue_msg(self, page: int=1):
+    def get_queue_msg(self, page: int=1, edit: bool=False):
         n_pages = math.ceil(len(self.queue) / 10)
 
         class ButtonPreviousPage(discord.ui.Button):
@@ -358,7 +358,7 @@ class Player:
                 super().__init__(style=discord.enums.ButtonStyle.primary, disabled=page <= 1, emoji="⬅️")
             
             async def callback(btn_self, interaction: discord.Interaction):
-                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page - 1))
+                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page - 1, edit=True))
 
         class ButtonNextPage(discord.ui.Button):
             def __init__(btn_self, page: int):
@@ -366,7 +366,7 @@ class Player:
                 super().__init__(style=discord.enums.ButtonStyle.primary, disabled=page >= n_pages, emoji="➡️")
             
             async def callback(btn_self, interaction: discord.Interaction):
-                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page + 1))
+                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page + 1, edit=True))
 
         if self.queue:
             page = min(max(page, 1), n_pages)
@@ -385,10 +385,12 @@ class Player:
         else:
             embed = MyEmbed(notification_type="inactive", title="再生キューは空です。")
             view = None
-        return {
-            "embed": embed,
-            "view": view
+        result = {
+            "embed": embed
         }
+        if edit or view is not None:
+            result["view"] = view
+        return result
 
 
     # 1つ前の曲に戻る
