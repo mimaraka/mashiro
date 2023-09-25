@@ -15,7 +15,7 @@ from modules.http import bin_startswith
 from modules.http import get_mimetype
 
 
-Track = ID3V2Track | FLACTrack | YTDLTrack | NicoNicoTrack | LocalTrack
+Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
 
 
 async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
