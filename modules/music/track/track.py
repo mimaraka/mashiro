@@ -7,6 +7,7 @@ from constants import YTDL_FORMAT_OPTIONS
 from typing import List
 from .id3v2 import ID3V2Track
 from .flac import FLACTrack
+from .riff import RIFFTrack
 from .ytdl import YTDLTrack
 from .niconico import NicoNicoTrack
 from .local import LocalTrack
@@ -26,6 +27,9 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
         # FLAC直リンクの場合
         elif await get_mimetype(text) == "audio/flac" and await bin_startswith(text, b"fLaC"):
             return [await FLACTrack.from_url(text, member)]
+        # RIFF直リンクの場合
+        elif await get_mimetype(text) in ["audio/wav", "audio/x-wav"] and await bin_startswith(text, b"RIFF"):
+            return [await RIFFTrack.from_url(text, member)]
 
     # その他はyt-dlpで処理
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:

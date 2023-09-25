@@ -10,12 +10,12 @@ from .base import BaseTrack
 
 
 # FLACのメタデータブロックを全て取得
-async def get_metadata_blocks(original_url: str):
+async def get_metadata_blocks(url: str):
     async with aiohttp.ClientSession() as session:
         current_idx = 4
         blocks = []
         while True:
-            header = await get_range_data(session, original_url, current_idx, current_idx + 3)
+            header = await get_range_data(session, url, current_idx, current_idx + 3)
             ids = header[0]
             size = int.from_bytes(header[1:], "big")
             data_types = [
@@ -27,7 +27,7 @@ async def get_metadata_blocks(original_url: str):
                 "CUESHEET",
                 "PICTURE"
             ]
-            data = await get_range_data(session, original_url, current_idx + 4, current_idx + 3 + size)
+            data = await get_range_data(session, url, current_idx + 4, current_idx + 3 + size)
 
             blocks.append({
                 "type": data_types[ids & 0b01111111],
@@ -43,12 +43,12 @@ async def get_metadata_blocks(original_url: str):
 # FLAC音声リンクのトラック
 class FLACTrack(BaseTrack):
     @classmethod
-    async def from_url(cls, original_url: str, member: discord.Member):
+    async def from_url(cls, url: str, member: discord.Member):
         duration = None
         thumbnail = None
         tags = {}
 
-        blocks = await get_metadata_blocks(original_url)
+        blocks = await get_metadata_blocks(url)
         # メタデータブロック毎に処理
         for block in blocks:
             data = block["data"]
@@ -83,12 +83,12 @@ class FLACTrack(BaseTrack):
                 thumbnail = make_filename_by_seq(f"data/temp/cover_{member.guild.id}.{ext}")
                 img.save(thumbnail)
         
-        filename = os.path.splitext(original_url.split("/")[-1])[0]
+        filename = os.path.splitext(url.split("/")[-1])[0]
         return cls(
             member=member,
             title=tags.get("title") or filename,
-            source_url=original_url,
-            original_url=original_url,
+            source_url=url,
+            original_url=url,
             duration=duration,
             artist=tags.get("artist"),
             album=tags.get("album"),

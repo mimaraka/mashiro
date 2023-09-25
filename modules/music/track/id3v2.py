@@ -12,16 +12,16 @@ from .base import BaseTrack
 
 class ID3V2Track(BaseTrack):
     @classmethod
-    async def from_url(cls, original_url: str, member: discord.Member):
+    async def from_url(cls, url: str, member: discord.Member):
         async with aiohttp.ClientSession() as session:
-            if (size_data := await get_range_data(session, original_url, 0, 10)) is None:
+            if (size_data := await get_range_data(session, url, 0, 10)) is None:
                 return None
 
             size_encorded = bytearray(size_data[6:])
             size = reduce(lambda a, b: a * 128 + b, size_encorded, 0)
 
             header = BytesIO()
-            data = await get_range_data(session, original_url, 0, size + 2881)
+            data = await get_range_data(session, url, 0, size + 2881)
             header.write(data)
             header.seek(0)
 
@@ -35,12 +35,12 @@ class ID3V2Track(BaseTrack):
         else:
             thumbnail = None
 
-        filename = os.path.splitext(original_url.split("/")[-1])[0]
+        filename = os.path.splitext(url.split("/")[-1])[0]
         return cls(
             member=member,
             title=str(audio.tags.get("TIT2")) or filename,
-            source_url=original_url,
-            original_url=original_url,
+            source_url=url,
+            original_url=url,
             duration=int(audio.info.length),
             artist=str(audio.tags.get("TPE1")),
             album=str(audio.tags.get("TALB")),
