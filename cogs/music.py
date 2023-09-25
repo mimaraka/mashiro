@@ -430,9 +430,10 @@ class Music(discord.Cog):
 
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
-    @discord.option("channel", description="URLを検索するチャンネル")
+    @discord.option("channel", description="URLを検索するチャンネル", required=False, default=None)
+    @discord.option("channel_id", description="URLを検索するチャンネルのID(私が所属している全てのサーバーのチャンネルをIDから参照できます)。", required=False, default=None)
     @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20, required=False)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, n: int):
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_id: int, n: int):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -444,6 +445,19 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
+        if channel is None and channel_id is None:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="`channel`と`channel_id`のいずれか一方を必ず指定してください。"))
+            return
+        elif channel_id is not None:
+            c = self.bot.get_channel(channel_id)
+            if c is None:
+                await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたIDからのチャンネルの取得に失敗しました。"))
+                return
+            else:
+                search_channel = c
+        else:
+            search_channel = channel
+        
         embed = MyEmbed(notif_type="inactive", title="🔎 1. 検索中です……。")
         inter = await ctx.respond(embed=embed)
         msg_proc = await inter.original_response()
@@ -452,7 +466,7 @@ class Music(discord.Cog):
 
         tracks = []
         message_count = 1
-        async for message in channel.history(limit=n):
+        async for message in search_channel.history(limit=n):
             for url in await find_valid_urls(message):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
