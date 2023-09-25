@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import re
 import time
 from typing import Dict
 from youtubesearchpython import VideosSearch
@@ -431,32 +432,35 @@ class Music(discord.Cog):
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
     @discord.option("channel", description="URLを検索するチャンネル", required=False, default=None)
-    @discord.option("channel_id", description="URLを検索するチャンネルのID(私が所属している全てのサーバーのチャンネルをIDから参照できます)。", required=False, default=None)
+    @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", required=False, default=None)
     @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20, required=False)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_id: int, n: int):
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
+        
+        if channel is None and channel_url is None:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="`channel`と`channel_url`のいずれか一方を必ず指定してください。"), ephemeral=True)
+            return
+        elif channel_url is not None:
+            if not re.fullmatch(r"https?://discord.com/channels/\d+/\d+", channel_url):
+                await ctx.respond(embed=MyEmbed(notif_type="error", description="チャンネルのURLの形式が正しくありません。"), ephemeral=True)
+                return
+            c = self.bot.get_channel(int(channel_url.split("/")[-1]))
+            if c is None:
+                await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたURLからのチャンネルの取得に失敗しました。"), ephemeral=True)
+                return
+            else:
+                search_channel = c
+        else:
+            search_channel = channel
 
         player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
         # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
         if ctx.voice_client.channel != ctx.author.voice.channel:
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
-        
-        if channel is None and channel_id is None:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="`channel`と`channel_id`のいずれか一方を必ず指定してください。"))
-            return
-        elif channel_id is not None:
-            c = self.bot.get_channel(channel_id)
-            if c is None:
-                await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたIDからのチャンネルの取得に失敗しました。"))
-                return
-            else:
-                search_channel = c
-        else:
-            search_channel = channel
         
         embed = MyEmbed(notif_type="inactive", title="🔎 1. 検索中です……。")
         inter = await ctx.respond(embed=embed)
