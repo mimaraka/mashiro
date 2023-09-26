@@ -1,3 +1,4 @@
+import aiohttp
 import asyncio
 import discord
 import re
@@ -21,15 +22,19 @@ Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTr
 async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
     # URLの場合
     if utils.is_url(text):
-        # ID3V2直リンクの場合
-        if await get_mimetype(text) == "audio/mpeg" and await bin_startswith(text, b"ID3"):
-            return [await ID3V2Track.from_url(text, member)]
-        # FLAC直リンクの場合
-        elif await get_mimetype(text) == "audio/flac" and await bin_startswith(text, b"fLaC"):
-            return [await FLACTrack.from_url(text, member)]
-        # RIFF直リンクの場合
-        elif await get_mimetype(text) in ["audio/wav", "audio/x-wav"] and await bin_startswith(text, b"RIFF"):
-            return [await RIFFTrack.from_url(text, member)]
+        try:
+            # ID3V2直リンクの場合
+            if await get_mimetype(text) == "audio/mpeg" and await bin_startswith(text, b"ID3"):
+                return [await ID3V2Track.from_url(text, member)]
+            # FLAC直リンクの場合
+            elif await get_mimetype(text) == "audio/flac" and await bin_startswith(text, b"fLaC"):
+                return [await FLACTrack.from_url(text, member)]
+            # RIFF直リンクの場合
+            elif await get_mimetype(text) in ["audio/wav", "audio/x-wav"] and await bin_startswith(text, b"RIFF"):
+                return [await RIFFTrack.from_url(text, member)]
+        # URLが見つからない場合
+        except aiohttp.ClientResponseError:
+            return None
 
     # その他はyt-dlpで処理
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
