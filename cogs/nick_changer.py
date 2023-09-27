@@ -44,11 +44,6 @@ class NickChanger(discord.Cog):
     def __member_is_changed(self, member: discord.Member) -> bool:
         data = self.__get_json()
         return self.__guild_is_changed(member.guild) and str(member.id) in data[str(member.guild.id)]
-        
-    # メンバーの元のニックネームを取得
-    def __get_member_old_nick(self, member: discord.Member):
-        data = self.__get_json()
-        return data.get(str(member.guild.id)) and data.get(str(member.guild.id)).get(str(member.id))
     
     # メンバーの元のニックネームをjsonファイルに登録
     def __save_member_old_nick(self, member: discord.Member):
