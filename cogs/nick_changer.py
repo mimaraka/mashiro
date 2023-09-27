@@ -70,6 +70,8 @@ class NickChanger(discord.Cog):
     # ギルド毎の置き換え後のニックネームをjsonファイルに登録
     def __set_guild_replaced_nick(self, guild: discord.Guild, nick: str) -> None:
         data = self.__get_json()
+        if data.get(str(guild.id)) is None:
+            data[str(guild.id)] = {}
         data[str(guild.id)]["nick"] = nick
         self.__set_json(data)
 
