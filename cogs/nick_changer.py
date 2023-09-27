@@ -40,7 +40,7 @@ class NickChanger(discord.Cog):
     async def __restore_member_nick(self, member: discord.Member) -> bool:
         if self.__member_is_changed(member):
             old_nick = self.__get_member_old_nick(member)
-            return self.__set_member_nick(member, old_nick)
+            return await self.__set_member_nick(member, old_nick)
         return False
 
     # ニックネーム変更コマンドが適用されたギルドであるかどうか
