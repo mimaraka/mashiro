@@ -8,6 +8,7 @@ from modules.mashilog import mashilog
 
 from cogs.mashiro import Mashiro
 from cogs.music import Music
+from cogs.nick_changer import NickChanger
 from cogs.others import Others
 
 
@@ -38,6 +39,7 @@ async def on_message(message: discord.Message):
 # コグの設定
 bot.add_cog(Mashiro(bot))
 bot.add_cog(Music(bot))
+bot.add_cog(NickChanger(bot))
 bot.add_cog(Others(bot))
 
 # Botを実行
