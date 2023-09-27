@@ -33,7 +33,7 @@ class NickChanger(discord.Cog):
     async def __change_member_nick(self, member: discord.Member) -> bool:
         if (nick := self.__get_guild_replaced_nick(member.guild)) is not None:
             if member.nick != nick:
-                return self.__set_member_nick(member, nick)
+                return await self.__set_member_nick(member, nick)
         return False
     
     # 指定したギルドメンバーのニックネームを元に戻す
