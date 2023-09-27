@@ -147,6 +147,7 @@ class NickChanger(discord.Cog):
             ),
             delete_after=10
         )
+        print(self.__get_json())
 
     # ギルドメンバー全員のニックネームを元に戻すコマンド
     @discord.slash_command(name="restore-nick", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)")
@@ -169,3 +170,4 @@ class NickChanger(discord.Cog):
             embed=MyEmbed(notif_type="succeed", title="ニックネームを元に戻しました。"),
             delete_after=10
         )
+        print(self.__get_json())
