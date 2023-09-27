@@ -35,13 +35,6 @@ class NickChanger(discord.Cog):
             if member.nick != nick:
                 return await self.__set_member_nick(member, nick)
         return False
-    
-    # 指定したギルドメンバーのニックネームを元に戻す
-    async def __restore_member_nick(self, member: discord.Member) -> bool:
-        if self.__member_is_changed(member):
-            old_nick = self.__get_member_old_nick(member)
-            return await self.__set_member_nick(member, old_nick)
-        return False
 
     # ニックネーム変更コマンドが適用されたギルドであるかどうか
     def __guild_is_changed(self, guild: discord.Guild) -> bool:
@@ -93,11 +86,14 @@ class NickChanger(discord.Cog):
 
     # 指定したギルドのメンバー全員のニックネームを元に戻す
     async def __restore_guild_nick(self, guild: discord.Guild) -> None:
-        for member in guild.members:
-            await self.__restore_member_nick(member)
         data = self.__get_json()
-        data.pop(str(guild.id))
+        old_nicks = data.pop(str(guild.id))
         self.__set_json(data)
+
+        for key, old_nick in old_nicks.items():
+            if key != "nick":
+                if (member := guild.get_member(int(key))) is not None:
+                    await self.__set_member_nick(member, old_nick)
 
     # Bot起動時
     @discord.Cog.listener()
