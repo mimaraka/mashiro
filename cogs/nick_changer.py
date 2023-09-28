@@ -80,8 +80,11 @@ class NickChanger(discord.Cog):
             await self.__change_member_nick(member)
 
     # 指定したギルドのメンバー全員のニックネームを元に戻す
-    async def __restore_guild_nick(self, guild: discord.Guild) -> None:
+    async def __restore_guild_nick(self, guild: discord.Guild) -> bool:
         data = self.__get_json()
+        if not str(guild.id) in data:
+            return False
+        
         old_nicks = data.pop(str(guild.id))
         self.__set_json(data)
 
@@ -89,6 +92,7 @@ class NickChanger(discord.Cog):
             if key != "nick":
                 if (member := guild.get_member(int(key))) is not None:
                     await self.__set_member_nick(member, old_nick)
+        return True
 
     # Bot起動時
     @discord.Cog.listener()
@@ -119,13 +123,31 @@ class NickChanger(discord.Cog):
         can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
         is_author_administrator = any([role.permissions.administrator for role in ctx.author.roles])
         if ctx.guild is None:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
+            await ctx.respond(
+                embed=MyEmbed(
+                    notif_type="error",
+                    description="ダイレクトメッセージでは実行できません。"
+                ),
+                ephemeral=True
+            )
             return
         elif not can_bot_manage_nicknames:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
+            await ctx.respond(
+                embed=MyEmbed(
+                    notif_type="error",
+                    description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"
+                ),
+                ephemeral=True
+            )
             return
         elif not is_author_administrator and ctx.author != ctx.guild.owner:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="管理者権限のないメンバーは実行できません。"))
+            await ctx.respond(
+                embed=MyEmbed(
+                    notif_type="error",
+                    description="管理者権限のないメンバーは実行できません。"
+                ),
+                ephemeral=True
+            )
             return
         
         await ctx.defer()
@@ -155,8 +177,16 @@ class NickChanger(discord.Cog):
             return
         
         await ctx.defer()
-        await self.__restore_guild_nick(ctx.guild)
-        await ctx.respond(
-            embed=MyEmbed(notif_type="succeed", title="ニックネームを元に戻しました。"),
-            delete_after=10
-        )
+        if not await self.__restore_guild_nick(ctx.guild):
+            await ctx.respond(
+                embed=MyEmbed(
+                    notif_type="error",
+                    description="ニックネームは変更されていません。"
+                ),
+                ephemeral=True
+            )
+        else:
+            await ctx.respond(
+                embed=MyEmbed(notif_type="succeed", title="ニックネームを元に戻しました。"),
+                delete_after=10
+            )
