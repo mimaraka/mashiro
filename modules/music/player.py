@@ -113,7 +113,7 @@ class Player:
     @staticmethod
     def track_text(track: Track, italic: bool=False, queue: bool=False):
         max_title = 40 if queue else 200
-        title = utils.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.replace("*", "∗")), max_title)
+        title = utils.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
         if track.original_url is not None:
             max_title_url = 145 if queue else 1000
             if len(title) + len(track.original_url) > max_title_url:
