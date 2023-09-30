@@ -302,7 +302,7 @@ class Music(discord.Cog):
             await ctx.respond(embed=EMBED_QUEUE_EMPTY, ephemeral=True)
         else:
             player.clear_queue()
-            player.update_controller()
+            await player.update_controller()
             await ctx.respond(embed=MyEmbed(title="再生キューをクリアしました。"), delete_after=10)
 
 
