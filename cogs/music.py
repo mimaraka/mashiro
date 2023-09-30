@@ -559,6 +559,7 @@ class Music(discord.Cog):
             tracks += await create_tracks(self.bot.loop, video.get("link"), ctx.author)
 
         if not tracks:
+            await msg_proc.delete()
             await ctx.respond(embed=MyEmbed(notif_type="error", description="検索結果がありませんでした。"), ephemeral=True)
             return
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
