@@ -532,8 +532,9 @@ class Music(discord.Cog):
 
     # /search
     @discord.slash_command(name="search", description="YouTubeの検索結果を再生します。")
+    @discord.option("keyword", description="検索語句")
     @discord.option("limit", description="検索する動画の最大件数(デフォルト: 10件)", required=False, default=10)
-    async def command_search(self, ctx: discord.ApplicationContext, limit: int):
+    async def command_search(self, ctx: discord.ApplicationContext, keyword: str, limit: int):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -549,7 +550,7 @@ class Music(discord.Cog):
         msg_proc = await inter.original_response()
         
         search_result = await self.bot.loop.run_in_executor(
-            None, lambda: VideosSearch(ctx.value, limit=limit)
+            None, lambda: VideosSearch(keyword, limit=limit)
         )
         videos = search_result.result().get("result")
         
