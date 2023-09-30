@@ -70,7 +70,11 @@ class Music(discord.Cog):
             emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
         else:
             emoji = "⌛"
-        embed=MyEmbed(notif_type="inactive", title=f"{emoji} {prefix}処理中です……。")
+        embed = MyEmbed(
+            notif_type="inactive",
+            title=f"{emoji} {prefix}処理中です……。",
+            description="しばらくお待ちください。"
+        )
         return embed
 
 
