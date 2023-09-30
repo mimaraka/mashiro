@@ -4,7 +4,8 @@ import discord
 import yt_dlp
 from constants import YTDL_FORMAT_OPTIONS, FFMPEG_OPTIONS
 from modules.mashilog import mashilog
-from modules.music.track.base import BaseTrack
+from .base import BaseTrack
+from ..duration import Duration
 
 
 class YTDLTrack(BaseTrack):
@@ -15,7 +16,7 @@ class YTDLTrack(BaseTrack):
             title: str,
             source_url: str,
             original_url: str,
-            duration: int | None=None,
+            duration: Duration | None=None,
             artist: str | None=None,
             thumbnail: str | None=None
     ) -> None:

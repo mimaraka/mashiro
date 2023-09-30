@@ -8,6 +8,7 @@ from PIL import Image
 from modules.file import make_filename_by_seq
 from modules.http import get_range_data
 from .base import BaseTrack
+from ..duration import Duration
 
 
 class ID3V2Track(BaseTrack):
@@ -41,7 +42,7 @@ class ID3V2Track(BaseTrack):
             title=str(audio.tags.get("TIT2")) or filename,
             source_url=url,
             original_url=url,
-            duration=int(audio.info.length),
+            duration=Duration(audio.info.length),
             artist=str(audio.tags.get("TPE1")),
             album=str(audio.tags.get("TALB")),
             thumbnail=thumbnail

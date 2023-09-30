@@ -2,6 +2,7 @@ import discord
 from constants import FFMPEG_OPTIONS
 from niconico import NicoNico
 from .base import BaseTrack
+from ..duration import Duration
 
 
 class NicoNicoTrack(BaseTrack):
@@ -10,7 +11,7 @@ class NicoNicoTrack(BaseTrack):
             member: discord.Member,
             title: str,
             original_url: str,
-            duration: int | None=None,
+            duration: Duration | None=None,
             artist: str | None=None,
             album: str | None=None,
             thumbnail: str | None=None

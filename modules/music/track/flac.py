@@ -7,6 +7,7 @@ from PIL import Image
 from modules.http import get_range_data
 from modules.file import make_filename_by_seq
 from .base import BaseTrack
+from ..duration import Duration
 
 
 # FLACのメタデータブロックを全て取得
@@ -44,7 +45,7 @@ async def get_metadata_blocks(url: str):
 class FLACTrack(BaseTrack):
     @classmethod
     async def from_url(cls, url: str, member: discord.Member):
-        duration = None
+        duration_sec = None
         thumbnail = None
         tags = {}
 
@@ -57,7 +58,7 @@ class FLACTrack(BaseTrack):
                 sample_rate = int.from_bytes(data[10:13], "big") // 0x10
                 n_samples = int.from_bytes(data[13:18], "big") & 0xFFFFFFFFF
                 if sample_rate and n_samples:
-                    duration = n_samples // sample_rate
+                    duration_sec = n_samples // sample_rate
             # VORBIS_COMMENT(タグ等)の場合
             elif block["type"] == "VORBIS_COMMENT":
                 vendor_length = int.from_bytes(data[:4], "little")
@@ -89,7 +90,7 @@ class FLACTrack(BaseTrack):
             title=tags.get("title") or filename,
             source_url=url,
             original_url=url,
-            duration=duration,
+            duration=Duration(duration_sec),
             artist=tags.get("artist"),
             album=tags.get("album"),
             thumbnail=thumbnail

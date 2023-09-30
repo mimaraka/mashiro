@@ -16,6 +16,7 @@ from modules.mashilog import mashilog
 from .track.track import Track, LocalTrack
 from .playerview import PlayerView
 from .errors import *
+from .duration import Duration
 
 
 class Player:
@@ -126,7 +127,7 @@ class Player:
         decoration = "***" if italic else "**"
         result = f"{decoration}{result}{decoration}"
         if track.duration is not None:
-            result += f" | {utils.make_duration_text(track.duration)}"
+            result += f" | {track.duration.text}"
         return result
     
     # 複数のトラック情報のテキストを生成(最大10件まで表示)
@@ -381,8 +382,8 @@ class Player:
                 view.add_item(ButtonNextPage(page))
             else:
                 view = None
-            duration_sum = sum([track.duration if track.duration is not None else 0 for track in self.queue])
-            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 | {utils.make_duration_text(duration_sum)})", description=description)
+            seconds_sum = sum([track.duration.seconds if track.duration is not None else 0 for track in self.queue])
+            embed = MyEmbed(title=f"再生キュー ({len(self.queue)}曲 | {Duration(seconds_sum).text})", description=description)
         else:
             embed = MyEmbed(notif_type="inactive", title="再生キューは空です。")
             view = None

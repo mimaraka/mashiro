@@ -9,7 +9,7 @@ import constants as const
 import modules.utils as utils
 from modules.attachments import MIMETYPES_FFMPEG
 from modules.myembed import MyEmbed
-from modules.music.track.track import create_tracks
+from modules.music.track.track import create_tracks, YTDLTrack
 from modules.music.player import Player
 from modules.music.errors import *
 from modules.attachments import find_valid_urls
@@ -530,9 +530,43 @@ class Music(discord.Cog):
         await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
 
 
+    # /search
+    @discord.slash_command(name="search", description="YouTubeの検索結果を再生します。")
+    @discord.option("limit", description="検索する動画の最大件数(デフォルト: 10件)", required=False, default=10)
+    async def command_search(self, ctx: discord.ApplicationContext, limit: int):
+        # コマンドを送ったメンバーがボイスチャンネルに居ない場合
+        if ctx.author.voice is None:
+            await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
+            return
+
+        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
+        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
+        if ctx.voice_client.channel != ctx.author.voice.channel:
+            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+            return
+        
+        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
+        msg_proc = await inter.original_response()
+        
+        search_result = await self.bot.loop.run_in_executor(
+            None, lambda: VideosSearch(ctx.value, limit=limit)
+        )
+        videos = search_result.result().get("result")
+        
+        tracks = []
+        for video in videos:
+            tracks += await create_tracks(self.bot.loop, video.get("link"), ctx.author)
+
+        if not tracks:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="検索結果がありませんでした。"), ephemeral=True)
+            return
+        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
+        
+
+
     # /voice
     @discord.slash_command(name="voice", description="私の声が聞きたいのですか？")
-    async def voice(self, ctx: discord.ApplicationContext):
+    async def command_voice(self, ctx: discord.ApplicationContext):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)

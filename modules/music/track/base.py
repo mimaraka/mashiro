@@ -1,5 +1,6 @@
 import discord
 from constants import FFMPEG_OPTIONS
+from ..duration import Duration
 
 
 class BaseTrack:
@@ -11,7 +12,7 @@ class BaseTrack:
             title: str,
             source_url: str,
             original_url: str | None=None,
-            duration: int | None=None,
+            duration: Duration | None=None,
             artist: str | None=None,
             album: str | None=None,
             thumbnail: str | None=None
@@ -20,7 +21,7 @@ class BaseTrack:
         self.title: str = title
         self.source_url: str = source_url
         self.original_url: str | None = original_url
-        self.duration: int | None = duration
+        self.duration: Duration | None = duration
         self.artist: str | None = artist
         self.album: str | None = album
         self.thumbnail: str | None = thumbnail

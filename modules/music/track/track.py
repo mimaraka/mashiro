@@ -14,6 +14,7 @@ from .niconico import NicoNicoTrack
 from .local import LocalTrack
 from modules.http import bin_startswith
 from modules.http import get_mimetype
+from ..duration import Duration
 
 
 Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
@@ -66,7 +67,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
                         member=member,
                         title=i.get("title"),
                         original_url=i.get("webpage_url") or i.get("original_url"),
-                        duration=i.get("duration") and int(i.get("duration")),
+                        duration=i.get("duration") and Duration(i.get("duration")),
                         artist=i.get("uploader"),
                         album=series_title,
                         thumbnail=i.get("thumbnail")
@@ -80,7 +81,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
                         title=i.get("title"),
                         source_url=i.get("url"),
                         original_url=i.get("webpage_url") or i.get("original_url"),
-                        duration=i.get("duration") and int(i.get("duration")),
+                        duration=i.get("duration") and Duration(i.get("duration")),
                         artist=i.get("uploader"),
                         thumbnail=i.get("thumbnail")
                     )

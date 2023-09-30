@@ -4,6 +4,7 @@ import math
 import os
 from modules.http import get_range_data
 from .base import BaseTrack
+from ..duration import Duration
 
 
 # RIFFのdataを除くチャンクを全て取得
@@ -48,7 +49,7 @@ def get_subchunks(chunk_data: bytes):
 class RIFFTrack(BaseTrack):
     @classmethod
     async def from_url(cls, url: str, member: discord.Member):
-        duration = None
+        duration_sec = None
         tags = {}
 
         chunks, samples_size = await get_chunks(url)
@@ -56,7 +57,7 @@ class RIFFTrack(BaseTrack):
             data = chunk["data"]
             if chunk["type"] == b"fmt ":
                 avr_sample_size = int.from_bytes(data[8:12], "little")
-                duration = samples_size // avr_sample_size
+                duration_sec = samples_size // avr_sample_size
             elif chunk["type"] == b"LIST":
                 if data[:4] == b"INFO":
                     subchunks = get_subchunks(data[4:])
@@ -74,7 +75,7 @@ class RIFFTrack(BaseTrack):
             title=tags.get("title") or filename,
             source_url=url,
             original_url=url,
-            duration=duration,
+            duration=Duration(duration_sec),
             artist=tags.get("artist"),
             album=tags.get("album"),
             thumbnail=None
