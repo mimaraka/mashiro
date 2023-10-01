@@ -46,7 +46,7 @@ bot.add_cog(CogNickChanger(bot))
 bot.add_cog(CogOthers(bot))
 
 # rembgのモデルをダウンロードしておく
-rembg.new_session()
+#rembg.new_session()
 
 # Botを実行
 bot.run(os.getenv("DISCORD_BOT_TOKEN"))
