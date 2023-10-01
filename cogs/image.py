@@ -25,6 +25,8 @@ class CogImage(discord.Cog):
         files_i: List[str] = []
         files_o: List[str] = []
         b_images: List[bytes] = []
+
+        await ctx.defer()
         
         if attachment:
             await attachment.save(f"{path_base}_i.png")
