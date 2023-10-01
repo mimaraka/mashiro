@@ -6,10 +6,11 @@ import os
 from modules.kotobagari import kotobagari_proc
 from modules.mashilog import mashilog
 
-from cogs.mashiro import Mashiro
-from cogs.music import Music
-from cogs.nick_changer import NickChanger
-from cogs.others import Others
+from cogs.image import CogImage
+from cogs.mashiro import CogMashiro
+from cogs.music import CogMusic
+from cogs.nick_changer import CogNickChanger
+from cogs.others import CogOthers
 
 
 load_dotenv(verbose=True)
@@ -37,10 +38,11 @@ async def on_message(message: discord.Message):
 
 
 # コグの設定
-bot.add_cog(Mashiro(bot))
-bot.add_cog(Music(bot))
-bot.add_cog(NickChanger(bot))
-bot.add_cog(Others(bot))
+bot.add_cog(CogImage(bot))
+bot.add_cog(CogMashiro(bot))
+bot.add_cog(CogMusic(bot))
+bot.add_cog(CogNickChanger(bot))
+bot.add_cog(CogOthers(bot))
 
 # Botを実行
 bot.run(os.getenv("DISCORD_BOT_TOKEN"))

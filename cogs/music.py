@@ -7,7 +7,6 @@ from youtubesearchpython import VideosSearch
 
 import constants as const
 import modules.utils as utils
-from modules.attachments import MIMETYPES_FFMPEG
 from modules.myembed import MyEmbed
 from modules.music.track.track import create_tracks
 from modules.music.player import Player
@@ -34,7 +33,7 @@ async def yt_title_autocomplete(ctx: discord.AutocompleteContext):
     return [info.get("title") for info in search_result.result().get("result")]
 
 
-class Music(discord.Cog):
+class CogMusic(discord.Cog):
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
         self.__player: Dict[int, Player] = {}
@@ -342,7 +341,7 @@ class Music(discord.Cog):
             return
         
         # 添付ファイルの形式を調べる
-        if await get_mimetype(attachment.url) not in MIMETYPES_FFMPEG:
+        if await get_mimetype(attachment.url) not in const.MIMETYPES_FFMPEG:
             await ctx.respond(
                 embed=MyEmbed(notif_type="error", description="添付ファイルの形式が正しくありません。"),
                 ephemeral=True

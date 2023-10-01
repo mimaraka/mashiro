@@ -1,3 +1,5 @@
+import aiohttp
+import aiofiles
 import discord
 import re
 import requests
@@ -41,31 +43,6 @@ async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typi
 
 
 # MediaType = typing.Literal["image", "gif", "audio", "video"]
-
-MIMETYPES_FFMPEG = [
-    "audio/aac",
-    "audio/basic",
-    "audio/flac",
-    "audio/mpeg",
-    "audio/ogg",
-    "audio/x-aiff",
-    "audio/x-ms-wma",
-    "audio/wav",
-    "audio/x-wav",
-    "audio/vnd.qcelp",
-    "audio/x-pn-realaudio",
-    "audio/x-twinvq",
-    "video/quicktime",
-    "video/mp4",
-    "video/mpeg",
-    "video/vnd.rn-realvideo",
-    "video/vnd.vivo",
-    "video/wavelet",
-    "video/webm",
-    "video/x-flv",
-    "video/x-ms-asf",
-    "video/x-msvideo"
-]
 
 # 添付ファイルを取得する関数
 async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_url: str=None, return_url=False):
@@ -127,4 +104,9 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
         return valid_urls
     # バイナリのリストを返す
     else:
-        return [requests.get(url).content for url in valid_urls]
+        result = []
+        for url in valid_urls:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    result.append(await resp.read())
+        return result

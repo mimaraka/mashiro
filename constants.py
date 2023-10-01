@@ -40,3 +40,28 @@ FFMPEG_OPTIONS = {
     "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3",
     "options": "-vn",
 }
+
+MIMETYPES_FFMPEG = [
+    "audio/aac",
+    "audio/basic",
+    "audio/flac",
+    "audio/mpeg",
+    "audio/ogg",
+    "audio/x-aiff",
+    "audio/x-ms-wma",
+    "audio/wav",
+    "audio/x-wav",
+    "audio/vnd.qcelp",
+    "audio/x-pn-realaudio",
+    "audio/x-twinvq",
+    "video/quicktime",
+    "video/mp4",
+    "video/mpeg",
+    "video/vnd.rn-realvideo",
+    "video/vnd.vivo",
+    "video/wavelet",
+    "video/webm",
+    "video/x-flv",
+    "video/x-ms-asf",
+    "video/x-msvideo"
+]

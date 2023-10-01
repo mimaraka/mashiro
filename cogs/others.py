@@ -2,7 +2,7 @@ import discord
 from modules.myembed import MyEmbed
 
 
-class Others(discord.Cog):
+class CogOthers(discord.Cog):
     def __init__(self, bot: discord.Bot) -> None:
         self.bot: discord.Bot = bot
 

@@ -33,7 +33,7 @@ MASHIRO_QUOTES_NEWYEAR = [
 g_conversations: typing.Dict[int, typing.List[dict]] = {}
 
 
-class Mashiro(discord.Cog):
+class CogMashiro(discord.Cog):
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
 

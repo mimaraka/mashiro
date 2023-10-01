@@ -3,7 +3,7 @@ import json
 from modules.myembed import MyEmbed
 
 
-class NickChanger(discord.Cog):
+class CogNickChanger(discord.Cog):
     DATA_PATH = "data/old_nicks.json"
 
     # コンストラクタ
