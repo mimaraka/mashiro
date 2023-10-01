@@ -1,4 +1,4 @@
-# ***Mashiro***
+<h1 align="center"><i><b>Mashiro</b></i></h1>
 
 ![mashiro_swimsuit_spr-04_0_waifu2x_2x_2n_png](https://github.com/mimaraka/mashiro/assets/106879397/9d085f2d-8846-4f4b-b992-a2bbfef8c0ad)
 
