@@ -1,7 +1,6 @@
 import aiofiles
 import discord
 import os
-import rembg
 from typing import List
 from modules.http import get_mimetype
 from modules.myembed import MyEmbed

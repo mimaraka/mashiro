@@ -2,7 +2,6 @@ import discord
 from dotenv import load_dotenv
 import openai
 import os
-import rembg
 
 from modules.kotobagari import kotobagari_proc
 from modules.mashilog import mashilog
@@ -44,9 +43,6 @@ bot.add_cog(CogMashiro(bot))
 bot.add_cog(CogMusic(bot))
 bot.add_cog(CogNickChanger(bot))
 bot.add_cog(CogOthers(bot))
-
-# rembgのモデルをダウンロードしておく
-#rembg.new_session()
 
 # Botを実行
 bot.run(os.getenv("DISCORD_BOT_TOKEN"))
