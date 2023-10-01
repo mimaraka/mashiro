@@ -38,7 +38,6 @@ class CogImage(discord.Cog):
                     await f.write(b)
 
         for file in files_i:
-            await attachment.save(file)
             image = Image.open(file)
             result = rembg.remove(image)
             file_o = f"{os.path.splitext(file)[0]}_o.png"
