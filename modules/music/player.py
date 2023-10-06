@@ -252,8 +252,7 @@ class Player:
         self.__history_idcs.clear()
         self.__current_index = 0
         self.__current_track = None
-        await self.__controller_msg.delete()
-        self.__controller_msg = None
+        await self.delete_controller()
 
         for f in glob.glob(f"data/temp/cover_{self.__voice_client.guild.id}_*.*"):
             os.remove(f)
@@ -348,6 +347,7 @@ class Player:
                 await self.__controller_msg.delete()
             except discord.errors.NotFound:
                 pass
+            self.__controller_msg = None
     
 
     # 再生キューのEmbedを取得

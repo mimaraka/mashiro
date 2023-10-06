@@ -97,6 +97,7 @@ class CogMusic(discord.Cog):
                 await asyncio.sleep(5)
                 if not member.guild.voice_client or not member.guild.voice_client.is_connected():
                     if member.guild.id in self.__player:
+                        await self.__player.get(member.guild.id).delete_controller()
                         self.__player.pop(member.guild.id)
                         mashilog("playerオブジェクトが残っていたため、削除しました。")
             return
