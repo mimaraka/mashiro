@@ -3,7 +3,7 @@ import asyncio
 import discord
 import re
 import yt_dlp
-import modules.utils as utils
+import modules.util as util
 from constants import YTDL_FORMAT_OPTIONS
 from typing import List
 from .id3v2 import ID3V2Track
@@ -22,7 +22,7 @@ Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTr
 
 async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
     # URLの場合
-    if utils.is_url(text):
+    if util.is_url(text):
         try:
             # ID3V2直リンクの場合
             if await get_mimetype(text) == "audio/mpeg" and await bin_startswith(text, b"ID3"):

@@ -1,14 +1,16 @@
 import asyncio
 import discord
+import glob
 import re
 import time
 from typing import Dict
 from youtubesearchpython import VideosSearch
 
 import constants as const
-import modules.utils as utils
+import modules.util as util
 from modules.myembed import MyEmbed
 from modules.music.track.track import create_tracks
+from modules.music.track.local import LocalTrack
 from modules.music.player import Player
 from modules.music.errors import *
 from modules.attachments import find_valid_urls
@@ -23,8 +25,10 @@ EMBED_BOT_ANOTHER_VC = MyEmbed(notif_type="error", description="私は既に別�
 EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notif_type="error", description="先生がボイスチャンネルに接続されていないようです。")
 EMBED_FAILED_TO_CREATE_TRACKS = MyEmbed(notif_type="error", description="トラックの生成に失敗しました。")
 
+OST_FILES = glob.glob("data/bluearchive_ost/*")
 
-async def yt_title_autocomplete(ctx: discord.AutocompleteContext):
+
+async def autocomp_yt_title(ctx: discord.AutocompleteContext):
     if not ctx.value:
         return []
     search_result = await ctx.bot.loop.run_in_executor(
@@ -170,7 +174,7 @@ class CogMusic(discord.Cog):
         # ボイスチャンネルに接続する
         player = await self.connect(ctx.author.voice.channel)
         await ctx.respond(
-            embed=MyEmbed(notif_type="succeed", title=f"接続しました！ (🔊 {utils.escape_markdown(ctx.author.voice.channel.name)})"),
+            embed=MyEmbed(notif_type="succeed", title=f"接続しました！ (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})"),
             delete_after=10
         )
         # 0.5秒後にランダムにボイスを再生する
@@ -201,7 +205,7 @@ class CogMusic(discord.Cog):
         parameter_name="text",
         name="input",
         description="再生したい曲のURL、またはYouTube上で検索するタイトル",
-        autocomplete=yt_title_autocomplete
+        autocomplete=autocomp_yt_title
     )
     @discord.option("interrupt", description="キューを無視して割り込み再生をさせるかどうか", required=False, default=False)
     async def command_play(self, ctx: discord.ApplicationContext, text: str, interrupt: bool):
@@ -383,6 +387,25 @@ class CogMusic(discord.Cog):
         await player.play_random_voice(ctx, msg_proc=msg_proc)
 
 
+    # /baost
+    # @discord.slash_command(name="baost", description="ブルーアーカイブのOSTを再生します。")
+    # @discord.option("title", description="再生するOSTのタイトル")
+    # @discord.option("n", description="ランダムに取り出す曲数(指定した場合、titleは無視されます。)", min_value=1, max_value=len(OST_FILES))
+    # async def command_baost(self, ctx: discord.ApplicationContext):
+    #     # コマンドを送ったメンバーがボイスチャンネルに居ない場合
+    #     if ctx.author.voice is None:
+    #         await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
+    #         return
+
+    #     player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
+    #     # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
+    #     if ctx.voice_client.channel != ctx.author.voice.channel:
+    #         await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+    #         return
+        
+        
+
+
     # /pause
     @discord.slash_command(name="pause", description="トラックの再生を一時停止します。")
     async def command_pause(self, ctx: discord.ApplicationContext):
@@ -467,8 +490,17 @@ class CogMusic(discord.Cog):
 
     # /repeat
     @discord.slash_command(name="repeat", description="リピート再生の設定を変更します。")
-    @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"], required=False)
-    async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
+    @discord.option(
+        "option",
+        description="リピート再生のオプション",
+        choices=[
+            discord.OptionChoice("オフ", value=0),
+            discord.OptionChoice("プレイリスト", value=1),
+            discord.OptionChoice("トラック", value=2)
+        ],
+        required=False
+    )
+    async def command_repeat(self, ctx: discord.ApplicationContext, option: discord.OptionChoice=None): 
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
@@ -484,12 +516,7 @@ class CogMusic(discord.Cog):
                 description = "オフ"
             embed = MyEmbed(title=f"{ICON} 現在のリピート再生の設定", description=description)
         else:
-            if option == "プレイリスト":
-                player.repeat = 1
-            elif option == "トラック":
-                player.repeat = 2
-            else:
-                player.repeat = 0
+            player.repeat = option.value
             embed = MyEmbed(notif_type="succeed", title=f"{ICON} リピート再生の設定を変更しました。", description=option)
             await player.update_controller()
         await ctx.respond(embed=embed, delete_after=10)

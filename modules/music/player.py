@@ -9,7 +9,7 @@ import time
 import traceback
 import typing
 
-import modules.utils as utils
+import modules.util as util
 import constants as const
 from modules.myembed import MyEmbed
 from modules.mashilog import mashilog
@@ -114,11 +114,11 @@ class Player:
     @staticmethod
     def track_text(track: Track, italic: bool=False, queue: bool=False):
         max_title = 40 if queue else 200
-        title = utils.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
+        title = util.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
         if track.original_url is not None:
             max_title_url = 145 if queue else 1000
             if len(title) + len(track.original_url) > max_title_url:
-                url = utils.shorten_url(track.original_url)
+                url = util.shorten_url(track.original_url)
             else:
                 url = track.original_url
             result = f"[{title}]({url})"
@@ -277,8 +277,8 @@ class Player:
                 notif_type = "inactive"
             title += f" (🔊 {self.__voice_client.channel.name})"
             description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
-            description += f"👤 {utils.limit_text_length(self.__current_track.artist or '-', 500)}\n"
-            description += f"💿 {utils.limit_text_length(self.__current_track.album or '-', 500)}"
+            description += f"👤 {util.limit_text_length(self.__current_track.artist or '-', 500)}\n"
+            description += f"💿 {util.limit_text_length(self.__current_track.album or '-', 500)}"
             embed = MyEmbed(notif_type=notif_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
@@ -324,7 +324,7 @@ class Player:
         controller = self.get_controller()
         if inter:
             await inter.response.edit_message(**controller, attachments=[])
-        else:
+        elif self.__controller_msg:
             await self.__controller_msg.edit(**controller, attachments=[])
 
 
