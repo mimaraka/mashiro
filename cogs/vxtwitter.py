@@ -24,7 +24,7 @@ class Vxtwitter(discord.Cog):
         # 既にオンの場合
         if ctx.guild.id in data.get("guilds"):
             data["guilds"] = [id for id in data.get("guilds") if id != ctx.guild.id]
-            await ctx.respond(embed=MyEmbed(title="URL変換を無効化しました。"))
+            await ctx.respond(embed=MyEmbed(title="URL変換を無効化しました。"), delete_after=10)
         # オフの場合
         else:
             if not ctx.channel.permissions_for(ctx.me).manage_messages:
@@ -32,7 +32,7 @@ class Vxtwitter(discord.Cog):
                 return
             
             data.get("guilds").append(ctx.guild.id)
-            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="URL変換を有効化しました。"))
+            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="URL変換を有効化しました。"), delete_after=10)
 
         self.save_data(data)
         
