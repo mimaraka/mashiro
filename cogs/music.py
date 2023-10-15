@@ -490,17 +490,8 @@ class CogMusic(discord.Cog):
 
     # /repeat
     @discord.slash_command(name="repeat", description="リピート再生の設定を変更します。")
-    @discord.option(
-        "option",
-        description="リピート再生のオプション",
-        choices=[
-            discord.OptionChoice("オフ", value=0),
-            discord.OptionChoice("プレイリスト", value=1),
-            discord.OptionChoice("トラック", value=2)
-        ],
-        required=False
-    )
-    async def command_repeat(self, ctx: discord.ApplicationContext, option: discord.OptionChoice=None): 
+    @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"], required=False)
+    async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
             return
@@ -516,7 +507,12 @@ class CogMusic(discord.Cog):
                 description = "オフ"
             embed = MyEmbed(title=f"{ICON} 現在のリピート再生の設定", description=description)
         else:
-            player.repeat = option.value
+            if option == "プレイリスト":
+                player.repeat = 1
+            elif option == "トラック":
+                player.repeat = 2
+            else:
+                player.repeat = 0
             embed = MyEmbed(notif_type="succeed", title=f"{ICON} リピート再生の設定を変更しました。", description=option)
             await player.update_controller()
         await ctx.respond(embed=embed, delete_after=10)
