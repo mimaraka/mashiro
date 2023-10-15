@@ -37,7 +37,7 @@ class Vxtwitter(discord.Cog):
         self.save_data(data)
         
 
-    @discord.Cog.listener
+    @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
         if re.match(r"https?://(x|twitter).com/", message.content):
             new_content = re.sub(r"(x|twitter).com", r"vxtwitter.com", message.content)
