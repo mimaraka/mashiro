@@ -41,7 +41,7 @@ class Vxtwitter(discord.Cog):
     async def on_message(self, message: discord.Message):
         if re.fullmatch(r"https?://(x|twitter).com/\w+/status/\d+(\?[\w=&]*)?", message.content):
             new_url = re.sub(r"(x|twitter).com", "vxtwitter.com", message.content)
-            new_url = re.sub(r"\?[\w=]*", "", new_url)
+            new_url = re.sub(r"\?[\w=&]*", "", new_url)
             result = f"**{message.author.display_name}** 先生が共有しました！ | [X]({new_url})"
             manage_messages = message.channel.permissions_for(message.guild.me)
             data = self.get_data()
