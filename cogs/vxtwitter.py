@@ -39,12 +39,13 @@ class Vxtwitter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if re.match(r"https?://(x|twitter).com/", message.content):
-            new_content = re.sub(r"(x|twitter).com", r"vxtwitter.com", message.content)
+        if re.fullmatch(r"https?://(x|twitter).com/\w+/status/\d+", message.content):
+            new_url = re.sub(r"(x|twitter).com", r"vxtwitter.com", message.content)
+            result = f"**{message.author.display_name}** 先生が共有しました！ | [X]({new_url})"
             manage_messages = message.channel.permissions_for(message.guild.me)
             data = self.get_data()
             if message.guild.id in data.get("guilds") and manage_messages:
                 # attachmentsがついたメッセージは削除しない
                 if not message.attachments:
                     await message.delete()
-                await message.channel.send(new_content, stickers=message.stickers, embeds=message.embeds)
+                await message.channel.send(result)
