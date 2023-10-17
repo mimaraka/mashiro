@@ -4,7 +4,7 @@ from modules.myembed import MyEmbed
 
 
 class CogNickChanger(discord.Cog):
-    DATA_PATH = "data/old_nicks.json"
+    DATA_PATH = "data/saves/old_nicks.json"
 
     # コンストラクタ
     def __init__(self, bot: discord.Bot) -> None:

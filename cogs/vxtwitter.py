@@ -5,15 +5,17 @@ from modules.myembed import MyEmbed
 
 
 class Vxtwitter(discord.Cog):
+    JSON_PATH = "data/saves/vxtwitter.json"
+
     def __init__(self, bot: discord.Bot) -> None:
         self.bot: discord.Bot = bot
 
     def get_data(self) -> dict:
-        with open("data/vxtwitter.json", "r") as f:
+        with open(self.JSON_PATH, "r") as f:
             return json.load(f)
 
     def save_data(self, data):
-        with open("data/vxtwitter.json", "w") as f:
+        with open(self.JSON_PATH, "w") as f:
             json.dump(data, f, indent=4)
 
 
