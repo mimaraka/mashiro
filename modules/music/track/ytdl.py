@@ -18,6 +18,7 @@ class YTDLTrack(BaseTrack):
             original_url: str,
             duration: Duration | None=None,
             artist: str | None=None,
+            album: str | None=None,
             thumbnail: str | None=None
     ) -> None:
         self.loop: asyncio.AbstractEventLoop = loop
@@ -28,7 +29,7 @@ class YTDLTrack(BaseTrack):
             original_url=original_url,
             duration=duration,
             artist=artist,
-            album=None,
+            album=album,
             thumbnail=thumbnail
         )
 

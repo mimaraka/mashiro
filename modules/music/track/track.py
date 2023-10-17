@@ -82,7 +82,8 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
                         source_url=i.get("url"),
                         original_url=i.get("webpage_url") or i.get("original_url"),
                         duration=i.get("duration") and Duration(i.get("duration")),
-                        artist=i.get("uploader"),
+                        artist=i.get("artist") or i.get("uploader"),
+                        album=i.get("album"),
                         thumbnail=i.get("thumbnail")
                     )
                 )
