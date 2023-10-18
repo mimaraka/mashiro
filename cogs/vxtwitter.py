@@ -19,22 +19,17 @@ class Vxtwitter(discord.Cog):
             json.dump(data, f, indent=4)
 
 
-    @discord.slash_command(name="vxtwitter", description="X(Twitter)のURLを自動でvxtwitter.comに変換します。(私にメッセージの管理権限が必要です。)")
-    async def command_vxtwitter(self, ctx: discord.ApplicationContext):
+    @discord.slash_command(name="vxtwitter", description="X(Twitter)のURLを自動でvxtwitter.comに変換します。")
+    @discord.option("switch", description="URL変換機能の有効化/無効化")
+    async def command_vxtwitter(self, ctx: discord.ApplicationContext, switch: bool):
         data = self.get_data()
 
-        # 既にオンの場合
-        if ctx.guild.id in data.get("guilds"):
+        if switch:
+            data["guilds"].append(ctx.guild.id)
+            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="URL変換を有効化しました。"), delete_after=10)
+        else:
             data["guilds"] = [id for id in data.get("guilds") if id != ctx.guild.id]
             await ctx.respond(embed=MyEmbed(title="URL変換を無効化しました。"), delete_after=10)
-        # オフの場合
-        else:
-            if not ctx.channel.permissions_for(ctx.me).manage_messages:
-                await ctx.respond(embed=MyEmbed(notif_type="error", description="私にメッセージの管理権限がありません。"), ephemeral=True)
-                return
-            
-            data.get("guilds").append(ctx.guild.id)
-            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="URL変換を有効化しました。"), delete_after=10)
 
         self.save_data(data)
         
@@ -50,5 +45,8 @@ class Vxtwitter(discord.Cog):
             if message.guild.id in data.get("guilds") and manage_messages:
                 # attachmentsがついたメッセージは削除しない
                 if not message.attachments:
-                    await message.delete()
+                    try:
+                        await message.delete()
+                    except discord.Forbidden:
+                        pass
                 await message.channel.send(result)
