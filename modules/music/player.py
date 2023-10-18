@@ -127,7 +127,7 @@ class Player:
         decoration = "***" if italic else "**"
         result = f"{decoration}{result}{decoration}"
         if track.duration is not None:
-            result += f" | {track.duration.text}"
+            result += f" | {str(track.duration)}"
         return result
     
     # 複数のトラック情報のテキストを生成(最大10件まで表示)

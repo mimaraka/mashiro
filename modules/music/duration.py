@@ -11,7 +11,10 @@ class Duration:
         return cls(result)
     
     @property
-    def text(self):
+    def seconds(self):
+        return self._seconds
+    
+    def __str__(self):
         h = self._seconds // 3600
         m = (self._seconds - h * 3600) // 60
         s = self._seconds % 60
@@ -20,10 +23,6 @@ class Duration:
         else:
             result = f"{m}:{str(s).zfill(2)}"
         return result
-    
-    @property
-    def seconds(self):
-        return self._seconds
     
     def __add__(self, other):
         return self.__class__(self.seconds + other.seconds)
