@@ -153,10 +153,14 @@ class Player:
     ):
         self.__channel = channel
 
+        # 割り込み再生の場合
         if interrupt:
+            # カレントトラックの後ろに挿入
             self.__playlist[self.__current_index + 1:self.__current_index + 1] = tracks
+            # 挿入した分だけ、カレントトラックの後ろのインデックスがずれる(指し示すトラック自体は変わらない)
             self.__queue_idcs = [i + len(tracks) if i > self.__current_index else i for i in self.__queue_idcs]
-            self.__queue_idcs[0:0] = [i for i in range(self.__current_index + 1, self.__current_index + 5)]
+            # キューの先頭に追加するトラックのインデックスを追加
+            self.__queue_idcs[0:0] = [i for i in range(self.__current_index + 1, self.__current_index + 1 + len(tracks))]
         else:
             self.__playlist += tracks
             self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
