@@ -167,6 +167,8 @@ class Player:
             if self.__shuffle:
                 random.shuffle(self.__queue_idcs)
 
+        print(self.__playlist)
+
         # 停止していない場合
         if not self.is_stopped:
             if interrupt:

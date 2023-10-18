@@ -225,11 +225,14 @@ class CogMusic(discord.Cog):
                 await channel.send(embed=EMBED_BOT_ANOTHER_VC)
             return
 
-        if ctx:
-            inter = await ctx.respond(embed=self.get_proc_embed(channel))
-            msg_proc = await inter.original_response()
+        if not silent:
+            if ctx:
+                inter = await ctx.respond(embed=self.get_proc_embed(channel))
+                msg_proc = await inter.original_response()
+            else:
+                msg_proc = await channel.send(embed=self.get_proc_embed(channel))
         else:
-            msg_proc = await channel.send(embed=self.get_proc_embed(channel))
+            msg_proc = None
 
         tracks = await create_tracks(self.bot.loop, query, member)
         if not tracks:
