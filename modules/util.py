@@ -12,7 +12,7 @@ def escape_markdown(text: str):
     return result
 
 
-def limit_text_length(text: str, length: int):
+def truncate_text(text: str, length: int):
     if len(text) > length:
         result = text[:length - 1] + "…"
     else:

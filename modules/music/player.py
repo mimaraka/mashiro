@@ -113,8 +113,8 @@ class Player:
     # トラック情報のテキストを生成
     @staticmethod
     def track_text(track: Track, italic: bool=False, queue: bool=False):
-        max_title = 40 if queue else 200
-        title = util.limit_text_length(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
+        max_title = 40 if queue else 100
+        title = util.truncate_text(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
         if track.original_url is not None:
             max_title_url = 145 if queue else 1000
             if len(title) + len(track.original_url) > max_title_url:
@@ -277,8 +277,8 @@ class Player:
                 notif_type = "inactive"
             title += f" (🔊 {self.__voice_client.channel.name})"
             description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
-            description += f"👤 {util.limit_text_length(self.__current_track.artist or '-', 500)}\n"
-            description += f"💿 {util.limit_text_length(self.__current_track.album or '-', 500)}"
+            description += f"👤 {util.truncate_text(self.__current_track.artist or '-', 72)}\n"
+            description += f"💿 {util.truncate_text(self.__current_track.album or '-', 72)}"
             embed = MyEmbed(notif_type=notif_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
