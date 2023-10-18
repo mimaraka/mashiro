@@ -1,7 +1,7 @@
 import asyncio
-import csv
 import datetime
 import discord
+import json
 import openai
 import random
 import re
@@ -40,36 +40,22 @@ class CogMashiro(discord.Cog):
 
     # ランダムでマシロのセリフを返す関数
     def get_mashiro_quote(self):
-        mashiro_quotes = []
         # CSVファイルからセリフのリストを読み込み
-        with open("data/mashiro_quotes.csv", encoding="utf-8") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                quote = row[0]
-                # 改行文字を変換
-                backslash = False
-                for i, c in enumerate(quote):
-                    if backslash:
-                        if c == "n":
-                            quote = quote[:i - 1] + "\n" + quote[i + 1:]
-                        backslash = False
-                    if c == "\\":
-                        backslash = True
-
-                mashiro_quotes.append(row[0])
+        with open("data/mashiro_quotes.json", encoding="utf-8") as f:
+            quotes = json.load(f)["quotes"]
         
         # 誕生日の場合
         today = datetime.date.today()
         if today == datetime.date(today.year, 6, 5):
-            mashiro_quotes += MASHIRO_QUOTES_BIRTHDAY
+            quotes += MASHIRO_QUOTES_BIRTHDAY
         elif today == datetime.date(today.year, 10, 31):
-            mashiro_quotes += MASHIRO_QUOTES_HALLOWEEN
+            quotes += MASHIRO_QUOTES_HALLOWEEN
         elif today == datetime.date(today.year, 12, 25):
-            mashiro_quotes += MASHIRO_QUOTES_CHRISTMAS
+            quotes += MASHIRO_QUOTES_CHRISTMAS
         elif today == datetime.date(today.year, 1, 1):
-            mashiro_quotes += MASHIRO_QUOTES_NEWYEAR
+            quotes += MASHIRO_QUOTES_NEWYEAR
 
-        return random.choice(mashiro_quotes)
+        return random.choice(quotes)
 
 
     # マシロのセリフをランダムに送信
@@ -141,7 +127,7 @@ class CogMashiro(discord.Cog):
                             if m := re.match(pattern_play, result):
                                 query = m.group(1)
                                 result = re.sub(pattern_play, "", result)
-                                cog_music = self.bot.get_cog("Music")
+                                cog_music = self.bot.get_cog("CogMusic")
                                 await cog_music.play(message.channel, message.author, query, interrupt=True, silent=True)
                             result_list = [result[i:i + 2000] for i in range(0, len(result), 2000)]
                             for r in result_list:
