@@ -143,7 +143,7 @@ class Player:
         self,
         channel: discord.TextChannel,
         tracks: typing.List[Track],
-        msg_proc: discord.Message | None=None,
+        msg_loading: discord.Message | None=None,
         ctx: discord.ApplicationContext | None=None,
         interrupt: bool=False,
         silent: bool=False
@@ -170,20 +170,20 @@ class Player:
             if interrupt:
                 self.__history_idcs.append(self.__current_index)
                 await self.abort()
-                await self.__play(msg_proc=msg_proc, silent=silent)
+                await self.__play(msg_loading=msg_loading, silent=silent)
                 return
             if not silent:
-                if msg_proc:
-                    await msg_proc.delete()
+                if msg_loading:
+                    await msg_loading.delete()
                 embed = MyEmbed(notif_type="succeed", title="再生キューに追加しました！", description=self.tracks_text(tracks))
                 await (ctx.respond if ctx else channel.send)(embed=embed, delete_after=10)
             await self.update_controller()
         else:
-            await self.__play(msg_proc=msg_proc, silent=silent)
+            await self.__play(msg_loading=msg_loading, silent=silent)
 
 
     # キューの先頭のインデックスに該当するトラックを取り出し再生する
-    async def __play(self, msg_proc: discord.Message=None, silent=False) -> None:
+    async def __play(self, msg_loading: discord.Message=None, silent=False) -> None:
         self.__current_index = self.__queue_idcs.pop(0)
         self.__current_track = self.__playlist[self.__current_index]
 
@@ -191,8 +191,8 @@ class Player:
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
         self.__time_started = time.time()
-        if msg_proc:
-            await msg_proc.delete()
+        if msg_loading:
+            await msg_loading.delete()
         # コントローラーの更新
         if not silent:
             controller = self.get_controller()
@@ -473,7 +473,7 @@ class Player:
 
 
     # マシロのボイスをランダムで再生する
-    async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False, msg_proc: discord.Message=None):
+    async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False, msg_loading: discord.Message=None):
         # 入室時のボイス
         if on_connect:
             voices = glob.glob("data/assets/voices/on_connect/*.*")
@@ -486,5 +486,5 @@ class Player:
             [LocalTrack(member=ctx.author, filepath=picked_voice)],
             ctx=ctx,
             silent=on_connect,
-            msg_proc=msg_proc
+            msg_loading=msg_loading
         )

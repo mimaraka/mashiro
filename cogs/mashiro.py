@@ -128,7 +128,7 @@ class CogMashiro(discord.Cog):
                                 query = m.group(1)
                                 result = re.sub(pattern_play, "", result)
                                 cog_music = self.bot.get_cog("CogMusic")
-                                await cog_music.play(message.channel, message.author, query, interrupt=True, silent=True)
+                                await cog_music.play(message.channel, message.author, query, interrupt=True)
                             result_list = [result[i:i + 2000] for i in range(0, len(result), 2000)]
                             for r in result_list:
                                 await message.channel.send(r)

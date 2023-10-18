@@ -67,7 +67,7 @@ class CogMusic(discord.Cog):
 
 
     # 処理中のEmbedを取得
-    def get_proc_embed(self, channel: discord.TextChannel, prefix=""):
+    def get_loading_embed(self, channel: discord.TextChannel, prefix=""):
         external_emojis = channel.permissions_for(channel.guild.me).external_emojis
         if external_emojis:
             emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
@@ -227,22 +227,22 @@ class CogMusic(discord.Cog):
 
         if not silent:
             if ctx:
-                inter = await ctx.respond(embed=self.get_proc_embed(channel))
-                msg_proc = await inter.original_response()
+                inter = await ctx.respond(embed=self.get_loading_embed(channel))
+                msg_loading = await inter.original_response()
             else:
-                msg_proc = await channel.send(embed=self.get_proc_embed(channel))
+                msg_loading = await channel.send(embed=self.get_loading_embed(channel))
         else:
-            msg_proc = None
+            msg_loading = None
 
         tracks = await create_tracks(self.bot.loop, query, member)
         if not tracks:
-            await msg_proc.delete()
+            await msg_loading.delete()
             if ctx:
                 await ctx.respond(embed=EMBED_FAILED_TO_CREATE_TRACKS, ephemeral=True)
             else:
                 await channel.send(embed=EMBED_FAILED_TO_CREATE_TRACKS)
             return
-        await player.register_tracks(channel, tracks, ctx=ctx, msg_proc=msg_proc, interrupt=interrupt, silent=silent)
+        await player.register_tracks(channel, tracks, ctx=ctx, msg_loading=msg_loading, interrupt=interrupt, silent=silent)
     
         
     # /play
@@ -269,8 +269,8 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
-        msg_proc = await inter.original_response()
+        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        msg_loading = await inter.original_response()
         
         search_result = await self.bot.loop.run_in_executor(
             None, lambda: VideosSearch(keyword, limit=limit)
@@ -282,10 +282,10 @@ class CogMusic(discord.Cog):
             tracks += await create_tracks(self.bot.loop, video.get("link"), ctx.author)
 
         if not tracks:
-            await msg_proc.delete()
+            await msg_loading.delete()
             await ctx.respond(embed=MyEmbed(notif_type="error", description="検索結果がありませんでした。"), ephemeral=True)
             return
-        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
 
 
     # /play-channel
@@ -323,7 +323,7 @@ class CogMusic(discord.Cog):
         
         embed = MyEmbed(notif_type="inactive", title="🔎 1. 検索中です……。")
         inter = await ctx.respond(embed=embed)
-        msg_proc = await inter.original_response()
+        msg_loading = await inter.original_response()
 
         # await asyncio.gather()で同時処理しようとすると重すぎて(通信量が多すぎて？)再生が途切れ途切れになってしまう
 
@@ -336,20 +336,20 @@ class CogMusic(discord.Cog):
                     description += player.tracks_text(response, start_index=len(tracks) + 1)
                     embed.description = description
                     tracks += response
-                    await msg_proc.edit(embed=embed)
+                    await msg_loading.edit(embed=embed)
             message_count += 1
         del message_count
 
         if not tracks:
-            await msg_proc.delete()
+            await msg_loading.delete()
             await ctx.respond(
                 embed=MyEmbed(notif_type="error", description="チャンネル内に有効なトラックが見つかりませんでした。"),
                 ephemeral=True
             )
             return
         
-        await msg_proc.edit(embed=self.get_proc_embed(ctx.channel, prefix="2. "))
-        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
+        await msg_loading.edit(embed=self.get_loading_embed(ctx.channel, prefix="2. "))
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
 
 
     # /play-file
@@ -375,18 +375,18 @@ class CogMusic(discord.Cog):
             )
             return
         
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
-        msg_proc = await inter.original_response()
+        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        msg_loading = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, attachment.url, ctx.author)
         if not tracks:
-            await msg_proc.delete()
+            await msg_loading.delete()
             await ctx.respond(
                 embed=MyEmbed(notif_type="error", description="トラックの生成に失敗しました。"),
                 ephemeral=True
             )
             return
-        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
         
 
     # /voice
@@ -403,10 +403,10 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
         
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
-        msg_proc = await inter.original_response()
+        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        msg_loading = await inter.original_response()
         
-        await player.play_random_voice(ctx, msg_proc=msg_proc)
+        await player.play_random_voice(ctx, msg_loading=msg_loading)
 
 
     # /baost
