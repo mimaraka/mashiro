@@ -26,8 +26,8 @@ class Player:
         self.__playlist: typing.List[Track] = []
         self.__queue_idcs: typing.List[int] = []
         self.__history_idcs: typing.List[int] = []
+        self.__current_index: int | None = None
         self.__current_track: Track | None = None
-        self.__current_index: int = 0
         self.__last_track: Track | None = None
         self.__volume: float = 1
         self.__repeat: int = 0
@@ -38,11 +38,11 @@ class Player:
         self.__time_started: float | None = None
 
     @property
-    def current_track(self):
+    def current_track(self) -> Track | None:
         return self.__current_track
     
     @property
-    def volume(self):
+    def volume(self) -> float:
         return self.__volume
     
     @volume.setter
@@ -76,15 +76,12 @@ class Player:
         if switch:
             random.shuffle(self.__queue_idcs)
         else:
-            self.__queue_idcs = [i for i in range(self.__current_index + 1, len(self.__playlist))]
+            if self.__current_index is not None:
+                self.__queue_idcs = [i for i in range(self.__current_index + 1, len(self.__playlist))]
 
     @property
     def queue(self) -> typing.List[Track]:
         return [self.__playlist[i] for i in self.__queue_idcs]
-    
-    @property
-    def current_track(self) -> Track:
-        return self.__current_track
     
     @property
     def is_playing(self) -> bool:
@@ -155,21 +152,18 @@ class Player:
 
         # 割り込み再生の場合
         if interrupt:
+            insert_idx = self.__current_index + 1 if self.__current_index is not None else 0
             # カレントトラックの後ろに挿入
-            self.__playlist[self.__current_index + 1:self.__current_index + 1] = tracks
+            self.__playlist[insert_idx:insert_idx] = tracks
             # 挿入した分だけ、カレントトラックの後ろのインデックスがずれる(指し示すトラック自体は変わらない)
-            self.__queue_idcs = [i + len(tracks) if i > self.__current_index else i for i in self.__queue_idcs]
+            self.__queue_idcs = [i + len(tracks) if i >= insert_idx else i for i in self.__queue_idcs]
             # キューの先頭に追加するトラックのインデックスを追加
-            self.__queue_idcs[0:0] = [i for i in range(self.__current_index + 1, self.__current_index + 1 + len(tracks))]
+            self.__queue_idcs[0:0] = [i for i in range(insert_idx, insert_idx + len(tracks))]
         else:
             self.__playlist += tracks
             self.__queue_idcs += [i for i in range(len(self.__playlist) - len(tracks), len(self.__playlist))]
             if self.__shuffle:
                 random.shuffle(self.__queue_idcs)
-
-        print(self.__playlist)
-        print(self.__queue_idcs)
-        print(self.__current_index)
 
         # 停止していない場合
         if not self.is_stopped:
@@ -266,7 +260,7 @@ class Player:
         self.__playlist.clear()
         self.__queue_idcs.clear()
         self.__history_idcs.clear()
-        self.__current_index = 0
+        self.__current_index = None
         self.__current_track = None
         await self.delete_controller()
 
