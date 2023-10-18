@@ -20,19 +20,22 @@ from ..duration import Duration
 Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
 
 
-async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: discord.Member) -> List[Track]:
+async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: discord.Member) -> List[Track]:
     # URLの場合
-    if util.is_url(text):
+    if util.is_url(query):
+        # Discordの添付ファイルのURLの場合、クエリを消す
+        if re.match(r"https?://cdn.discordapp.com/attachments/", query):
+            query = re.sub(r"\?.*", "", query)
         try:
             # ID3V2直リンクの場合
-            if await get_mimetype(text) == "audio/mpeg" and await bin_startswith(text, b"ID3"):
-                return [await ID3V2Track.from_url(text, member)]
+            if await get_mimetype(query) == "audio/mpeg" and await bin_startswith(query, b"ID3"):
+                return [await ID3V2Track.from_url(query, member)]
             # FLAC直リンクの場合
-            elif await get_mimetype(text) == "audio/flac" and await bin_startswith(text, b"fLaC"):
-                return [await FLACTrack.from_url(text, member)]
+            elif await get_mimetype(query) == "audio/flac" and await bin_startswith(query, b"fLaC"):
+                return [await FLACTrack.from_url(query, member)]
             # RIFF直リンクの場合
-            elif await get_mimetype(text) in ["audio/wav", "audio/x-wav"] and await bin_startswith(text, b"RIFF"):
-                return [await RIFFTrack.from_url(text, member)]
+            elif await get_mimetype(query) in ["audio/wav", "audio/x-wav"] and await bin_startswith(query, b"RIFF"):
+                return [await RIFFTrack.from_url(query, member)]
         # URLが見つからない場合
         except aiohttp.ClientResponseError:
             return None
@@ -41,7 +44,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, text: str, member: disc
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
         try:
             info = await loop.run_in_executor(
-                None, lambda: ytdl.extract_info(text, download=False)
+                None, lambda: ytdl.extract_info(query, download=False)
             )
         except yt_dlp.DownloadError as e:
             print(e)

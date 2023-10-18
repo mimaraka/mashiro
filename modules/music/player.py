@@ -142,8 +142,16 @@ class Player:
     
 
     # キューとプレイリストにトラックを積む
-    async def register_tracks(self, ctx: discord.ApplicationContext, tracks: typing.List[Track], msg_proc: discord.Message=None, interrupt=False, silent=False):
-        self.__channel = ctx.channel
+    async def register_tracks(
+        self,
+        channel: discord.TextChannel,
+        tracks: typing.List[Track],
+        msg_proc: discord.Message | None=None,
+        ctx: discord.ApplicationContext | None=None,
+        interrupt: bool=False,
+        silent: bool=False
+    ):
+        self.__channel = channel
 
         if interrupt:
             self.__playlist[self.__current_index + 1:self.__current_index + 1] = tracks
@@ -166,7 +174,7 @@ class Player:
                 if msg_proc:
                     await msg_proc.delete()
                 embed = MyEmbed(notif_type="succeed", title="再生キューに追加しました！", description=self.tracks_text(tracks))
-                await ctx.respond(embed=embed, delete_after=10)
+                await (ctx.respond if ctx else channel.send)(embed=embed, delete_after=10)
             await self.update_controller()
         else:
             await self.__play(msg_proc=msg_proc, silent=silent)
@@ -471,4 +479,10 @@ class Player:
             voices = glob.glob("data/assets/voices/**/*.*", recursive=True)
 
         picked_voice = random.choice(voices)
-        await self.register_tracks(ctx, [LocalTrack(member=ctx.author, filepath=picked_voice)], silent=on_connect, msg_proc=msg_proc)
+        await self.register_tracks(
+            ctx.channel,
+            [LocalTrack(member=ctx.author, filepath=picked_voice)],
+            ctx=ctx,
+            silent=on_connect,
+            msg_proc=msg_proc
+        )

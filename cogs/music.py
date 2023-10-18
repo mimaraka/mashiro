@@ -197,38 +197,57 @@ class CogMusic(discord.Cog):
 
         await self.disconnect(ctx.guild)
         await ctx.respond(embed=MyEmbed(title="切断しました。"), delete_after=10)
+
+
+    async def play(
+        self,
+        channel: discord.TextChannel,
+        member: discord.Member,
+        query: str,
+        ctx: discord.ApplicationContext | None=None,
+        interrupt: bool=False,
+        silent: bool=False
+    ):
+        # コマンドを送ったメンバーがボイスチャンネルに居ない場合
+        if member.voice is None:
+            if ctx:
+                await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
+            else:
+                await channel.send(embed=EMBED_AUTHOR_NOT_CONNECTED)
+            return
+
+        player = self.__player.get(member.guild.id) or await self.connect(member.voice.channel)
+        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
+        if member.guild.voice_client.channel != member.voice.channel:
+            if ctx:
+                await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+            else:
+                await channel.send(embed=EMBED_BOT_ANOTHER_VC)
+            return
+
+        if ctx:
+            inter = await ctx.respond(embed=self.get_proc_embed(channel))
+            msg_proc = await inter.original_response()
+        else:
+            msg_proc = await channel.send(embed=self.get_proc_embed(channel))
+
+        tracks = await create_tracks(self.bot.loop, query, member)
+        if not tracks:
+            await msg_proc.delete()
+            if ctx:
+                await ctx.respond(embed=EMBED_FAILED_TO_CREATE_TRACKS, ephemeral=True)
+            else:
+                await channel.send(embed=EMBED_FAILED_TO_CREATE_TRACKS)
+            return
+        await player.register_tracks(channel, tracks, ctx=ctx, msg_proc=msg_proc, interrupt=interrupt, silent=silent)
     
         
     # /play
     @discord.slash_command(name="play", description="指定されたURLまたはキーワードの曲を再生します。")
-    @discord.option(
-        parameter_name="text",
-        name="input",
-        description="再生したい曲のURL、またはYouTube上で検索するタイトル",
-        autocomplete=autocomp_yt_title
-    )
+    @discord.option("query", description="再生したい曲のURL、またはYouTube上で検索するタイトル", autocomplete=autocomp_yt_title)
     @discord.option("interrupt", description="キューを無視して割り込み再生をさせるかどうか", required=False, default=False)
-    async def command_play(self, ctx: discord.ApplicationContext, text: str, interrupt: bool):
-        # コマンドを送ったメンバーがボイスチャンネルに居ない場合
-        if ctx.author.voice is None:
-            await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
-            return
-
-        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
-            return
-
-        inter = await ctx.respond(embed=self.get_proc_embed(ctx.channel))
-        msg_proc = await inter.original_response()
-
-        tracks = await create_tracks(self.bot.loop, text, ctx.author)
-        if not tracks:
-            await msg_proc.delete()
-            await ctx.respond(embed=EMBED_FAILED_TO_CREATE_TRACKS, ephemeral=True)
-            return
-        await player.register_tracks(ctx, tracks, msg_proc=msg_proc, interrupt=interrupt)
+    async def command_play(self, ctx: discord.ApplicationContext, query: str, interrupt: bool):
+        await self.play(ctx.channel, ctx.author, query, ctx=ctx, interrupt=interrupt)
 
 
     # /search
@@ -263,7 +282,7 @@ class CogMusic(discord.Cog):
             await msg_proc.delete()
             await ctx.respond(embed=MyEmbed(notif_type="error", description="検索結果がありませんでした。"), ephemeral=True)
             return
-        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
 
 
     # /play-channel
@@ -327,7 +346,7 @@ class CogMusic(discord.Cog):
             return
         
         await msg_proc.edit(embed=self.get_proc_embed(ctx.channel, prefix="2. "))
-        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
 
 
     # /play-file
@@ -364,7 +383,7 @@ class CogMusic(discord.Cog):
                 ephemeral=True
             )
             return
-        await player.register_tracks(ctx, tracks, msg_proc=msg_proc)
+        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_proc=msg_proc)
         
 
     # /voice
