@@ -12,7 +12,7 @@ class CogOthers(discord.Cog):
         raw_ping = self.bot.latency
         # ミリ秒に変換して丸める
         ping = round(raw_ping * 1000, 2)
-        await ctx.respond(embed=MyEmbed(title="お呼びですか、先生？", description=f"Ping値: `{ping}[ms]`"))
+        await ctx.respond(embed=MyEmbed(title="お呼びですか、先生？", description=f"Ping値: `{ping}ms`"))
 
 
     @discord.slash_command(name="help", description="何かお困りですか？")
