@@ -3,7 +3,7 @@ import discord
 import glob
 import re
 import time
-from typing import Dict
+from typing import Dict, List
 from youtubesearchpython import VideosSearch
 
 import constants as const
@@ -203,7 +203,7 @@ class CogMusic(discord.Cog):
         self,
         channel: discord.TextChannel,
         member: discord.Member,
-        query: str,
+        queries: List[str],
         ctx: discord.ApplicationContext | None=None,
         interrupt: bool=False,
         silent: bool=False
@@ -234,7 +234,11 @@ class CogMusic(discord.Cog):
         else:
             msg_loading = None
 
-        tracks = await create_tracks(self.bot.loop, query, member)
+        tracks = []
+        for query in queries:
+            if result := await create_tracks(self.bot.loop, query, member):
+                tracks += result
+
         if not tracks:
             await msg_loading.delete()
             if ctx:
@@ -250,7 +254,18 @@ class CogMusic(discord.Cog):
     @discord.option("query", description="再生したい曲のURL、またはYouTube上で検索するタイトル", autocomplete=autocomp_yt_title)
     @discord.option("interrupt", description="キューを無視して割り込み再生をさせるかどうか", required=False, default=False)
     async def command_play(self, ctx: discord.ApplicationContext, query: str, interrupt: bool):
-        await self.play(ctx.channel, ctx.author, query, ctx=ctx, interrupt=interrupt)
+        await self.play(ctx.channel, ctx.author, [query], ctx=ctx, interrupt=interrupt)
+
+
+    # メッセージコマンド(再生する)
+    @discord.message_command(name="再生する")
+    async def message_command_play(self, ctx: discord.ApplicationContext, message: discord.Message):
+        if not message.clean_content:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたメッセージにテキストがありません。"), ephemeral=True)
+            return
+        # メッセージにURLが含まれる場合は抽出
+        queries = re.findall(const.RE_PATTERN_URL, message.clean_content) or [message.clean_content]
+        await self.play(ctx.channel, ctx.author, queries, ctx=ctx)
 
 
     # /search
@@ -424,8 +439,6 @@ class CogMusic(discord.Cog):
     #     if ctx.voice_client.channel != ctx.author.voice.channel:
     #         await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
     #         return
-        
-        
 
 
     # /pause

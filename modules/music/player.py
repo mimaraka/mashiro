@@ -300,7 +300,7 @@ class Player:
             # サムネイルを表示
             if thumbnail := self.__current_track.thumbnail:
                 # URLの場合
-                if re.fullmatch(const.RE_URL_PATTERN, thumbnail):
+                if re.fullmatch(const.RE_PATTERN_URL, thumbnail):
                     embed.set_image(url=thumbnail)
                 # ローカルファイルのパスの場合
                 else:

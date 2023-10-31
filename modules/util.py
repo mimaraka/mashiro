@@ -1,5 +1,6 @@
 import re
 from pyshorteners import Shortener
+from constants import RE_PATTERN_URL
 
 
 # Discordの文字装飾のエスケープ
@@ -21,7 +22,7 @@ def truncate_text(text: str, length: int):
 
 
 def is_url(text: str):
-    return re.match(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", text)
+    return re.match(RE_PATTERN_URL, text)
 
 
 def shorten_url(url: str):
