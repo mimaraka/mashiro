@@ -19,7 +19,7 @@ class CogVxtwitter(discord.Cog):
             json.dump(data, f, indent=4)
 
 
-    @discord.slash_command(name="vxtwitter", description="X(Twitter)のURLを自動でvxtwitter.comに変換します。")
+    @discord.slash_command(name="vxtwitter", description="X(Twitter)のURLを自動でvxtwitter.comに変換する機能を有効/無効にします。")
     @discord.option("switch", description="URL変換機能の有効化/無効化")
     async def command_vxtwitter(self, ctx: discord.ApplicationContext, switch: bool):
         data = self.get_data()
