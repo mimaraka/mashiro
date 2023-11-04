@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import discord
 from modules.myembed import MyEmbed
 
+
+JST = timezone(timedelta(hours=9), 'JST')
 
 class CogVcstat(discord.Cog):
     def __init__(self, bot) -> None:
@@ -18,7 +20,7 @@ class CogVcstat(discord.Cog):
                 if len(after.channel.members) == 1:
                     if self.vc_info.get(member.guild.id) is None:
                         self.vc_info[member.guild.id]  = {}
-                    self.vc_info[member.guild.id][after.channel.id] = datetime.now()
+                    self.vc_info[member.guild.id][after.channel.id] = datetime.now(JST)
             # 移動前のチャンネルからメンバーがいなくなった場合
             if before.channel and len(before.channel.members) == 0:
                 self.vc_info[member.guild.id].pop(before.channel.id)
@@ -34,7 +36,7 @@ class CogVcstat(discord.Cog):
             return
 
         start_time: datetime = self.vc_info[ctx.guild.id][ctx.author.voice.channel.id]
-        total_seconds = int((datetime.now() - start_time).total_seconds())
+        total_seconds = int((datetime.now(JST) - start_time).total_seconds())
         hours = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
         seconds = total_seconds % 60
@@ -48,5 +50,5 @@ class CogVcstat(discord.Cog):
 
         await ctx.respond(embed=MyEmbed(
             title='ボイスチャット情報',
-            description=f'通話開始時刻 : **{start_time.strftime("%H:%M:%S %m/%d/%Y")}**\n通話時間 : **{length or "-"}**'
+            description=f'**通話開始時刻** : {start_time.strftime("%H:%M:%S %m/%d/%Y")}\n**通話時間** : {length or "-"}'
         ))
