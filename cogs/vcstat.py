@@ -49,6 +49,6 @@ class CogVcstat(discord.Cog):
             length += f'{seconds}秒'
 
         await ctx.respond(embed=MyEmbed(
-            title='ボイスチャット情報',
+            title=f'ボイスチャット情報 (🔊 {ctx.author.voice.channel.name})',
             description=f'**通話開始時刻** : {start_time.strftime("%H:%M:%S (%m/%d/%Y)")}\n**通話時間** : {length or "-"}'
         ))

@@ -21,4 +21,6 @@ class CogOthers(discord.Cog):
         for item in self.bot.walk_application_commands():
             if type(item) == discord.SlashCommand:
                 embed.add_field(name=f"/{item.name}", value=item.description, inline=False)
-        await ctx.respond(embed=embed, ephemeral=True)
+        view = discord.ui.View(timeout=None)
+        view.add_item(discord.ui.Button(label='GitHubリポジトリ', url='https://github.com/mimaraka/mashiro'))
+        await ctx.respond(embed=embed, view=view, ephemeral=True)
