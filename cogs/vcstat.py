@@ -32,8 +32,8 @@ class CogVcstat(discord.Cog):
                 ephemeral=True
             )
             return
-        
-        start_time: datetime = self.vc_info[ctx.guild.id][ctx.author.voice.channel]
+
+        start_time: datetime = self.vc_info[ctx.guild.id][ctx.author.voice.channel.id]
         total_seconds = int((datetime.now() - start_time).total_seconds())
         hours = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
