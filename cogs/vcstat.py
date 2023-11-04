@@ -28,7 +28,7 @@ class CogVcstat(discord.Cog):
     # /vcstat
     @discord.slash_command(name='vcstat', description='通話の情報を表示します。')
     async def command_vcstat(self, ctx: discord.ApplicationContext):
-        if ctx.author.voice.channel is None:
+        if ctx.author.voice is None or ctx.author.voice.channel is None:
             await ctx.respond(
                 embed=MyEmbed(notif_type='error', description='先生がボイスチャンネルに接続されていないようです。'),
                 ephemeral=True
