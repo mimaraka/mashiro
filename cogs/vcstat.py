@@ -11,14 +11,14 @@ class CogVcstat(discord.Cog):
     @discord.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         # メンバーがVCを移動した場合
-        if member.voice.channel != before.channel:
+        if after.channel != before.channel:
             # VCに接続・移動した場合
-            if member.voice.channel is not None:
+            if after.channel is not None:
                 # それまでVCに誰も居なかった場合、記録を開始
-                if len(member.voice.channel.members) == 1:
+                if len(after.channel.members) == 1:
                     if self.vc_info.get(member.guild.id) is None:
                         self.vc_info[member.guild.id]  = {}
-                    self.vc_info[member.guild.id][member.voice.channel.id] = datetime.now()
+                    self.vc_info[member.guild.id][after.channel.id] = datetime.now()
             # 移動前のチャンネルからメンバーがいなくなった場合
             if before.channel and len(before.channel.members) == 0:
                 self.vc_info[member.guild.id].pop(before.channel.id)
