@@ -26,7 +26,7 @@ class CogVcstat(discord.Cog):
                 self.vc_info[member.guild.id].pop(before.channel.id)
 
     # /vcstat
-    @discord.slash_command(name='vcstat', description='通話の情報を表示します。')
+    @discord.slash_command(name='vcstat', description='現在アクティブな通話の情報を表示します。')
     async def command_vcstat(self, ctx: discord.ApplicationContext):
         if ctx.author.voice is None or ctx.author.voice.channel is None:
             await ctx.respond(
@@ -48,7 +48,10 @@ class CogVcstat(discord.Cog):
         if 0 < seconds:
             length += f'{seconds}秒'
 
-        await ctx.respond(embed=MyEmbed(
-            title=f'ボイスチャット情報 (🔊 {ctx.author.voice.channel.name})',
-            description=f'**通話開始時刻** : {start_time.strftime("%H:%M:%S (%m/%d/%Y)")}\n**通話時間** : {length or "-"}'
-        ))
+        await ctx.respond(
+            embed=MyEmbed(
+                title=f'ボイスチャット情報 (🔊 {ctx.author.voice.channel.name})',
+                description=f'**通話開始時刻** : {start_time.strftime("%H:%M:%S (%m/%d/%Y)")}\n**通話時間** : {length or "-"}'
+            ),
+            ephemeral=True
+        )

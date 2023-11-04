@@ -634,7 +634,7 @@ class CogMusic(discord.Cog):
 
 
     # /player
-    @discord.slash_command(name="player", description="プレイヤー操作メッセージを移動させます。")
+    @discord.slash_command(name="player", description="プレイヤー操作メッセージをコマンドを送信したチャンネルに移動させます。")
     async def command_player(self, ctx: discord.ApplicationContext):
         if (player := self.__player.get(ctx.guild.id)) is None:
             await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
