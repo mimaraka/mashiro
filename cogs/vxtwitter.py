@@ -36,7 +36,7 @@ class CogVxtwitter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        RE_PATTERN_X = r'https?://(?:x|twitter).com/\w+/status/\d+(\?[\w=&\-]*)?'
+        RE_PATTERN_X = r'https?://(?:x|twitter).com/\w+/status/\d+(?:\?[\w=&\-]*)?'
         new_urls = []
 
         data = self.get_data()
