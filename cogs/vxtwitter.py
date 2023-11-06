@@ -36,17 +36,35 @@ class CogVxtwitter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if re.fullmatch(r"https?://(x|twitter).com/\w+/status/\d+(\?[\w=&\-]*)?", message.content):
-            new_url = re.sub(r"(x|twitter).com", "vxtwitter.com", message.content)
-            new_url = re.sub(r"\?[\w=&\-]*", "", new_url)
-            result = f"**{message.author.display_name}**(`{message.author.name}`) 先生が共有しました！ | [ポストを見る]({new_url})"
-            manage_messages = message.channel.permissions_for(message.guild.me)
-            data = self.get_data()
-            if message.guild.id in data.get("guilds") and manage_messages:
-                # attachmentsがついたメッセージは削除しない
-                if not message.attachments:
+        RE_PATTERN_X = r'https?://(x|twitter).com/\w+/status/\d+(\?[\w=&\-]*)?'
+        new_urls = []
+
+        data = self.get_data()
+        if message.guild.id in data.get('guilds'):
+            # X(Twitter)のURLを全て検出し、変換
+            for url in re.findall(RE_PATTERN_X, message.content):
+                new_url = re.sub(r'(x|twitter).com', 'vxtwitter.com', url)
+                new_url = re.sub(r'\?[\w=&\-]*', '', new_url)
+                new_urls.append(new_url)
+
+            deleted = False
+            # X(Twitter)のURLのみのとき
+            if re.fullmatch(rf'^(\s*{RE_PATTERN_X}\s*)+$', message.content):
+                manage_messages = message.channel.permissions_for(message.guild.me)
+                # attachmentsがなく、マシロにメッセージ管理権限がある場合、元のメッセージを削除
+                if manage_messages and not message.attachments:
                     try:
                         await message.delete()
+                        deleted = True
                     except discord.Forbidden:
                         pass
-                await message.channel.send(result)
+                    
+            if deleted:
+                results = [f'**{message.author.display_name}**(`{message.author.name}`) 先生が共有しました！ | [ポストを見る]({url})' for url in new_urls]
+            else:
+                results = [f'[ポストを見る]({url})' for url in new_urls]
+            for result in results:
+                if deleted:
+                    await message.channel.send(result)
+                else:
+                    await message.reply(result)
