@@ -36,14 +36,13 @@ class CogVxtwitter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        RE_PATTERN_X = r'https?://(:?x|twitter).com/\w+/status/\d+(\?[\w=&\-]*)?'
+        RE_PATTERN_X = r'https?://(?:x|twitter).com/\w+/status/\d+(\?[\w=&\-]*)?'
         new_urls = []
 
         data = self.get_data()
         if message.guild.id in data.get('guilds'):
             # X(Twitter)のURLを全て検出し、変換
             for url in re.findall(RE_PATTERN_X, message.content):
-                print(url)
                 new_url = re.sub(r'(x|twitter).com', 'vxtwitter.com', url)
                 new_url = re.sub(r'\?[\w=&\-]*', '', new_url)
                 new_urls.append(new_url)
