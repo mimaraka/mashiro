@@ -43,7 +43,6 @@ class CogVxtwitter(discord.Cog):
         if message.guild.id in data.get('guilds'):
             # X(Twitter)のURLを全て検出し、変換
             for url in re.findall(RE_PATTERN_X, message.content):
-                print(url)
                 new_url = re.sub(r'(x|twitter).com', 'vxtwitter.com', url)
                 new_url = re.sub(r'\?[\w=&\-]*', '', new_url)
                 new_urls.append(new_url)
@@ -68,4 +67,4 @@ class CogVxtwitter(discord.Cog):
                 if deleted:
                     await message.channel.send(result)
                 else:
-                    await message.reply(result)
+                    await message.reply(result, mention_author=False)
