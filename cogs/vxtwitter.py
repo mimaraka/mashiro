@@ -40,7 +40,7 @@ class CogVxtwitter(discord.Cog):
         new_urls = []
 
         data = self.get_data()
-        if message.guild.id in data.get('guilds'):
+        if message.guild and message.guild.id in data.get('guilds'):
             # X(Twitter)のURLを全て検出し、変換
             for url in re.findall(RE_PATTERN_X, message.content):
                 new_url = re.sub(r'(x|twitter).com', 'vxtwitter.com', url)
