@@ -260,12 +260,16 @@ class CogMusic(discord.Cog):
     # メッセージコマンド(再生する)
     @discord.message_command(name="再生する")
     async def message_command_play(self, ctx: discord.ApplicationContext, message: discord.Message):
-        if not message.clean_content:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたメッセージにテキストがありません。"), ephemeral=True)
+        if message.attachments:
+            queries = [a.url for a in message.attachments]
+            await self.play(ctx.channel, ctx.author, queries, ctx=ctx)
+        elif message.clean_content:
+            # メッセージにURLが含まれる場合は抽出
+            queries = re.findall(const.RE_PATTERN_URL, message.clean_content) or [message.clean_content]
+            await self.play(ctx.channel, ctx.author, queries, ctx=ctx)
+        else:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="指定されたメッセージにテキストまたは添付ファイルがありません。"), ephemeral=True)
             return
-        # メッセージにURLが含まれる場合は抽出
-        queries = re.findall(const.RE_PATTERN_URL, message.clean_content) or [message.clean_content]
-        await self.play(ctx.channel, ctx.author, queries, ctx=ctx)
 
 
     # /search
