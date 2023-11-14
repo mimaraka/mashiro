@@ -120,18 +120,13 @@ class CogNickChanger(discord.Cog):
     # ギルドメンバー全員のニックネームを変更するコマンド
     @discord.slash_command(name="change-nick", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)")
     async def command_change_nick(self, ctx: discord.ApplicationContext, nick: str):
+        if ctx.guild is None:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
+            return
+
         can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
         is_author_administrator = any([role.permissions.administrator for role in ctx.author.roles])
-        if ctx.guild is None:
-            await ctx.respond(
-                embed=MyEmbed(
-                    notif_type="error",
-                    description="ダイレクトメッセージでは実行できません。"
-                ),
-                ephemeral=True
-            )
-            return
-        elif not can_bot_manage_nicknames:
+        if not can_bot_manage_nicknames:
             await ctx.respond(
                 embed=MyEmbed(
                     notif_type="error",
@@ -164,12 +159,14 @@ class CogNickChanger(discord.Cog):
     # ギルドメンバー全員のニックネームを元に戻すコマンド
     @discord.slash_command(name="restore-nick", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)")
     async def command_restore_nick(self, ctx: discord.ApplicationContext):
-        can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
-        is_author_administrator = any([role.permissions.administrator for role in ctx.author.roles])
         if ctx.guild is None:
             await ctx.respond(embed=MyEmbed(notif_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
             return
-        elif not can_bot_manage_nicknames:
+        
+        can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
+        is_author_administrator = any([role.permissions.administrator for role in ctx.author.roles])
+
+        if not can_bot_manage_nicknames:
             await ctx.respond(embed=MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
             return
         elif not is_author_administrator and ctx.author != ctx.guild.owner:
