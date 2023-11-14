@@ -173,7 +173,7 @@ class CogNickChanger(discord.Cog):
             await ctx.respond(embed=MyEmbed(notif_type="error", description="管理者権限のないメンバーは実行できません。"))
             return
         
-        await ctx.defer()
+        await ctx.defer(ephemeral=True)
         if not await self.__restore_guild_nick(ctx.guild):
             await ctx.respond(
                 embed=MyEmbed(
