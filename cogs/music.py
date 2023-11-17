@@ -169,6 +169,7 @@ class CogMusic(discord.Cog):
                     player = await self.get_player(member.guild)
                     if player.is_playing:
                         await player.pause()
+                        await asyncio.sleep(1)
                         await player.resume()
                     else:
                         await player.update_controller()
