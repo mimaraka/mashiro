@@ -21,7 +21,6 @@ from modules.http import get_mimetype
 EMBED_BOT_NOT_CONNECTED = MyEmbed(notif_type="error", description="私はボイスチャンネルに接続していません。")
 EMBED_NOT_PLAYING = MyEmbed(notif_type="inactive", title="再生していません……。")
 EMBED_QUEUE_EMPTY = MyEmbed(notif_type="error", description="再生キューが空です。")
-EMBED_BOT_ANOTHER_VC = MyEmbed(notif_type="error", description="私は既に別のボイスチャンネルに接続しています。")
 EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notif_type="error", description="先生がボイスチャンネルに接続されていないようです。")
 EMBED_FAILED_TO_CREATE_TRACKS = MyEmbed(notif_type="error", description="トラックの生成に失敗しました。")
 
@@ -46,7 +45,11 @@ class CogMusic(discord.Cog):
 
     # マシロをプレーヤーとしてボイスチャンネルに接続させるときの共通処理
     async def connect(self, vc: discord.VoiceChannel):
-        await vc.connect()
+        try:
+            await vc.connect()
+        # 手動切断後しばらくはVCへの接続ができない場合がある
+        except discord.ClientException:
+            return None
         self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
         mashilog("ボイスチャンネルに正常に接続しました。")
         return self.__player[vc.guild.id]
@@ -64,6 +67,49 @@ class CogMusic(discord.Cog):
                 pass
         await guild.voice_client.disconnect()
         mashilog("ボイスチャンネルから正常に切断しました。")
+
+
+    # 指定したボイスチャンネルにBotしかいないか
+    def vc_is_bot_only(self, vc: discord.VoiceChannel | discord.StageChannel):
+        return all([m.bot for m in vc.members])
+    
+
+    # Guildに紐づけられたPlayerオブジェクトを取得する
+    async def get_player(self, *, ctx: discord.ApplicationContext=None, channel: discord.TextChannel=None, vc: discord.VoiceChannel | discord.StageChannel | None=None):
+        if not ctx and not channel:
+            return None
+        # Guildに紐づけられたPlayerオブジェクトが既に存在すればそれを取得する
+        player = self.__player.get((ctx or channel).guild.id)
+
+        # Playerオブジェクトが存在しない場合
+        if player is None:
+            # 自動接続先が指定されていない場合
+            if vc is None:
+                embed = MyEmbed(notif_type="error", description="私はボイスチャンネルに接続していません。")
+                if ctx:
+                    await ctx.respond(embed=embed, ephemeral=True)
+                elif channel:
+                    await channel.send(embed=embed)
+                return None
+            player = await self.connect(vc)
+            if player is None:
+                embed = MyEmbed(notif_type="error", description="ボイスチャンネルへの接続に失敗しました。しばらく経ってからもう一度お試しください。")
+                if ctx:
+                    await ctx.respond(embed=embed, ephemeral=True)
+                elif channel:
+                    await channel.send(embed=embed)
+                return None
+        else:
+            # 自動接続先とは異なるVCのPlayerが既に存在する場合
+            if vc is not None and player.vc != vc:
+                embed = MyEmbed(notif_type="error", description="私は既に別のボイスチャンネルに接続しています。")
+                if ctx:
+                    await ctx.respond(embed=embed, ephemeral=True)
+                elif channel:
+                    await channel.send(embed=embed)
+                return None
+
+        return player
 
 
     # 処理中のEmbedを取得
@@ -89,6 +135,9 @@ class CogMusic(discord.Cog):
             # 自分がボイスチャンネルに接続したとき
             if after.channel is not None and before.channel is None:
                 mashilog(f"ボイスチャンネルに接続しました。", guild=member.guild, channel=after.channel)
+                # time_bot_onlyの辞書があれば削除
+                if member.guild.id in self.__time_bot_only:
+                    self.__time_bot_only.pop(member.guild.id)
                 # 1秒経ってもPlayerが作成されていない場合は作成する
                 await asyncio.sleep(1)
                 if not member.guild.id in self.__player:
@@ -97,7 +146,7 @@ class CogMusic(discord.Cog):
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
-                # 5秒経ってまだPlayerが残っていれば削除する
+                # 5秒経ってまだPlayerオブジェクトが残っていれば削除する
                 await asyncio.sleep(5)
                 if not member.guild.voice_client or not member.guild.voice_client.is_connected():
                     if member.guild.id in self.__player:
@@ -113,25 +162,27 @@ class CogMusic(discord.Cog):
         # マシロが現在接続しているボイスチャンネルでメンバーが抜けた場合
         if member.guild.voice_client.channel == before.channel and member.guild.voice_client.channel != after.channel:
             mashilog(f"ボイスチャンネルから1人のメンバーが切断しました。", guild=member.guild, channel=before.channel)
-            # 現在のボイスチャンネルにBotしかいないかどうか
-            bot_only = all([m.bot for m in member.guild.voice_client.channel.members])
 
             # ボイスチャンネルにBotしかいない場合
-            if bot_only:
-                mashilog(f"現在、ボイスチャンネルはBotのみです。", guild=member.guild, channel=before.channel)
-                # Unix時間を記録
-                self.__time_bot_only[member.guild.id] = time.time()
-                # 1分待つ
-                await asyncio.sleep(60)
-                # 1分後に
-                # ・マシロがボイスチャンネルに接続しており
-                # ・ボイスチャンネルにBotしかおらず
-                # ・最後にボイスチャンネルがBotのみになってから1分が経過した場合
-                if member.guild.voice_client is not None:
-                    if member.guild.id in self.__time_bot_only:
-                        if time.time() - self.__time_bot_only[member.guild.id] > 59:
-                            # ボイスチャンネルから切断
-                            await self.disconnect(member.guild)
+            if self.vc_is_bot_only(member.guild.voice_client.channel):
+                # メンバーが別のボイスチャンネルに移動した場合は、ついて行く
+                if after.channel is not None:
+                    await member.guild.voice_client.move_to(after.channel)
+                else:
+                    mashilog(f"現在、ボイスチャンネルはBotのみです。", guild=member.guild, channel=before.channel)
+                    # Unix時間を記録
+                    self.__time_bot_only[member.guild.id] = time.time()
+                    # 1分待つ
+                    await asyncio.sleep(60)
+                    # 1分後に
+                    # ・マシロがボイスチャンネルに接続しており
+                    # ・ボイスチャンネルにBotしかおらず
+                    # ・最後にボイスチャンネルがBotのみになってから1分が経過した場合
+                    if member.guild.voice_client is not None:
+                        if member.guild.id in self.__time_bot_only:
+                            if time.time() - self.__time_bot_only[member.guild.id] > 59:
+                                # ボイスチャンネルから切断
+                                await self.disconnect(member.guild)
         # マシロが現在接続しているボイスチャンネルにメンバーが入った場合
         elif member.guild.voice_client.channel != before.channel and member.guild.voice_client.channel == after.channel:
             mashilog(f"ボイスチャンネルに1人のメンバーが接続しました。", guild=member.guild, channel=after.channel)
@@ -166,13 +217,12 @@ class CogMusic(discord.Cog):
                     embed=MyEmbed(notif_type="error", description="既に接続しています。"),
                     ephemeral=True
                 )
-            # 同じギルド内の他のボイスチャンネルに接続している場合
-            else:
-                await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
             return
 
         # ボイスチャンネルに接続する
-        player = await self.connect(ctx.author.voice.channel)
+        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        if not player:
+            return
         await ctx.respond(
             embed=MyEmbed(notif_type="succeed", title=f"接続しました！ (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})"),
             delete_after=10
@@ -215,14 +265,9 @@ class CogMusic(discord.Cog):
             else:
                 await channel.send(embed=EMBED_AUTHOR_NOT_CONNECTED)
             return
-
-        player = self.__player.get(member.guild.id) or await self.connect(member.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if member.guild.voice_client.channel != member.voice.channel:
-            if ctx:
-                await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
-            else:
-                await channel.send(embed=EMBED_BOT_ANOTHER_VC)
+        
+        player = await self.get_player(ctx=ctx, channel=channel, vc=ctx.author.voice.channel)
+        if not player:
             return
 
         if not silent:
@@ -282,10 +327,8 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        if not player:
             return
         
         inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
@@ -334,10 +377,8 @@ class CogMusic(discord.Cog):
         else:
             search_channel = channel
 
-        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        if not player:
             return
         
         embed = MyEmbed(notif_type="inactive", title="🔎 1. 検索中です……。")
@@ -380,10 +421,8 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        if not player:
             return
         
         # 添付ファイルの形式を調べる
@@ -416,10 +455,8 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-        # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-        if ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
+        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        if not player:
             return
         
         inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
@@ -448,8 +485,8 @@ class CogMusic(discord.Cog):
     # /pause
     @discord.slash_command(name="pause", description="トラックの再生を一時停止します。")
     async def command_pause(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
 
         try:
@@ -467,8 +504,8 @@ class CogMusic(discord.Cog):
     # /resume
     @discord.slash_command(name="resume", description="トラックの再生を再開します。")
     async def command_resume(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         try:
@@ -486,8 +523,8 @@ class CogMusic(discord.Cog):
     # /stop
     @discord.slash_command(name="stop", description="トラックの再生を停止します。")
     async def command_stop(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         try:
@@ -503,8 +540,8 @@ class CogMusic(discord.Cog):
     # /skip
     @discord.slash_command(name="skip", description="再生中のトラックをスキップします。")
     async def command_skip(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         try:
             player.skip()
@@ -531,8 +568,8 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="repeat", description="リピート再生の設定を変更します。")
     @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"], required=False)
     async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         ICON = "🔁"
@@ -561,8 +598,8 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="shuffle", description="シャッフル再生のオン/オフを変更します。")
     @discord.option("switch", description="シャッフル再生のオン/オフ(True/False)。シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます。", required=False)
     async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool=None):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         ICON = "🔀"
 
@@ -584,8 +621,8 @@ class CogMusic(discord.Cog):
     # /queue
     @discord.slash_command(name="queue", description="現在の再生キューを表示します。")
     async def command_queue(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         await ctx.defer(ephemeral=True)
         await ctx.respond(ephemeral=True, **player.get_queue_msg(page=1))
@@ -594,8 +631,8 @@ class CogMusic(discord.Cog):
     # /clear
     @discord.slash_command(name="clear", description="再生キューをクリアします。")
     async def command_clear(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         if not player.queue:
@@ -610,8 +647,8 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="volume", description="現在のボリュームを表示・変更します。")
     @discord.option("volume", description="ボリューム(0～100)(指定なしで現在のボリュームを表示)", max_value=100, min_value=0, required=False)
     async def command_volume(self, ctx: discord.ApplicationContext, volume: int=None):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         if volume is not None:
@@ -640,8 +677,8 @@ class CogMusic(discord.Cog):
     # /player
     @discord.slash_command(name="player", description="プレイヤー操作メッセージをコマンドを送信したチャンネルに移動させます。")
     async def command_player(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx=ctx)
+        if not player:
             return
         
         if player.is_stopped:

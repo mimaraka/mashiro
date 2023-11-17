@@ -107,6 +107,10 @@ class Player:
     def controller_msg(self, message: discord.Message):
         self.__controller_msg = message
 
+    @property
+    def vc(self) -> discord.VoiceChannel | discord.StageChannel:
+        return self.__voice_client.channel
+
     # トラック情報のテキストを生成
     @staticmethod
     def track_text(track: Track, italic: bool=False, queue: bool=False):

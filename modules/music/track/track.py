@@ -54,7 +54,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
         return None
         
     # キー"entries"が存在すればプレイリスト
-    info_list = info.get("entries") or [info]
+    info_list: List[dict] = info.get("entries") or [info]
 
     result = []
     for i in info_list:
