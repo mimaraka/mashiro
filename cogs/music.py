@@ -75,11 +75,9 @@ class CogMusic(discord.Cog):
     
 
     # Guildに紐づけられたPlayerオブジェクトを取得する
-    async def get_player(self, *, ctx: discord.ApplicationContext=None, channel: discord.TextChannel=None, vc: discord.VoiceChannel | discord.StageChannel | None=None):
-        if not ctx and not channel:
-            return None
+    async def get_player(self, guild: discord.Guild, *, ctx: discord.ApplicationContext=None, channel: discord.TextChannel=None, vc: discord.VoiceChannel | discord.StageChannel | None=None):
         # Guildに紐づけられたPlayerオブジェクトが既に存在すればそれを取得する
-        player = self.__player.get((ctx or channel).guild.id)
+        player = self.__player.get(guild.id)
 
         # Playerオブジェクトが存在しない場合
         if player is None:
@@ -168,6 +166,12 @@ class CogMusic(discord.Cog):
                 # メンバーが別のボイスチャンネルに移動した場合は、ついて行く
                 if after.channel is not None:
                     await member.guild.voice_client.move_to(after.channel)
+                    player = await self.get_player(member.guild)
+                    if player.is_playing:
+                        await player.pause()
+                        await player.resume()
+                    else:
+                        await player.update_controller()
                 else:
                     mashilog(f"現在、ボイスチャンネルはBotのみです。", guild=member.guild, channel=before.channel)
                     # Unix時間を記録
@@ -220,7 +224,7 @@ class CogMusic(discord.Cog):
             return
 
         # ボイスチャンネルに接続する
-        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        player = await self.get_player(ctx.guild, ctx=ctx, vc=ctx.author.voice.channel)
         if not player:
             return
         await ctx.respond(
@@ -266,7 +270,7 @@ class CogMusic(discord.Cog):
                 await channel.send(embed=EMBED_AUTHOR_NOT_CONNECTED)
             return
         
-        player = await self.get_player(ctx=ctx, channel=channel, vc=ctx.author.voice.channel)
+        player = await self.get_player(channel.guild, ctx=ctx, channel=channel, vc=ctx.author.voice.channel)
         if not player:
             return
 
@@ -327,7 +331,7 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        player = await self.get_player(ctx.guild, ctx=ctx, vc=ctx.author.voice.channel)
         if not player:
             return
         
@@ -377,7 +381,7 @@ class CogMusic(discord.Cog):
         else:
             search_channel = channel
 
-        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        player = await self.get_player(ctx.guild, ctx=ctx, vc=ctx.author.voice.channel)
         if not player:
             return
         
@@ -421,7 +425,7 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        player = await self.get_player(ctx.guild, ctx=ctx, vc=ctx.author.voice.channel)
         if not player:
             return
         
@@ -455,7 +459,7 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
             return
 
-        player = await self.get_player(ctx=ctx, vc=ctx.author.voice.channel)
+        player = await self.get_player(ctx.guild, ctx=ctx, vc=ctx.author.voice.channel)
         if not player:
             return
         
@@ -485,7 +489,7 @@ class CogMusic(discord.Cog):
     # /pause
     @discord.slash_command(name="pause", description="トラックの再生を一時停止します。")
     async def command_pause(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
 
@@ -504,7 +508,7 @@ class CogMusic(discord.Cog):
     # /resume
     @discord.slash_command(name="resume", description="トラックの再生を再開します。")
     async def command_resume(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
@@ -523,7 +527,7 @@ class CogMusic(discord.Cog):
     # /stop
     @discord.slash_command(name="stop", description="トラックの再生を停止します。")
     async def command_stop(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
@@ -540,7 +544,7 @@ class CogMusic(discord.Cog):
     # /skip
     @discord.slash_command(name="skip", description="再生中のトラックをスキップします。")
     async def command_skip(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         try:
@@ -568,7 +572,7 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="repeat", description="リピート再生の設定を変更します。")
     @discord.option("option", description="リピート再生のオプション", choices=["オフ", "プレイリスト", "トラック"], required=False)
     async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
@@ -598,7 +602,7 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="shuffle", description="シャッフル再生のオン/オフを変更します。")
     @discord.option("switch", description="シャッフル再生のオン/オフ(True/False)。シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます。", required=False)
     async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool=None):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         ICON = "🔀"
@@ -621,7 +625,7 @@ class CogMusic(discord.Cog):
     # /queue
     @discord.slash_command(name="queue", description="現在の再生キューを表示します。")
     async def command_queue(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         await ctx.defer(ephemeral=True)
@@ -631,7 +635,7 @@ class CogMusic(discord.Cog):
     # /clear
     @discord.slash_command(name="clear", description="再生キューをクリアします。")
     async def command_clear(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
@@ -647,7 +651,7 @@ class CogMusic(discord.Cog):
     @discord.slash_command(name="volume", description="現在のボリュームを表示・変更します。")
     @discord.option("volume", description="ボリューム(0～100)(指定なしで現在のボリュームを表示)", max_value=100, min_value=0, required=False)
     async def command_volume(self, ctx: discord.ApplicationContext, volume: int=None):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
@@ -677,7 +681,7 @@ class CogMusic(discord.Cog):
     # /player
     @discord.slash_command(name="player", description="プレイヤー操作メッセージをコマンドを送信したチャンネルに移動させます。")
     async def command_player(self, ctx: discord.ApplicationContext):
-        player = await self.get_player(ctx=ctx)
+        player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
         
