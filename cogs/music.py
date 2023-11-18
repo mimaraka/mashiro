@@ -271,7 +271,7 @@ class CogMusic(discord.Cog):
                 await channel.send(embed=EMBED_AUTHOR_NOT_CONNECTED)
             return
         
-        player = await self.get_player(channel.guild, ctx=ctx, channel=channel, vc=ctx.author.voice.channel)
+        player = await self.get_player(channel.guild, ctx=ctx, channel=channel, vc=member.voice.channel)
         if not player:
             return
 
