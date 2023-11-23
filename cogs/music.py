@@ -558,10 +558,9 @@ class CogMusic(discord.Cog):
     # /replay
     @discord.slash_command(name="replay", description="再生中の、または最後に再生したトラックをリプレイします。")
     async def command_replay(self, ctx: discord.ApplicationContext):
-        if (player := self.__player.get(ctx.guild.id)) is None:
-            await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
+        player = await self.get_player(ctx.guild, ctx=ctx)
+        if not player:
             return
-        
         try:
             await player.replay()
             await ctx.respond(embed=MyEmbed(notif_type="succeed", title="🔄 リプレイを開始しました！"), delete_after=10)
