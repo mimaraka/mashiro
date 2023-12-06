@@ -40,6 +40,6 @@ class Duration:
             result += f'{h}時間'
         if 0 < m:
             result += f'{m}分'
-        if 0 < s:
+        if 0 < s or (h == 0 and m == 0):
             result += f'{s}秒'
         return result
