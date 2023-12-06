@@ -84,7 +84,7 @@ class CogMashiro(discord.Cog):
             # 自撮りを送る
             if "自撮り" in message.content:
                 async with message.channel.typing():
-                    images = ["jidori_01.png", "jidori_02.png", "jidori_03.png", "jidori_04.png"]
+                    images = ["selfie_01.png", "selfie_02.png", "selfie_03.png", "selfie_04.png"]
                     messages = ["少々お待ちください……。", "少々お待ちくださいね。", "今撮りますね。"]
                     await asyncio.sleep(3)
                     await message.channel.send(random.choice(messages))

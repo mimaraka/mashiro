@@ -26,7 +26,7 @@ class CogDownloader(discord.Cog):
     async def command_dl_video(self, ctx: discord.ApplicationContext, query: str):
         await ctx.respond(
             embed=MyEmbed(
-                notif_type="succeed",
+                notif_type="succeeded",
                 title="ダウンロードが完了しました！",
                 description=f"***[]()***"
             )

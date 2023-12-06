@@ -149,7 +149,7 @@ class CogNickChanger(discord.Cog):
         await self.__change_guild_nick(ctx.guild, nick)
         await ctx.respond(
             embed=MyEmbed(
-                notif_type="succeed",
+                notif_type="succeeded",
                 title="ニックネームを変更しました！",
                 description=f"サーバーメンバーのニックネームを\n**{nick}**\nに変更しました。"
             ),
@@ -184,6 +184,6 @@ class CogNickChanger(discord.Cog):
             )
         else:
             await ctx.respond(
-                embed=MyEmbed(notif_type="succeed", title="ニックネームを元に戻しました。"),
+                embed=MyEmbed(notif_type="succeeded", title="ニックネームを元に戻しました。"),
                 delete_after=10
             )

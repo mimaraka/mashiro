@@ -8,7 +8,7 @@ EMBED_THUMBNAIL = {
     "normal": "https://media.discordapp.net/attachments/1142318975829676104/1142319072709718036/mashiro_normal.png?width=662&height=662",
     "error": "https://media.discordapp.net/attachments/1142318975829676104/1142319099150598184/mashiro_error.png?width=662&height=662",
     "inactive": "https://media.discordapp.net/attachments/1142318975829676104/1142321489769660496/mashiro_sleeping.png?width=662&height=662",
-    "succeed": "https://media.discordapp.net/attachments/1142318975829676104/1142713236718887024/mashiro_smile.png?width=662&height=662",
+    "succeeded": "https://media.discordapp.net/attachments/1142318975829676104/1142713236718887024/mashiro_smile.png?width=662&height=662",
     "question": "https://media.discordapp.net/attachments/1142318975829676104/1142793060128927944/mashiro_question.png?width=662&height=662",
     "warning": "https://media.discordapp.net/attachments/1142318975829676104/1142793794518003762/mashiro_warning.png?width=662&height=662"
 }
@@ -19,10 +19,10 @@ EMBED_COLOR = {
     "inactive": 0x858585,
     "warning": 0xfbf65f,
     "question": 0x2eb2ff,
-    "succeed": 0x18db66
+    "succeeded": 0x18db66
 }
 
-NotificationType = Literal["normal", "error", "warning", "inactive", "question", "succeed"]
+NotificationType = Literal["normal", "error", "warning", "inactive", "question", "succeeded"]
 
 # オリジナルの埋め込みクラス
 class MyEmbed(discord.Embed):

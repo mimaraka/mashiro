@@ -26,7 +26,7 @@ class CogVxtwitter(discord.Cog):
 
         if switch:
             data["guilds"].append(ctx.guild.id)
-            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="URL変換を有効化しました。"), delete_after=10)
+            await ctx.respond(embed=MyEmbed(notif_type="succeeded", title="URL変換を有効化しました。"), delete_after=10)
         else:
             data["guilds"] = [id for id in data.get("guilds") if id != ctx.guild.id]
             await ctx.respond(embed=MyEmbed(title="URL変換を無効化しました。"), delete_after=10)
