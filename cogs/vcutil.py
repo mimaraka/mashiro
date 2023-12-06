@@ -53,7 +53,7 @@ class CogVcutil(discord.Cog):
     @discord.option('hours', description='時間', min_value=0, default=0)
     @discord.option('minutes', description='分', min_value=0, max_value=59, default=0)
     @discord.option('seconds', description='秒', min_value=0, max_value=59, default=0)
-    async def command_vckickalarm(self, ctx: discord.ApplicationContext, hours: int, minutes: int, seconds):
+    async def command_vckickalarm(self, ctx: discord.ApplicationContext, hours: int, minutes: int, seconds: int):
         # マシロにメンバーを移動させる権限がない場合
         if not ctx.channel.permissions_for(ctx.guild.me).move_members:
             await ctx.respond(embed=MyEmbed(notif_type='error', description='私に先生をボイスチャンネルから移動させる権限がありません。'), ephemeral=True)
