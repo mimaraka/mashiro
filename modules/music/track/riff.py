@@ -4,7 +4,7 @@ import math
 import os
 from modules.http import get_range_data
 from .base import BaseTrack
-from ..duration import Duration
+from ...duration import Duration
 
 
 # RIFFのdataを除くチャンクを全て取得

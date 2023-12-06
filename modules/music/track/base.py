@@ -1,6 +1,6 @@
 import discord
 from constants import FFMPEG_OPTIONS
-from ..duration import Duration
+from ...duration import Duration
 
 
 class BaseTrack:

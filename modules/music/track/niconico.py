@@ -2,7 +2,7 @@ import discord
 from constants import FFMPEG_OPTIONS
 from niconico import NicoNico
 from .base import BaseTrack
-from ..duration import Duration
+from ...duration import Duration
 
 
 class NicoNicoTrack(BaseTrack):

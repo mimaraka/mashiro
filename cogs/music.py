@@ -1,6 +1,5 @@
 import asyncio
 import discord
-import glob
 import re
 import time
 from typing import Dict, List
@@ -10,21 +9,12 @@ import constants as const
 import modules.util as util
 from modules.myembed import MyEmbed
 from modules.music.track.track import create_tracks
-from modules.music.track.local import LocalTrack
 from modules.music.player import Player
 from modules.music.errors import *
 from modules.attachments import find_valid_urls
 from modules.mashilog import mashilog
 from modules.http import get_mimetype
-
-
-EMBED_BOT_NOT_CONNECTED = MyEmbed(notif_type="error", description="私はボイスチャンネルに接続していません。")
-EMBED_NOT_PLAYING = MyEmbed(notif_type="inactive", title="再生していません……。")
-EMBED_QUEUE_EMPTY = MyEmbed(notif_type="error", description="再生キューが空です。")
-EMBED_AUTHOR_NOT_CONNECTED = MyEmbed(notif_type="error", description="先生がボイスチャンネルに接続されていないようです。")
-EMBED_FAILED_TO_CREATE_TRACKS = MyEmbed(notif_type="error", description="トラックの生成に失敗しました。")
-
-OST_FILES = glob.glob("data/bluearchive_ost/*")
+from modules.vc_common import *
 
 
 async def autocomp_yt_title(ctx: discord.AutocompleteContext):
@@ -83,11 +73,10 @@ class CogMusic(discord.Cog):
         if player is None:
             # 自動接続先が指定されていない場合
             if vc is None:
-                embed = MyEmbed(notif_type="error", description="私はボイスチャンネルに接続していません。")
                 if ctx:
-                    await ctx.respond(embed=embed, ephemeral=True)
+                    await ctx.respond(embed=EMBED_BOT_NOT_CONNECTED, ephemeral=True)
                 elif channel:
-                    await channel.send(embed=embed)
+                    await channel.send(embed=EMBED_BOT_NOT_CONNECTED)
                 return None
             player = await self.connect(vc)
             if player is None:
@@ -100,7 +89,7 @@ class CogMusic(discord.Cog):
         else:
             # 自動接続先とは異なるVCのPlayerが既に存在する場合
             if vc is not None and player.vc != vc:
-                embed = MyEmbed(notif_type="error", description="私は既に別のボイスチャンネルに接続しています。")
+                embed = EMBED_BOT_ANOTHER_VC
                 if ctx:
                     await ctx.respond(embed=embed, ephemeral=True)
                 elif channel:
@@ -229,7 +218,7 @@ class CogMusic(discord.Cog):
         if not player:
             return
         await ctx.respond(
-            embed=MyEmbed(notif_type="succeed", title=f"接続しました！ (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})"),
+            embed=MyEmbed(notif_type="succeeded", title=f"接続しました！ (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})"),
             delete_after=10
         )
         # 0.5秒後にランダムにボイスを再生する
@@ -470,23 +459,6 @@ class CogMusic(discord.Cog):
         await player.play_random_voice(ctx, msg_loading=msg_loading)
 
 
-    # /baost
-    # @discord.slash_command(name="baost", description="ブルーアーカイブのOSTを再生します。")
-    # @discord.option("title", description="再生するOSTのタイトル")
-    # @discord.option("n", description="ランダムに取り出す曲数(指定した場合、titleは無視されます。)", min_value=1, max_value=len(OST_FILES))
-    # async def command_baost(self, ctx: discord.ApplicationContext):
-    #     # コマンドを送ったメンバーがボイスチャンネルに居ない場合
-    #     if ctx.author.voice is None:
-    #         await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
-    #         return
-
-    #     player = self.__player.get(ctx.guild.id) or await self.connect(ctx.author.voice.channel)
-    #     # コマンドを送ったメンバーとは別のボイスチャンネルに接続している場合
-    #     if ctx.voice_client.channel != ctx.author.voice.channel:
-    #         await ctx.respond(embed=EMBED_BOT_ANOTHER_VC, ephemeral=True)
-    #         return
-
-
     # /pause
     @discord.slash_command(name="pause", description="トラックの再生を一時停止します。")
     async def command_pause(self, ctx: discord.ApplicationContext):
@@ -563,7 +535,7 @@ class CogMusic(discord.Cog):
             return
         try:
             await player.replay()
-            await ctx.respond(embed=MyEmbed(notif_type="succeed", title="🔄 リプレイを開始しました！"), delete_after=10)
+            await ctx.respond(embed=MyEmbed(notif_type="succeeded", title="🔄 リプレイを開始しました！"), delete_after=10)
         except PlayerError as e:
             await ctx.respond(embed=MyEmbed(notif_type="error", description=e), ephemeral=True)
 
@@ -593,7 +565,7 @@ class CogMusic(discord.Cog):
                 player.repeat = 2
             else:
                 player.repeat = 0
-            embed = MyEmbed(notif_type="succeed", title=f"{ICON} リピート再生の設定を変更しました。", description=option)
+            embed = MyEmbed(notif_type="succeeded", title=f"{ICON} リピート再生の設定を変更しました。", description=option)
             await player.update_controller()
         await ctx.respond(embed=embed, delete_after=10)
 
@@ -611,13 +583,15 @@ class CogMusic(discord.Cog):
             player.shuffle = player.shuffle
             if player.shuffle:
                 embed=MyEmbed(title=f"{ICON} 再生キューをシャッフルしました。")
-                await player.update_controller()
+                if player.controller_msg is not None:
+                    await player.update_controller()
             else:
                 embed=MyEmbed(title=f"{ICON} シャッフル再生はオフです。")
         else:
             player.shuffle = switch
-            embed=MyEmbed(notif_type="succeed", title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
-            await player.update_controller()
+            embed=MyEmbed(notif_type="succeeded", title=f"{ICON} シャッフル再生を{'オン' if switch else 'オフ'}にしました。")
+            if player.controller_msg is not None:
+                await player.update_controller()
 
         await ctx.respond(embed=embed, delete_after=10)
 
@@ -673,7 +647,7 @@ class CogMusic(discord.Cog):
         else:
             remark = ""
         await ctx.respond(
-            embed=MyEmbed(notif_type="succeed", title=f"{title}{remark}", description=description),
+            embed=MyEmbed(notif_type="succeeded", title=f"{title}{remark}", description=description),
             delete_after=10
         )
 
@@ -689,4 +663,4 @@ class CogMusic(discord.Cog):
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
             return
         await player.regenerate_controller(ctx.channel)
-        await ctx.respond(embed=MyEmbed(notif_type="succeed", title=f"プレイヤーを移動しました。"), delete_after=10)
+        await ctx.respond(embed=MyEmbed(notif_type="succeeded", title=f"プレイヤーを移動しました。"), delete_after=10)

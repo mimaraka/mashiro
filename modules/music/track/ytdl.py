@@ -5,7 +5,7 @@ import yt_dlp
 from constants import YTDL_FORMAT_OPTIONS, FFMPEG_OPTIONS
 from modules.mashilog import mashilog
 from .base import BaseTrack
-from ..duration import Duration
+from ...duration import Duration
 
 
 class YTDLTrack(BaseTrack):

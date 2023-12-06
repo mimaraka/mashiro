@@ -1,3 +1,5 @@
+from typing import Tuple
+
 class Duration:
     def __init__(self, seconds: int):
         self._seconds: int = int(seconds)
@@ -11,13 +13,17 @@ class Duration:
         return cls(result)
     
     @property
-    def seconds(self):
+    def seconds(self) -> int:
         return self._seconds
     
-    def __str__(self):
+    def get_hms(self) -> Tuple[int]:
         h = self._seconds // 3600
         m = (self._seconds - h * 3600) // 60
         s = self._seconds % 60
+        return (h, m, s)
+    
+    def __str__(self):
+        h, m, s = self.get_hms()
         if h:
             result = f"{h}:{str(m).zfill(2)}:{str(s).zfill(2)}"
         else:
@@ -26,3 +32,14 @@ class Duration:
     
     def __add__(self, other):
         return self.__class__(self.seconds + other.seconds)
+    
+    def japanese_str(self) -> str:
+        h, m, s = self.get_hms()
+        result = ''
+        if 0 < h:
+            result += f'{h}時間'
+        if 0 < m:
+            result += f'{m}分'
+        if 0 < s:
+            result += f'{s}秒'
+        return result

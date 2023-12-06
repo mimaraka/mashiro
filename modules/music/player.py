@@ -16,7 +16,7 @@ from modules.mashilog import mashilog
 from .track.track import Track, LocalTrack
 from .playerview import PlayerView
 from .errors import *
-from .duration import Duration
+from ..duration import Duration
 
 
 class Player:
@@ -179,7 +179,7 @@ class Player:
             if not silent:
                 if msg_loading:
                     await msg_loading.delete()
-                embed = MyEmbed(notif_type="succeed", title="再生キューに追加しました！", description=self.tracks_text(tracks))
+                embed = MyEmbed(notif_type="succeeded", title="再生キューに追加しました！", description=self.tracks_text(tracks))
                 await (ctx.respond if ctx else channel.send)(embed=embed, delete_after=10)
             await self.update_controller()
         else:

@@ -8,7 +8,7 @@ from PIL import Image
 from modules.file import make_filename_by_seq
 from modules.http import get_range_data
 from .base import BaseTrack
-from ..duration import Duration
+from ...duration import Duration
 
 
 class ID3V2Track(BaseTrack):
