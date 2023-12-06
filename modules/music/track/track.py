@@ -14,7 +14,7 @@ from .niconico import NicoNicoTrack
 from .local import LocalTrack
 from modules.http import bin_startswith
 from modules.http import get_mimetype
-from ..duration import Duration
+from ...duration import Duration
 
 
 Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
