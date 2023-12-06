@@ -8,7 +8,7 @@
 静山マシロのDiscord Botです。音楽再生がメインの機能となります。
 
 ## 導入
-[こちらのリンク](https://discord.com/api/oauth2/authorize?client_id=1105880759857860709&permissions=4914184440896&scope=bot%20applications.commands)からサーバーに導入してください。
+[こちらのリンク](https://discord.com/api/oauth2/authorize?client_id=1105880759857860709&permissions=48794539912272&scope=applications.commands+bot)からサーバーに導入してください。
 
 ## 使い方
 `/play [URL/キーワード]`で、URLやキーワードから音楽を再生することができます。  
