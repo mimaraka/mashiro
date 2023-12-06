@@ -54,10 +54,6 @@ class CogVcutil(discord.Cog):
     @discord.option('minutes', description='分', min_value=0, max_value=59, default=0)
     @discord.option('seconds', description='秒', min_value=0, max_value=59, default=0)
     async def command_vckickalarm(self, ctx: discord.ApplicationContext, hours: int, minutes: int, seconds: int):
-        # マシロにメンバーを移動させる権限がない場合
-        if not ctx.channel.permissions_for(ctx.guild.me).move_members:
-            await ctx.respond(embed=MyEmbed(notif_type='error', description='私に先生をボイスチャンネルから移動させる権限がありません。'), ephemeral=True)
-            return
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -74,11 +70,14 @@ class CogVcutil(discord.Cog):
         await asyncio.sleep(duration.seconds)
         
         if ctx.author.voice and ctx.author.voice.channel is not None:
-            await ctx.author.move_to(None)
-            await ctx.respond(
-                embed=MyEmbed(
-                    title='⏱️ ボイスチャンネル切断タイマー',
-                    description=f'**{ctx.author.display_name}**(`{ctx.author.name}`) 先生をボイスチャンネルから切断しました。'
-                ),
-                delete_after=10
-            )
+            try:
+                await ctx.author.move_to(None, reason='ボイスチャンネル切断タイマー(/vckicktimer)により切断')
+                await ctx.respond(
+                    embed=MyEmbed(
+                        title='⏱️ ボイスチャンネル切断タイマー',
+                        description=f'**{ctx.author.display_name}**(`{ctx.author.name}`) 先生をボイスチャンネルから切断しました。'
+                    ),
+                    delete_after=10
+                )
+            except discord.Forbidden:
+                await ctx.respond(embed=MyEmbed(notif_type='error', description='先生が接続しているボイスチャンネルでは、私に先生を切断する権限が与えられていません。'))
