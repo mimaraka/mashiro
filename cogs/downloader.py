@@ -46,11 +46,14 @@ class CogDownloader(discord.Cog):
             print(e)
             return None
 
-    async def download(self, ctx: discord.ApplicationContext, media_type: str, query):
+    async def download(self, ctx: discord.ApplicationContext, media_type: str, query, bestvideo=False):
         await ctx.defer()
 
         if media_type == "video":
-            format = "best"
+            if bestvideo:
+                format = "bestvideo*"
+            else:
+                format = "best"
             author = "🎬 ダウンローダー(動画)"
         else:
             format = "bestaudio"
@@ -85,7 +88,10 @@ class CogDownloader(discord.Cog):
             await self.download(ctx, media_type, query)
         elif message.clean_content:
             # メッセージにURLが含まれる場合は抽出
-            query = re.search(RE_PATTERN_URL, message.clean_content).group() or message.clean_content
+            if m := re.search(RE_PATTERN_URL, message.clean_content):
+                query = m.group()
+            else:
+                query = message.clean_content
             await self.download(ctx, media_type, query)
         else:
             await ctx.respond(
@@ -96,8 +102,9 @@ class CogDownloader(discord.Cog):
     # /dl-video
     @discord.slash_command(name="dl-video", description="動画のダウンロードリンクを取得します。")
     @discord.option("query", description="URLまたはYouTube上で検索するキーワード")
-    async def command_dl_video(self, ctx: discord.ApplicationContext, query: str):
-        await self.download(ctx, "video", query)
+    @discord.option("bestvideo", description="最高画質の動画のリンクを取得しますが、音声が含まれない可能性があります。", default=False)
+    async def command_dl_video(self, ctx: discord.ApplicationContext, query: str, bestvideo: bool):
+        await self.download(ctx, "video", query, bestvideo=bestvideo)
 
     # メッセージコマンド (ダウンロード(動画))
     @discord.message_command(name="ダウンロード(動画)")
@@ -112,5 +119,5 @@ class CogDownloader(discord.Cog):
 
     # メッセージコマンド (ダウンロード(音声))
     @discord.message_command(name="ダウンロード(音声)")
-    async def message_command_dl_video(self, ctx: discord.ApplicationContext, message: discord.Message):
+    async def message_command_dl_audio(self, ctx: discord.ApplicationContext, message: discord.Message):
         await self.message_command_common(ctx, message, "audio")
