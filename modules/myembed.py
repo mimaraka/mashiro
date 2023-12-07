@@ -43,4 +43,4 @@ class MyEmbed(discord.Embed):
 
         self.set_thumbnail(url=EMBED_THUMBNAIL[custom_icon or notif_type])
         if image:
-            self.set_image(image)
+            self.set_image(url=image)

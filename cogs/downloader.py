@@ -24,6 +24,9 @@ class CogDownloader(discord.Cog):
                     None, lambda: ytdl.extract_info(query, download=False)
                 )
 
+            if info.get("entries") is not None:
+                info = info[0]
+
             if re.search(RE_PATTERN_URL_NICONICO, query):
                 url = f"https://www.nicovideodl.jp/watch/{info.get('webpage_url_basename')}"
             else:
