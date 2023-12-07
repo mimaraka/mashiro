@@ -7,7 +7,7 @@ import constants as const
 
 
 # 正規表現を用いた少しゆるめの検索
-def searchex(lis, target_text, strength, ignore_katahira=False, ignore_dakuten=False):
+def searchex(lis, target_text, looseness, ignore_katahira=False, ignore_dakuten=False):
     TRANS_UL = str.maketrans("ぁぃぅぇぉっゃゅょゎ～", "あいうえおつやゆよわー")
     TRANS_DAKUTEN = str.maketrans("がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ", "かきくけこさしすせそだぢづでどはひふへほはひふへほ")
     # re.search()に用いるパターンの用意
@@ -30,7 +30,7 @@ def searchex(lis, target_text, strength, ignore_katahira=False, ignore_dakuten=F
             if i == len(lis) - 1:
                 pattern += r"(" + rchar + r")"
             else:
-                pattern += r"(" + rchar + r")" + r"((\s*|᠎*)*|.{," + r"{}".format(strength) + r"})"
+                pattern += r"(" + rchar + r")" + r"((\s*|᠎*)*|.{," + r"{}".format(looseness) + r"})"
         # リストの要素の型が文字列であった場合
         elif type(el) == str:
             # 文字列ごとの正規表現を用意
@@ -41,7 +41,7 @@ def searchex(lis, target_text, strength, ignore_katahira=False, ignore_dakuten=F
                 if j == len(el) - 1:
                     rstr += r"{}".format(c)
                 else:
-                    rstr += r"{}".format(c) + r"((\s*|᠎*)*|.{," + r"{}".format(strength) + r"})"
+                    rstr += r"{}".format(c) + r"((\s*|᠎*)*|.{," + r"{}".format(looseness) + r"})"
             # 末端処理
             if i == len(lis) - 1:
                 pattern += r"(" + rstr + r")"
@@ -61,9 +61,9 @@ def searchex(lis, target_text, strength, ignore_katahira=False, ignore_dakuten=F
 
 # 言葉狩り
 async def kotobagari_proc(message: discord.Message):
-    for _ in searchex(["ひつす", "必須"], str(message.content), 1, True):
+    for _ in searchex(["ひつす", "必須"], str(message.content), 0, True):
         images = [const.URL_IMAGE_HISSU_01, const.URL_IMAGE_HISSU_02]
         await message.channel.send(random.choice(images))
 
-    for _ in searchex(["あいす", "ちんこ", "ふえら"], str(message.content), 1, True):
+    for _ in searchex(["あいす", "ふえら"], str(message.content), 0, True):
         await message.channel.send(const.URL_IMAGE_ICECREAM)
