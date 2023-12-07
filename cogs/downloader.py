@@ -26,7 +26,7 @@ class CogDownloader(discord.Cog):
                 )
 
             if info.get("entries") is not None:
-                info = info[0]
+                info = info.get("entries")[0]
 
             if re.search(RE_PATTERN_URL_NICONICO, query):
                 url = f"https://www.nicovideodl.jp/watch/{info.get('webpage_url_basename')}"
