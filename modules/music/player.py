@@ -375,7 +375,7 @@ class Player:
             
             async def callback(btn_self, interaction: discord.Interaction):
                 await interaction.response.defer()
-                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page - 1, edit=True))
+                await interaction.followup.edit_message(**self.get_queue_msg(page=btn_self.page - 1, edit=True))
 
         class ButtonNextPage(discord.ui.Button):
             def __init__(btn_self, page: int):
@@ -384,7 +384,7 @@ class Player:
             
             async def callback(btn_self, interaction: discord.Interaction):
                 await interaction.response.defer()
-                await interaction.response.edit_message(**self.get_queue_msg(page=btn_self.page + 1, edit=True))
+                await interaction.followup.edit_message(**self.get_queue_msg(page=btn_self.page + 1, edit=True))
 
         if self.queue:
             page = min(max(page, 1), n_pages)

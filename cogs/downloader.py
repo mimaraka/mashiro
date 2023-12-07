@@ -47,7 +47,7 @@ class CogDownloader(discord.Cog):
             return None
 
     async def download(self, ctx: discord.ApplicationContext, media_type: str, query):
-        await ctx.defer()
+        await ctx.defer(ephemeral=True)
 
         if media_type == "video":
             format = "best"
@@ -57,17 +57,23 @@ class CogDownloader(discord.Cog):
             author = "💿 ダウンローダー(音声)"
         info = await self.get_info(query, format)
 
+        if info is None:
+            await ctx.respond(
+                embed=MyEmbed(notif_type="error", description="ダウンロードリンクの取得に失敗しました。"),
+                ephemeral=True
+            )
+            return
+
         embed = MyEmbed(
-            notif_type="succeeded",
             title=info.get("title"),
-            description=f"👤 {info.get('uploader')}",
+            description=f"👤 {info.get('uploader') or '-'}",
             url=info.get("webpage_url"),
             image=info.get("thumbnail")
         )
         embed.set_author(name=author)
 
         view = discord.ui.View(timeout=None)
-        view.add_item(discord.ui.Button(label="ダウンロード", url=info.get("url")))
+        view.add_item(discord.ui.Button(label="ダウンロード(リンクは一定時間後に無効になります)", url=info.get("url")))
 
         await ctx.respond(embed=embed, view=view)
 
