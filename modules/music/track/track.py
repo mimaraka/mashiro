@@ -4,7 +4,7 @@ import discord
 import re
 import yt_dlp
 import modules.util as util
-from constants import YTDL_FORMAT_OPTIONS
+from constants import YTDL_FORMAT_OPTIONS, RE_PATTERN_URL_NICONICO
 from typing import List
 from .id3v2 import ID3V2Track
 from .flac import FLACTrack
@@ -60,7 +60,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
     for i in info_list:
         if i:
             # ニコニコの場合
-            if re.search(r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+", i.get("original_url")):
+            if re.search(RE_PATTERN_URL_NICONICO, i.get("original_url")):
                 if i.get("_api_data") and i["_api_data"].get("series"):
                     series_title = i["_api_data"]["series"].get("title")
                 else:
