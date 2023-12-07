@@ -26,6 +26,4 @@ def is_url(text: str):
 
 
 def shorten_url(url: str):
-    shortener = Shortener()
-    shortened_url = shortener.tinyurl.short(url)
-    return shortened_url
+    return Shortener().tinyurl.short(url)

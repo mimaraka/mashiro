@@ -2,6 +2,7 @@ import discord
 import re
 import yt_dlp
 from modules.myembed import MyEmbed
+from modules.util import shorten_url
 from constants import RE_PATTERN_URL_NICONICO, RE_PATTERN_URL
 
 
@@ -31,6 +32,8 @@ class CogDownloader(discord.Cog):
                 url = f"https://www.nicovideodl.jp/watch/{info.get('webpage_url_basename')}"
             else:
                 url = info.get("url")
+                if len(url) > 512:
+                    url = shorten_url(url)
             
             return {
                 "title": info.get("title"),
