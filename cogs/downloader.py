@@ -47,7 +47,7 @@ class CogDownloader(discord.Cog):
             return None
 
     async def download(self, ctx: discord.ApplicationContext, media_type: str, query):
-        await ctx.defer(ephemeral=True)
+        await ctx.defer()
 
         if media_type == "video":
             format = "best"
@@ -60,7 +60,7 @@ class CogDownloader(discord.Cog):
         if info is None:
             await ctx.respond(
                 embed=MyEmbed(notif_type="error", description="ダウンロードリンクの取得に失敗しました。"),
-                ephemeral=True
+                delete_after=10
             )
             return
 
