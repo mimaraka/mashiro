@@ -71,9 +71,10 @@ class CogDownloader(discord.Cog):
             image=info.get("thumbnail")
         )
         embed.set_author(name=author)
+        embed.set_footer(text="※ダウンロードリンクは一定時間後に無効になる可能性があります。")
 
         view = discord.ui.View(timeout=None)
-        view.add_item(discord.ui.Button(label="ダウンロード(リンクは一定時間後に無効になります)", url=info.get("url")))
+        view.add_item(discord.ui.Button(label="ダウンロード", url=info.get("url")))
 
         await ctx.respond(embed=embed, view=view)
 
