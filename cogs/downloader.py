@@ -61,7 +61,7 @@ class CogDownloader(discord.Cog):
             url=info.get("webpage_url"),
             image=info.get("thumbnail")
         )
-        embed.set_author(author)
+        embed.set_author(name=author)
 
         view = discord.ui.View(timeout=None)
         view.add_item(discord.ui.Button(label="ダウンロード", url=info.get("url")))
@@ -84,7 +84,7 @@ class CogDownloader(discord.Cog):
             )
     
     # /dl-video
-    @discord.slash_command(name="dl-video")
+    @discord.slash_command(name="dl-video", description="動画のダウンロードリンクを取得します。")
     @discord.option("query", description="URLまたはYouTube上で検索するキーワード")
     async def command_dl_video(self, ctx: discord.ApplicationContext, query: str):
         await self.download(ctx, "video", query)
@@ -95,7 +95,7 @@ class CogDownloader(discord.Cog):
         await self.message_command_common(ctx, message, "video")
 
     # /dl-audio
-    @discord.slash_command(name="dl-audio")
+    @discord.slash_command(name="dl-audio", description="音声のダウンロードリンクを取得します。")
     @discord.option("query", description="URLまたはYouTube上で検索するキーワード")
     async def command_dl_audio(self, ctx: discord.ApplicationContext, query: str):
         await self.download(ctx, "audio", query)
