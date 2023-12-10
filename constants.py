@@ -29,7 +29,7 @@ EMOJI_ID_LOADING = 1154011417029128242
 
 # yt_dlp
 YTDL_FORMAT_OPTIONS = {
-    "format": "bestaudio/best*[acodec=aac]",
+    "format": "best*[acodec!=none]",
     "restrictfilenames": True,
     "noplaylist": True,
     "nocheckcertificate": True,

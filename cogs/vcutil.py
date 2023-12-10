@@ -29,7 +29,7 @@ class CogVcutil(discord.Cog):
                 self.vc_info[member.guild.id].pop(before.channel.id)
 
     # /vcstat
-    @discord.slash_command(name='vcstat', description='現在アクティブな通話の情報を表示します。')
+    @discord.slash_command(name='vcstat', description='先生が接続している通話の情報を表示します。')
     async def command_vcstat(self, ctx: discord.ApplicationContext):
         if ctx.author.voice is None or ctx.author.voice.channel is None:
             await ctx.respond(
