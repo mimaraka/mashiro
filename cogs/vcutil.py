@@ -72,7 +72,7 @@ class CogVcutil(discord.Cog):
         if ctx.author.voice and ctx.author.voice.channel is not None:
             try:
                 await ctx.author.move_to(None, reason='ボイスチャンネル切断タイマー(/vckicktimer)により切断')
-                await ctx.respond(
+                await ctx.channel.send(
                     embed=MyEmbed(
                         title='⏱️ ボイスチャンネル切断タイマー',
                         description=f'**{ctx.author.display_name}**(`{ctx.author.name}`) 先生をボイスチャンネルから切断しました。'
@@ -80,4 +80,8 @@ class CogVcutil(discord.Cog):
                     delete_after=10
                 )
             except discord.Forbidden:
-                await ctx.respond(embed=MyEmbed(notif_type='error', description='先生が接続しているボイスチャンネルでは、私に先生を切断する権限が与えられていません。'))
+                await ctx.channel.send(
+                    embed=MyEmbed(
+                        notif_type='error', description='先生が接続しているボイスチャンネルでは、私に先生を切断する権限が与えられていません。'),
+                    delete_after=10
+                )
