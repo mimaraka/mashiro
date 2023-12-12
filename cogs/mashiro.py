@@ -93,7 +93,7 @@ class CogMashiro(discord.Cog):
             # ランダムでセリフを送る
             else:
                 # ChatGPTの使用が可能なギルド内の場合
-                if message.guild.id in const.GUILD_IDS_CHATGPT:
+                if message.guild is not None and  message.guild.id in const.GUILD_IDS_CHATGPT:
                     # メンションの後に何か文字があった場合、ChatGPTにより返答
                     if content := re.sub(r"[#*_\-|~]{0,2}<@\d+>[*_\-|~]{0,2}\s*", "", message.content):
                         global g_conversations
@@ -124,7 +124,7 @@ class CogMashiro(discord.Cog):
                             )
                             result = response["choices"][0]["message"]["content"]
                             pattern_play = re.compile(r"\{play:(.+?)\}\s*")
-                            if m := re.match(pattern_play, result):
+                            if m := re.search(pattern_play, result):
                                 query = m.group(1)
                                 result = re.sub(pattern_play, "", result)
                                 cog_music = self.bot.get_cog("CogMusic")
