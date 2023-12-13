@@ -346,10 +346,11 @@ class CogMusic(discord.Cog):
 
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
-    @discord.option("channel", description="URLを検索するチャンネル", required=False, default=None)
-    @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", required=False, default=None)
-    @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20, required=False)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int):
+    @discord.option("channel", description="URLを検索するチャンネル", default=None)
+    @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", default=None)
+    @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20)
+    @discord.option("oldest_first", description="メッセージを古い順から検索します。", default=False)
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, oldest_first: bool):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -383,7 +384,7 @@ class CogMusic(discord.Cog):
 
         tracks = []
         message_count = 1
-        async for message in search_channel.history(limit=n):
+        async for message in search_channel.history(limit=n, oldest_first=oldest_first):
             for url in await find_valid_urls(message):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
