@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 import discord
 from typing import Literal
 
@@ -15,7 +15,7 @@ def mashilog(content, ctx: discord.ApplicationContext=None, log_type: LogType="i
     if ctx and hasattr(ctx.command, "name"):
         content_ = f"[{ctx.command.name}] {content_}"
 
-    now_str = datetime.datetime.now(timezone(timedelta(hours=9), 'JST')).strftime("%Y-%m-%d %H:%M:%S")
+    now_str = datetime.now(timezone(timedelta(hours=9), 'JST')).strftime("%Y-%m-%d %H:%M:%S")
     log_text = f"\033[1;94m{now_str}\033[m {type_text}\t\033[1;32m静山マシロ\033[m {content_}"
     print(log_text)
 
