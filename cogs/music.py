@@ -1,5 +1,6 @@
 import asyncio
 import discord
+import random
 import re
 import time
 from typing import Dict, List
@@ -349,8 +350,8 @@ class CogMusic(discord.Cog):
     @discord.option("channel", description="URLを検索するチャンネル", default=None)
     @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", default=None)
     @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20)
-    @discord.option("oldest_first", description="メッセージを古い順から検索します。", default=False)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, oldest_first: bool):
+    @discord.option("order", description="キューに追加するトラックの順番を指定します。", choices=["新しい順", "古い順", "ランダム"], default=None)
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, order: str):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -384,7 +385,7 @@ class CogMusic(discord.Cog):
 
         tracks = []
         message_count = 1
-        async for message in search_channel.history(limit=n, oldest_first=oldest_first):
+        async for message in search_channel.history(limit=n, oldest_first=order == "古い順"):
             for url in await find_valid_urls(message):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
@@ -403,6 +404,9 @@ class CogMusic(discord.Cog):
             )
             return
         
+        if order == "ランダム":
+            random.shuffle(tracks)
+
         await msg_loading.edit(embed=self.get_loading_embed(ctx.channel, prefix="2. "))
         await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
 
