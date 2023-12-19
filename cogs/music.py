@@ -347,9 +347,9 @@ class CogMusic(discord.Cog):
 
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
-    @discord.option("channel", description="URLを検索するチャンネル", default=None)
-    @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", default=None)
-    @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20)
+    @discord.option("channel", description="トラックを検索するチャンネル", default=None)
+    @discord.option("channel_url", description="トラックを検索するチャンネルのURL (私が所属している全てのサーバーのチャンネルをURLから参照できます)", default=None)
+    @discord.option("n", description="検索するメッセージの件数 (デフォルト: 20件)", min_value=1, default=20)
     @discord.option("order", description="キューに追加するトラックの順番を指定します。", choices=["新しい順", "古い順", "ランダム"], default=None)
     async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, order: str):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
@@ -413,7 +413,7 @@ class CogMusic(discord.Cog):
 
     # /play-file
     @discord.slash_command(name="play-file", description="添付したファイルの音声を再生します。")
-    @discord.option("attachment", description="再生する音声の添付ファイル(音声・動画)")
+    @discord.option("attachment", description="再生する音声の添付ファイル (音声・動画)")
     async def command_play_file(self, ctx: discord.ApplicationContext, attachment: discord.Attachment):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
@@ -577,7 +577,7 @@ class CogMusic(discord.Cog):
 
     # /shuffle
     @discord.slash_command(name="shuffle", description="シャッフル再生のオン/オフを変更します。")
-    @discord.option("switch", description="シャッフル再生のオン/オフ(True/False)。シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます。", required=False)
+    @discord.option("switch", description="シャッフル再生のオン/オフ [True/False] (シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます)", required=False)
     async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool=None):
         player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
@@ -628,7 +628,7 @@ class CogMusic(discord.Cog):
     
     # /volume
     @discord.slash_command(name="volume", description="現在のボリュームを表示・変更します。")
-    @discord.option("volume", description="ボリューム(0～100)(指定なしで現在のボリュームを表示)", max_value=100, min_value=0, required=False)
+    @discord.option("volume", description="ボリューム [0～100] (指定なしで現在のボリュームを表示)", max_value=100, min_value=0, required=False)
     async def command_volume(self, ctx: discord.ApplicationContext, volume: int=None):
         player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
