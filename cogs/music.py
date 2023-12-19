@@ -347,10 +347,10 @@ class CogMusic(discord.Cog):
 
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
-    @discord.option("channel", description="トラックを検索するチャンネル", default=None)
-    @discord.option("channel_url", description="トラックを検索するチャンネルのURL (私が所属している全てのサーバーのチャンネルをURLから参照できます)", default=None)
-    @discord.option("n", description="検索するメッセージの件数 (デフォルト: 20件)", min_value=1, default=20)
-    @discord.option("order", description="キューに追加するトラックの順番を指定します。", choices=["新しい順", "古い順", "ランダム"], default=None)
+    @discord.option("channel", description="URLを検索するチャンネル", default=None)
+    @discord.option("channel_url", description="URLを検索するチャンネルのリンク(私が所属している全てのサーバーのチャンネルをURLから参照できます)。", default=None)
+    @discord.option("n", description="検索するメッセージの件数(デフォルト: 20件)", min_value=1, default=20)
+    @discord.option("order", description="再生キューに追加するトラックの順番", choices=["新しい順", "古い順", "ランダム"], default=None)
     async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, order: str):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
