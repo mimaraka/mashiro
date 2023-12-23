@@ -46,10 +46,10 @@ class CogVcutil(discord.Cog):
         duration = Duration((datetime.now(JST) - start_time).total_seconds())
 
         embed = MyEmbed(title=f'ボイスチャット情報 (🔊 {ctx.author.voice.channel.name})')
-        embed.add_field(name="通話開始時刻(JST)", value=start_time.strftime("%H:%M:%S (%m/%d/%Y)"))
-        embed.add_field(name="通話時間", value=duration.japanese_str() or "-")
+        embed.add_field(name="通話開始時刻(JST)", value=start_time.strftime("%H:%M:%S (%m/%d/%Y)"), inline=False)
+        embed.add_field(name="通話時間", value=duration.japanese_str() or "-", inline=False)
         member = self.vc_info[ctx.guild.id][ctx.author.voice.channel.id]["member"]
-        embed.add_field(name="通話を開始した先生", value=get_member_text(member, bold=False))
+        embed.add_field(name="通話を開始した先生", value=get_member_text(member, bold=False, suffix=None), inline=False)
 
         await ctx.respond(
             embed=embed,
