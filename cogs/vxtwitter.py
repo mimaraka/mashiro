@@ -66,7 +66,7 @@ class CogVxtwitter(discord.Cog):
                 api_url = re.sub('vxtwitter.com', 'api.vxtwitter.com', new_url)
                 async with aiohttp.ClientSession() as session:
                     async with session.get(api_url) as resp:
-                        data = resp.json()
+                        data = await resp.json()
                         if data.get('possibly_sensitive'):
                             link_text = f'||{link_text}||'
                 
