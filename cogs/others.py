@@ -51,7 +51,7 @@ class CogOthers(discord.Cog):
         page = min(max(page, 1), n_pages)
         start_index = (page - 1) * 10
         for i in range(start_index, start_index + 10):
-            embed.add_field(name=f"/{commands[i]['name']}", value=commands[i]["description"])
+            embed.add_field(name=f"/{commands[i]['name']}", value=commands[i]["description"], inline=False)
 
         if len(commands) > 10:
             embed.description = f"**{page}** / {n_pages}ページ"
