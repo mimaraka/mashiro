@@ -24,7 +24,7 @@ class CogVcutil(discord.Cog):
                 if len(after.channel.members) == 1:
                     if self.vc_info.get(member.guild.id) is None:
                         self.vc_info[member.guild.id]  = {}
-                    self.vc_info[member.guild.id] = {
+                    self.vc_info[member.guild.id][member.voice.channel.id] = {
                         "time": datetime.now(JST),
                         "member": member
                     }
