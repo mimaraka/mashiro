@@ -24,8 +24,10 @@ class CogVcutil(discord.Cog):
                 if len(after.channel.members) == 1:
                     if self.vc_info.get(member.guild.id) is None:
                         self.vc_info[member.guild.id]  = {}
-                    self.vc_info[member.guild.id][after.channel.id]["time"] = datetime.now(JST)
-                    self.vc_info[member.guild.id][after.channel.id]["member"] = member
+                    self.vc_info[member.guild.id] = {
+                        "time": datetime.now(JST),
+                        "member": member
+                    }
             # 移動前のチャンネルからメンバーがいなくなった場合
             if before.channel and len(before.channel.members) == 0:
                 self.vc_info[member.guild.id].pop(before.channel.id)

@@ -17,7 +17,7 @@ class CogOthers(discord.Cog):
 
 
     # コマンド一覧のメッセージを取得
-    async def get_help_msg(self, page: int, edit: bool=False):
+    def get_help_msg(self, page: int):
         commands = []
         for item in self.bot.walk_application_commands():
             if type(item) == discord.SlashCommand:
@@ -35,7 +35,7 @@ class CogOthers(discord.Cog):
             
             async def callback(btn_self, interaction: discord.Interaction):
                 await interaction.response.defer()
-                await interaction.followup.edit_message(interaction.message.id, **self.get_help_msg(page=btn_self.page - 1, edit=True))
+                await interaction.followup.edit_message(interaction.message.id, **self.get_help_msg(page=btn_self.page - 1))
 
         class ButtonNextPage(discord.ui.Button):
             def __init__(btn_self, page: int):
@@ -44,7 +44,7 @@ class CogOthers(discord.Cog):
             
             async def callback(btn_self, interaction: discord.Interaction):
                 await interaction.response.defer()
-                await interaction.followup.edit_message(interaction.message.id, **self.get_help_msg(page=btn_self.page + 1, edit=True))
+                await interaction.followup.edit_message(interaction.message.id, **self.get_help_msg(page=btn_self.page + 1))
 
         embed = MyEmbed(title="コマンド一覧")
         view = discord.ui.View(timeout=None)
