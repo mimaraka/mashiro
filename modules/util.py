@@ -1,3 +1,4 @@
+import discord
 import re
 from pyshorteners import Shortener
 from constants import RE_PATTERN_URL
@@ -27,3 +28,16 @@ def is_url(text: str):
 
 def shorten_url(url: str):
     return Shortener().tinyurl.short(url)
+
+
+def get_member_text(member: discord.Member, bold: bool=True, decoration: bool=True, suffix: str="先生"):
+    result = member.display_name
+    if bold and decoration:
+        result = f"**{result}**"
+    global_name = member.name
+    if decoration:
+        global_name = f"`{global_name}`"
+    result += f"({global_name})"
+    if suffix:
+        result += f" {suffix}"
+    return result
