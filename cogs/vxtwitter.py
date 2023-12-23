@@ -1,7 +1,9 @@
+import aiohttp
 import discord
 import json
 import re
 from modules.myembed import MyEmbed
+from modules.util import get_member_text
 
 
 class CogVxtwitter(discord.Cog):
@@ -59,12 +61,18 @@ class CogVxtwitter(discord.Cog):
                     except discord.Forbidden:
                         pass
 
-            if deleted:
-                results = [f'**{message.author.display_name}**(`{message.author.name}`) 先生が共有しました！ | [ポストを見る]({url})' for url in new_urls]
-            else:
-                results = [f'[ポストを見る]({url})' for url in new_urls]
-            for result in results:
+            for new_url in new_urls:
+                link_text = f'[ポストを見る]({new_url})'
+                api_url = re.sub('vxtwitter.com', 'api.vxtwitter.com', new_url)
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(api_url) as resp:
+                        data = resp.json()
+                        if data.get('possibly_sensitive'):
+                            link_text = f'||{link_text}||'
+                
                 if deleted:
+                    result = f'{get_member_text(message.author)}が共有しました！ | {link_text}'
                     await message.channel.send(result)
                 else:
+                    result = link_text
                     await message.reply(result, mention_author=False)
