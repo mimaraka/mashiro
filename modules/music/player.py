@@ -13,6 +13,7 @@ import modules.util as util
 import constants as const
 from modules.myembed import MyEmbed
 from modules.mashilog import mashilog
+from modules.util import get_member_text
 from .track.track import Track, LocalTrack
 from .playerview import PlayerView
 from .errors import *
@@ -225,6 +226,7 @@ class Player:
         await self.__current_track.release_source()
 
         if error:
+            mashilog("音声の再生中にエラーが発生しました。", log_type="error")
             print(f"An error occurred while playing.")
             traceback.print_exception(error)
             return
@@ -321,7 +323,7 @@ class Player:
 
         embed.set_author(name="🎵 プレイヤー")
         member = self.__current_track.member
-        embed.set_footer(text=f"{member.display_name} 先生が追加", icon_url=member.display_avatar.url)
+        embed.set_footer(text=f"{get_member_text(member, decoration=False)}が追加", icon_url=member.display_avatar.url)
 
         result = {
             "embed": embed,
