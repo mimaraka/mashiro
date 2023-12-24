@@ -42,7 +42,7 @@ class CogMessageSender(discord.Cog):
             def __init__(self_) -> None:
                 super().__init__(title="メッセージの設定", timeout=None)
 
-                print(discord.ui.InputText.__init__().__code__.co_varnames[:discord.ui.InputText.__init__().__code__.co_argcount])
+                print(discord.ui.InputText.__init__.__code__.co_varnames[:discord.ui.InputText.__init__.__code__.co_argcount])
                 # content
                 self_.input_content = discord.ui.InputText(
                     label="メッセージの内容",
