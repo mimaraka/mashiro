@@ -46,14 +46,16 @@ class CogMessageSender(discord.Cog):
                 self_.input_content = InputText(
                     label="メッセージの内容",
                     required=False,
-                    style=discord.InputTextStyle.paragraph
+                    style=discord.InputTextStyle.paragraph,
+                    max_length=2000
                 )
 
                 # embed_title
                 self_.input_embed_title = InputText(
                     label="埋め込みのタイトル",
                     required=False,
-                    style=discord.InputTextStyle.short
+                    style=discord.InputTextStyle.short,
+                    max_length=256
                 )
 
                 # embed_description
@@ -90,7 +92,7 @@ class CogMessageSender(discord.Cog):
                     delete_after=10
                 )
                 while not await self.send_message_callback(time, channel, content, embed):
-                    asyncio.sleep(10)
+                    await asyncio.sleep(10)
         
         modal_message = MessageModal()
         await ctx.send_modal(modal_message)
