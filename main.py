@@ -11,6 +11,7 @@ from cogs.mashiro import CogMashiro
 from cogs.music import CogMusic
 from cogs.nick_changer import CogNickChanger
 from cogs.downloader import CogDownloader
+from cogs.message_sender import CogMessageSender
 from cogs.vcutil import CogVcutil
 from cogs.vxtwitter import CogVxtwitter
 from cogs.others import CogOthers
@@ -46,6 +47,7 @@ bot.add_cog(CogMashiro(bot))
 bot.add_cog(CogMusic(bot))
 bot.add_cog(CogNickChanger(bot))
 bot.add_cog(CogDownloader(bot))
+bot.add_cog(CogMessageSender(bot))
 bot.add_cog(CogVcutil(bot))
 bot.add_cog(CogVxtwitter(bot))
 bot.add_cog(CogOthers(bot))
