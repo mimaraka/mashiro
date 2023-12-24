@@ -41,24 +41,23 @@ class CogMessageSender(discord.Cog):
         class MessageModal(discord.ui.Modal):
             def __init__(self_) -> None:
                 super().__init__(title="メッセージの設定", timeout=None)
-
-                print(discord.ui.InputText.__init__.__code__.co_varnames[:discord.ui.InputText.__init__.__code__.co_argcount])
+            
                 # content
-                self_.input_content = discord.ui.InputText(
+                self_.input_content = InputText(
                     label="メッセージの内容",
                     required=False,
                     style=discord.InputTextStyle.paragraph
                 )
 
                 # embed_title
-                self_.input_embed_title = discord.ui.InputText(
+                self_.input_embed_title = InputText(
                     label="埋め込みのタイトル",
                     required=False,
                     style=discord.InputTextStyle.short
                 )
 
                 # embed_description
-                self_.input_embed_description = discord.InputText(
+                self_.input_embed_description = InputText(
                     label="埋め込みの説明",
                     required=False,
                     style=discord.InputTextStyle.paragraph
