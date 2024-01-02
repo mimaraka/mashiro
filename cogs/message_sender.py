@@ -1,9 +1,11 @@
 import asyncio
 import discord
-import datetime
+from datetime import datetime, timezone, timedelta
 
 from discord.ui.input_text import InputText
 from modules.myembed import MyEmbed
+
+JST = timezone(timedelta(hours=9), 'JST')
 
 
 class CogMessageSender(discord.Cog):
@@ -11,9 +13,9 @@ class CogMessageSender(discord.Cog):
         self.bot: discord.Bot = bot
 
     # メッセージ送信用のコールバック
-    async def send_message_callback(self, time: datetime.datetime, channel: discord.TextChannel, content: str, embed: MyEmbed):
+    async def send_message_callback(self, time: datetime, channel: discord.TextChannel, content: str, embed: MyEmbed):
         # 既に指定時間を過ぎている場合
-        if time <= datetime.datetime.now():
+        if time <= datetime.now(JST):
             await channel.send(content, embed=embed)
             return True
         return False
@@ -27,13 +29,13 @@ class CogMessageSender(discord.Cog):
     @discord.option("minute", description="送信する分 (省略した場合は現在の分)", default=None, min_value=0, max_value=59)
     async def command_send_message(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, day: int, hour: int, minute: int):
         channel = channel or ctx.channel
-        now = datetime.datetime.now()
+        now = datetime.now(JST)
         day = day or now.day
         hour = hour or now.hour
         minute = minute or now.minute
 
         try:
-            time = datetime.datetime(now.year, now.month, day, hour, minute)
+            time = datetime(now.year, now.month, day, hour, minute)
         except ValueError:
             await ctx.respond(embed=MyEmbed(notif_type="error", description="日時の指定が無効です。"), ephemeral=True)
             return
