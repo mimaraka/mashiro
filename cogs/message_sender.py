@@ -49,7 +49,8 @@ class CogMessageSender(discord.Cog):
                     label="メッセージの内容",
                     required=False,
                     style=discord.InputTextStyle.paragraph,
-                    max_length=2000
+                    max_length=2000,
+                    placeholder="ユーザーメンション：<@!ユーザーID>\nロールメンション：<@&ロールID>\nカスタム絵文字：<:絵文字名:絵文字ID>\nチャンネルへのリンク：<#チャンネルID>"
                 )
 
                 # embed_title
