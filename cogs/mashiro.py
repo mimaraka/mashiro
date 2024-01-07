@@ -77,10 +77,10 @@ class CogMashiro(discord.Cog):
 
 
 
-    # メンションされたとき
+    # メッセージに@静山マシロが含まれているとき
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if self.bot.user.mentioned_in(message):
+        if self.bot.user.id in [m.id for m in message.mentions]:
             # 自撮りを送る
             if "自撮り" in message.content:
                 async with message.channel.typing():
@@ -90,7 +90,7 @@ class CogMashiro(discord.Cog):
                     await message.channel.send(random.choice(messages))
                     await asyncio.sleep(6)
                     await message.channel.send(file=discord.File(f"data/assets/{random.choice(images)}"))
-            # ランダムでセリフを送る
+            # ランダムでセリフを送る、またはChatGPTにより会話する
             else:
                 # ChatGPTの使用が可能なギルド内の場合
                 if message.guild is not None and  message.guild.id in const.GUILD_IDS_CHATGPT:
