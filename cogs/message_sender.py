@@ -35,7 +35,7 @@ class CogMessageSender(discord.Cog):
         minute = minute or now.minute
 
         try:
-            time = datetime(now.year, now.month, day, hour, minute)
+            time = datetime(now.year, now.month, day, hour, minute, tzinfo=JST)
         except ValueError:
             await ctx.respond(embed=MyEmbed(notif_type="error", description="日時の指定が無効です。"), ephemeral=True)
             return
