@@ -80,14 +80,14 @@ class CogMessageSender(discord.Cog):
                     embed = None
 
                 if not content and not embed:
-                    await ctx.respond(embed=MyEmbed(notif_type="error", description="送信する文章と埋め込みの内容のいずれか一方を必ず指定してください。"), ephemeral=True)
+                    await inter.response.send_message(embed=MyEmbed(notif_type="error", description="送信する文章と埋め込みの内容のいずれか一方を必ず指定してください。"), ephemeral=True)
                     return
 
                 await inter.response.send_message(
                     embed=MyEmbed(
                         notif_type="succeeded",
                         title="メッセージの送信を設定しました！",
-                        description=f"指定したメッセージは`{time.strftime('%H:%M:%S (%m/%d/%Y)')}`に #{channel.name} にて送信されます。"
+                        description=f"指定したメッセージは`{time.strftime('%H:%M:%S (%m/%d/%Y)')}`に <#{channel.id}> にて送信されます。"
                     ),
                     delete_after=10
                 )
