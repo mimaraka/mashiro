@@ -134,13 +134,21 @@ class CogMusic(discord.Cog):
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
                 mashilog(f"ボイスチャンネルから切断しました。", guild=member.guild, channel=before.channel)
-                # 5秒経ってまだPlayerオブジェクトが残っていれば削除する
-                await asyncio.sleep(5)
+
+                # Playerオブジェクトが消去されておらず、3秒経っても再接続されない場合は手動での再接続を試みる
+                await asyncio.sleep(3)
                 if not member.guild.voice_client or not member.guild.voice_client.is_connected():
                     if member.guild.id in self.__player:
-                        await self.__player.get(member.guild.id).delete_controller()
-                        self.__player.pop(member.guild.id)
-                        mashilog("playerオブジェクトが残っていたため、削除しました。")
+                        if player := await self.connect(before.channel):
+                            mashilog("ボイスチャンネルに再接続しました。")
+                            if player.is_playing:
+                                await player.pause()
+                                await asyncio.sleep(1)
+                                await player.resume()
+                        else:
+                            await self.__player.get(member.guild.id).delete_controller()
+                            self.__player.pop(member.guild.id)
+                            mashilog("playerオブジェクトが残っていたため、削除しました。")
             return
         
         # マシロがボイスチャンネルに接続していない場合は無視する
