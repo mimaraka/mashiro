@@ -46,7 +46,7 @@ class CogURLReplacer(discord.Cog):
         if message.author.bot:
             return
         deleted = False
-        if self.replacer_vxtwitter.is_enabled() or self.replacer_phixiv.is_enabled():
+        if self.replacer_vxtwitter.is_enabled(message.guild.id) or self.replacer_phixiv.is_enabled(message.guild.id):
             # vxtwitterとphixivのURLのみのとき
             if re.fullmatch(rf'^(\s*({self.replacer_vxtwitter.url_pattern.pattern})|({self.replacer_phixiv.url_pattern.pattern})\s*)+$', message.content):
                 manage_messages = message.channel.permissions_for(message.guild.me)
