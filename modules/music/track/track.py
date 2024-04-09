@@ -60,22 +60,24 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
     for i in info_list:
         if i:
             # ニコニコの場合
+            # ニコニコのAPIは現在使用不可能
             if re.search(RE_PATTERN_URL_NICONICO, i.get("original_url")):
-                if i.get("_api_data") and i["_api_data"].get("series"):
-                    series_title = i["_api_data"]["series"].get("title")
-                else:
-                    series_title = None
-                result.append(
-                    NicoNicoTrack(
-                        member=member,
-                        title=i.get("title"),
-                        original_url=i.get("webpage_url") or i.get("original_url"),
-                        duration=i.get("duration") and Duration(i.get("duration")),
-                        artist=i.get("uploader"),
-                        album=series_title,
-                        thumbnail=i.get("thumbnail")
-                    )
-                )
+                # if i.get("_api_data") and i["_api_data"].get("series"):
+                #     series_title = i["_api_data"]["series"].get("title")
+                # else:
+                #     series_title = None
+                # result.append(
+                #     NicoNicoTrack(
+                #         member=member,
+                #         title=i.get("title"),
+                #         original_url=i.get("webpage_url") or i.get("original_url"),
+                #         duration=i.get("duration") and Duration(i.get("duration")),
+                #         artist=i.get("uploader"),
+                #         album=series_title,
+                #         thumbnail=i.get("thumbnail")
+                #     )
+                # )
+                pass
             else:
                 result.append(
                     YTDLTrack(
