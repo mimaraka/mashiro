@@ -42,6 +42,9 @@ class CogURLReplacer(discord.Cog):
     # メッセージ送信時
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
+        # とりあえずループしないようにする
+        if message.author.bot:
+            return
         deleted = False
         # vxtwitterとphixivのURLのみのとき
         if re.fullmatch(rf'^(\s*({self.replacer_vxtwitter.url_pattern})|({self.replacer_phixiv.url_pattern})\s*)+$', message.content):
