@@ -46,9 +46,9 @@ class CogURLReplacer(discord.Cog):
         if message.author.bot:
             return
         deleted = False
+        print(rf'^(\s*({self.replacer_vxtwitter.url_pattern})|({self.replacer_phixiv.url_pattern})\s*)+$')
         # vxtwitterとphixivのURLのみのとき
         if re.fullmatch(rf'^(\s*({self.replacer_vxtwitter.url_pattern})|({self.replacer_phixiv.url_pattern})\s*)+$', message.content):
-            print("test")
             manage_messages = message.channel.permissions_for(message.guild.me)
             # attachmentsがなく、マシロにメッセージ管理権限がある場合、元のメッセージを削除
             if manage_messages and not message.attachments:
