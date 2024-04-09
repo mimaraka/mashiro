@@ -21,6 +21,7 @@ class URLReplacer:
 
     def _get_data(self) -> dict:
         root: dict = self._get_root()
+        print(root)
         return root.get(self._name)
         
     def _get_root(self) -> dict:
