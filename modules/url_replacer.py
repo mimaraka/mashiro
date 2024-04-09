@@ -34,6 +34,7 @@ class URLReplacer:
     def _save_data(self, data):
         with open(self.JSON_PATH, "w") as f:
             root = self._get_root()
+            print(root)
             root[self._name] = data
             json.dump(root, f, indent=4)
 

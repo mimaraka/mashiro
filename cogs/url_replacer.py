@@ -45,19 +45,31 @@ class CogURLReplacer(discord.Cog):
         # とりあえずループしないようにする
         if message.author.bot:
             return
-        deleted = False
-        if self.replacer_vxtwitter.is_enabled(message.guild.id) or self.replacer_phixiv.is_enabled(message.guild.id):
-            # vxtwitterとphixivのURLのみのとき
+        flag_delete_msg = False
+        enabled_vxtwitter = self.replacer_vxtwitter.is_enabled(message.guild.id)
+        enabled_phixiv = self.replacer_phixiv.is_enabled(message.guild.id)
+
+        if enabled_vxtwitter and enabled_phixiv:
             if re.fullmatch(rf'^(\s*({self.replacer_vxtwitter.url_pattern.pattern})|({self.replacer_phixiv.url_pattern.pattern})\s*)+$', message.content):
-                manage_messages = message.channel.permissions_for(message.guild.me)
-                # attachmentsがなく、マシロにメッセージ管理権限がある場合、元のメッセージを削除
-                if manage_messages and not message.attachments:
-                    try:
-                        await message.delete()
-                        deleted = True
-                    except discord.Forbidden:
-                        pass
+                flag_delete_msg = True
+        elif enabled_vxtwitter:
+            if re.fullmatch(rf'^(\s*{self.replacer_vxtwitter.url_pattern.pattern}\s*)+$', message.content):
+                flag_delete_msg = True
+        elif enabled_phixiv:
+            if re.fullmatch(rf'^(\s*{self.replacer_phixiv.url_pattern.pattern}\s*)+$', message.content):
+                flag_delete_msg = True
+
+        if flag_delete_msg:
+            manage_messages = message.channel.permissions_for(message.guild.me)
+            # attachmentsがなく、マシロにメッセージ管理権限がある場合、元のメッセージを削除
+            if manage_messages and not message.attachments:
+                try:
+                    await message.delete()
+                except discord.Forbidden:
+                    flag_delete_msg = False
+            else:
+                flag_delete_msg = False
 
         # 変換後のURLを送信
-        await self.replacer_vxtwitter.send(message, deleted=deleted)
-        await self.replacer_phixiv.send(message, deleted=deleted)
+        await self.replacer_vxtwitter.send(message, deleted=flag_delete_msg)
+        await self.replacer_phixiv.send(message, deleted=flag_delete_msg)
