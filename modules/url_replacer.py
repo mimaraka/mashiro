@@ -37,6 +37,9 @@ class URLReplacer:
             root[self._name] = data
             json.dump(root, f, indent=4)
 
+    def is_enabled(self, guild_id: int):
+        return self._get_data() and guild_id in self._get_data().get("guilds")
+
     async def switch_replacer(self, ctx: discord.ApplicationContext, switch: bool):
         data = self._get_data() or {"guilds": []}
 
