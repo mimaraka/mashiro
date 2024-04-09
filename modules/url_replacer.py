@@ -62,6 +62,7 @@ class URLReplacer:
 
         if self._get_data() and guild_id in self._get_data().get("guilds"):
             for url in re.findall(self._url_pattern, content):
+                print(re.search(self._replacing_pattern, url))
                 new_url = re.sub(self._replacing_pattern, self._replaced_str, url)
                 if delete_query:
                     new_url = re.sub(r'\?[\w=&\-]*', '', url)
