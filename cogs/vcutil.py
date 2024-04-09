@@ -9,7 +9,7 @@ from modules.util import get_member_text
 
 JST = timezone(timedelta(hours=9), 'JST')
 
-class CogVcutil(discord.Cog):
+class CogVCUtil(discord.Cog):
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
         self.vc_info = {}
