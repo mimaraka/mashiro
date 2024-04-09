@@ -59,9 +59,10 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
     result = []
     for i in info_list:
         if i:
+            if False:
             # ニコニコの場合
             # ニコニコのAPIは現在使用不可能
-            if re.search(RE_PATTERN_URL_NICONICO, i.get("original_url")):
+            # if re.search(RE_PATTERN_URL_NICONICO, i.get("original_url")):
                 # if i.get("_api_data") and i["_api_data"].get("series"):
                 #     series_title = i["_api_data"]["series"].get("title")
                 # else:
