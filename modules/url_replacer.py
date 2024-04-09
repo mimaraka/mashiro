@@ -21,7 +21,6 @@ class URLReplacer:
 
     def _get_data(self) -> dict:
         root: dict = self._get_root()
-        print(root)
         return root.get(self._name)
         
     def _get_root(self) -> dict:
@@ -33,14 +32,14 @@ class URLReplacer:
             return ret
 
     def _save_data(self, data):
+        root = self._get_root()
         with open(self.JSON_PATH, "w") as f:
-            root = self._get_root()
-            print(root)
             root[self._name] = data
             json.dump(root, f, indent=4)
 
     def is_enabled(self, guild_id: int):
-        return self._get_data() and guild_id in self._get_data().get("guilds")
+        data = self._get_data()
+        return data and guild_id in data.get("guilds")
 
     async def switch_replacer(self, ctx: discord.ApplicationContext, switch: bool):
         data = self._get_data() or {"guilds": []}
@@ -65,7 +64,7 @@ class URLReplacer:
     def get_replaced_urls(self, content: str, guild_id: int, delete_query: bool = True):
         ret = []
 
-        if self._get_data() and guild_id in self._get_data().get("guilds"):
+        if self.is_enabled(guild_id):
             for url in re.findall(self._url_pattern, content):
                 new_url = re.sub(self._replacing_pattern, self._replaced_str, url)
                 if delete_query:
