@@ -20,13 +20,16 @@ class URLReplacer:
         return self._url_pattern
 
     def _get_data(self) -> dict:
-        with open(self.JSON_PATH, "r") as f:
-            root: dict = json.load(f)
-            return root.get(self._name)
+        root: dict = self._get_root()
+        return root.get(self._name)
         
     def _get_root(self) -> dict:
         with open(self.JSON_PATH, "r") as f:
-            return json.load(f)
+            try:
+                ret = json.load(f)
+            except json.decoder.JSONDecodeError:
+                ret = {}
+            return ret
 
     def _save_data(self, data):
         with open(self.JSON_PATH, "w") as f:
