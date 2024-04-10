@@ -15,7 +15,6 @@ from .local import LocalTrack
 from modules.http import bin_startswith
 from modules.http import get_mimetype
 from ...duration import Duration
-import traceback
 
 
 Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
@@ -24,9 +23,10 @@ Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTr
 async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: discord.Member) -> List[Track]:
     # URLの場合
     if util.is_url(query):
+        # クエリを消すとURLが無効になってしまうようになった
         # Discordの添付ファイルのURLの場合、URLのクエリを消す
-        if re.match(r"https?://cdn.discordapp.com/attachments/", query):
-            query = re.sub(r"\?.*", "", query)
+        # if re.match(r"https?://cdn.discordapp.com/attachments/", query):
+        #     query = re.sub(r"\?.*", "", query)
         try:
             # ID3V2直リンクの場合
             if await get_mimetype(query) == "audio/mpeg" and await bin_startswith(query, b"ID3"):
@@ -38,8 +38,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             elif await get_mimetype(query) in ["audio/wav", "audio/x-wav"] and await bin_startswith(query, b"RIFF"):
                 return [await RIFFTrack.from_url(query, member)]
         # URLが見つからない場合
-        except aiohttp.ClientResponseError as e:
-            traceback.print_exception(e)
+        except aiohttp.ClientResponseError:
             return None
 
     # その他はyt-dlpで処理
