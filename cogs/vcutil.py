@@ -30,7 +30,8 @@ class CogVCUtil(discord.Cog):
                     }
             # 移動前のチャンネルからメンバーがいなくなった場合
             if before.channel and len(before.channel.members) == 0:
-                self.vc_info[member.guild.id].pop(before.channel.id)
+                if self.vc_info.get(member.guild.id):
+                    self.vc_info[member.guild.id].pop(before.channel.id)
 
     # /vcstat
     @discord.slash_command(name='vcstat', description='先生が接続している通話の情報を表示します。')

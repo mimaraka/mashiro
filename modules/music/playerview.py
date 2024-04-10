@@ -66,7 +66,10 @@ class ButtonSkip(discord.ui.Button):
         if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
-        self.__player.skip()
+        try:
+            self.__player.skip()
+        except NotPlayingError as e:
+            await inter.response.send_message(embed=MyEmbed(notif_type="error", description=e), ephemeral=True)
         # インタラクションの無視
         await inter.response.edit_message()
         

@@ -194,7 +194,11 @@ class Player:
 
         await self.__current_track.create_source(self.__volume)
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
-        self.__voice_client.play(self.__current_track.source, after=after)
+        try:
+            self.__voice_client.play(self.__current_track.source, after=after)
+        except:
+            print("test")
+        print("test2")
         self.__time_started = time.time()
         if msg_loading:
             await msg_loading.delete()
@@ -256,7 +260,6 @@ class Player:
                 await self.__play()
             else:
                 self.__last_track = self.__current_track
-                print("test")
                 # 再生情報をリセット
                 await self.__clear_data()
 

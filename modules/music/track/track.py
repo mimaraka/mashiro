@@ -23,7 +23,7 @@ Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTr
 async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: discord.Member) -> List[Track]:
     # URLの場合
     if util.is_url(query):
-        # Discordの添付ファイルのURLの場合、クエリを消す
+        # Discordの添付ファイルのURLの場合、URLのクエリを消す
         if re.match(r"https?://cdn.discordapp.com/attachments/", query):
             query = re.sub(r"\?.*", "", query)
         try:
