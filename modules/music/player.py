@@ -192,12 +192,7 @@ class Player:
         self.__current_index = self.__queue_idcs.pop(0)
         self.__current_track = self.__playlist[self.__current_index]
 
-        try:
-            await self.__current_track.create_source(self.__volume)
-        except Exception as e:
-            traceback.print_exception(e)
-            self.skip()
-            print("hoge")
+        await self.__current_track.create_source(self.__volume)
 
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
