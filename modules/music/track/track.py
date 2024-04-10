@@ -15,6 +15,7 @@ from .local import LocalTrack
 from modules.http import bin_startswith
 from modules.http import get_mimetype
 from ...duration import Duration
+import traceback
 
 
 Track = ID3V2Track | FLACTrack | RIFFTrack | YTDLTrack | NicoNicoTrack | LocalTrack
@@ -37,8 +38,8 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             elif await get_mimetype(query) in ["audio/wav", "audio/x-wav"] and await bin_startswith(query, b"RIFF"):
                 return [await RIFFTrack.from_url(query, member)]
         # URLが見つからない場合
-        except aiohttp.ClientResponseError:
-            print("test")
+        except aiohttp.ClientResponseError as e:
+            traceback.print_exception(e)
             return None
 
     # その他はyt-dlpで処理
