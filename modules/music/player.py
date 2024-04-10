@@ -193,7 +193,10 @@ class Player:
         self.__current_track = self.__playlist[self.__current_index]
 
         print("before creating source")
-        await self.__current_track.create_source(self.__volume)
+        try:
+            await self.__current_track.create_source(self.__volume)
+        except:
+            print("failed to create source")
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         print("after creating source")
         try:
