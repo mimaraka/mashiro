@@ -4,6 +4,7 @@ import time
 from discord.enums import ButtonStyle
 from modules.music.errors import *
 from modules.myembed import MyEmbed
+from modules.vc_common import EMBED_NOT_PLAYING
 
 EMBED_PERMISSON_DENIED = MyEmbed(notif_type="error", description="このトラックを追加したユーザー以外は操作できません。")
 
@@ -38,7 +39,11 @@ class ButtonPlay(discord.ui.Button):
         if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
-        await self.__player.resume()
+        try:
+            await self.__player.resume()
+        except NotPlayingError:
+            await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
+            return
         await self.__player.update_controller(inter)
     
 
@@ -52,7 +57,11 @@ class ButtonPause(discord.ui.Button):
         if self.__player.current_track.member.id != inter.user.id:
             await inter.response.send_message(embed=EMBED_PERMISSON_DENIED, ephemeral=True)
             return
-        await self.__player.pause()
+        try:
+            await self.__player.pause()
+        except NotPlayingError:
+            await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
+            return
         await self.__player.update_controller(inter)
     
 
@@ -68,8 +77,9 @@ class ButtonSkip(discord.ui.Button):
             return
         try:
             self.__player.skip()
-        except NotPlayingError as e:
-            await inter.response.send_message(embed=MyEmbed(notif_type="error", description=e), ephemeral=True)
+        except NotPlayingError:
+            await inter.response.send_message(embed=EMBED_NOT_PLAYING, ephemeral=True)
+            return
         # インタラクションの無視
         await inter.response.edit_message()
         

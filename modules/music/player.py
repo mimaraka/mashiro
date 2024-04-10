@@ -195,9 +195,10 @@ class Player:
         try:
             await self.__current_track.create_source(self.__volume)
         except Exception as e:
-            print(e)
+            traceback.print_exception(e)
             self.skip()
-            
+            print("hoge")
+
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
 
