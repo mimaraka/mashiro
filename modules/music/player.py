@@ -192,14 +192,15 @@ class Player:
         self.__current_index = self.__queue_idcs.pop(0)
         self.__current_track = self.__playlist[self.__current_index]
 
+        print("before creating source")
         await self.__current_track.create_source(self.__volume)
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
-        print("test0")
+        print("after creating source")
         try:
             self.__voice_client.play(self.__current_track.source, after=after)
         except:
-            print("test")
-        print("test2")
+            print("failed to play the source")
+        print("succeed to play the source")
         self.__time_started = time.time()
         if msg_loading:
             await msg_loading.delete()
