@@ -227,7 +227,6 @@ class Player:
 
         if error:
             mashilog("音声の再生中にエラーが発生しました。", log_type="error")
-            print(f"An error occurred while playing.")
             traceback.print_exception(error)
             return
         
@@ -257,6 +256,7 @@ class Player:
                 await self.__play()
             else:
                 self.__last_track = self.__current_track
+                print("test")
                 # 再生情報をリセット
                 await self.__clear_data()
 
