@@ -6,7 +6,7 @@ jaconv==0.3.4
 mutagen==1.47.0
 niconico.py==1.2.4
 openai==0.28.1
-pillow==10.1.0
+pillow==10.3.0
 pyshorteners==1.0.1
 python-dotenv==1.0.0
 requests==2.31.0
