@@ -395,7 +395,6 @@ class CogMusic(discord.Cog):
         message_count = 1
         async for message in search_channel.history(limit=n, oldest_first=order == "古い順"):
             for url in await find_valid_urls(message):
-                print(url)
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1)
