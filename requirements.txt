@@ -9,7 +9,7 @@ openai==1.29.0
 pillow==10.3.0
 pyshorteners==1.0.1
 python-dotenv==1.0.1
-requests==2.31.0
+requests==2.32.1
 typing_extensions==4.11.0
 youtube-search-python==1.6.6
 yt-dlp==2024.4.9
