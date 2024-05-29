@@ -12,4 +12,4 @@ python-dotenv==1.0.1
 requests==2.32.1
 typing_extensions==4.12.0
 youtube-search-python==1.6.6
-yt-dlp==2024.4.9
+yt-dlp==2024.5.27
