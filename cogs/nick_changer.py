@@ -187,3 +187,28 @@ class CogNickChanger(discord.Cog):
                 embed=MyEmbed(notif_type="succeeded", title="ニックネームを元に戻しました。"),
                 delete_after=10
             )
+
+    @discord.slash_command(name="remove-nick", description="指定されたニックネームを削除します (管理者のみ実行可)")
+    @discord.option("nick", description="削除するニックネーム")
+    async def command_remove_nick(self, ctx: discord.ApplicationContext, nick: str):
+        if ctx.guild is None:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="ダイレクトメッセージでは実行できません。"), ephemeral=True)
+            return
+
+        can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
+        is_author_administrator = any([role.permissions.administrator for role in ctx.author.roles])
+
+        if not can_bot_manage_nicknames:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。"), ephemeral=True)
+            return
+        elif not is_author_administrator and ctx.author != ctx.guild.owner:
+            await ctx.respond(embed=MyEmbed(notif_type="error", description="管理者権限のないメンバーは実行できません。"))
+            return
+
+        await ctx.defer(ephemeral=True)
+        for member in ctx.guild.members:
+            await self.__set_member_nick(member, None)
+        await ctx.respond(
+            embed=MyEmbed(notif_type="succeeded", title=f"ニックネーム「{nick}」を削除しました。"),
+            delete_after=10
+        )
