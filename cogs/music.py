@@ -399,11 +399,11 @@ class CogMusic(discord.Cog):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
                     if immediately:
                         await player.register_tracks(ctx.channel, response, ctx=ctx, silent=player.queue or player.is_playing)
-                    tracks += response
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1)
                     embed.description = description
                     await msg_loading.edit(embed=embed)
+                    tracks += response
             message_count += 1
         del message_count
 
