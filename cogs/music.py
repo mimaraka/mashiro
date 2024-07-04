@@ -300,7 +300,7 @@ class CogMusic(discord.Cog):
     # /play
     @discord.slash_command(name="play", description="指定されたURLまたはキーワードの曲を再生します。")
     @discord.option("query", description="再生したい曲のURL、またはYouTube上で検索するタイトル", autocomplete=autocomp_yt_title)
-    @discord.option("interrupt", description="キューを無視して割り込み再生をさせるかどうか", required=False, default=False)
+    @discord.option("interrupt", description="キューを無視して割り込み再生をします", required=False, default=False)
     async def command_play(self, ctx: discord.ApplicationContext, query: str, interrupt: bool):
         await self.play(ctx.channel, ctx.author, [query], ctx=ctx, interrupt=interrupt)
 
@@ -356,10 +356,11 @@ class CogMusic(discord.Cog):
     # /play-channel
     @discord.slash_command(name="play-channel", description="指定したチャンネルに貼られたリンクからトラックを取得し、プレイリストに追加します。")
     @discord.option("channel", description="トラックを検索するチャンネル", default=None)
-    @discord.option("channel_url", description="トラックを検索するチャンネルのURL (私が所属している全てのサーバーのチャンネルをURLから参照できます)。", default=None)
+    @discord.option("channel_url", description="トラックを検索するチャンネルのURL (私が所属している全てのサーバーのチャンネルをURLから参照できます)", default=None)
     @discord.option("n", description="検索するメッセージの件数 (デフォルト: 20件)", min_value=1, default=20)
     @discord.option("order", description="再生キューに追加するトラックの順番", choices=["新しい順", "古い順", "ランダム"], default=None)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, order: str):
+    @discord.option("immediately", description="トラック取得し次第、逐次再生・キューに追加します (orderはランダムにはなりません)", default=False)
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, order: str, immediately: bool):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -396,10 +397,12 @@ class CogMusic(discord.Cog):
         async for message in search_channel.history(limit=n, oldest_first=order == "古い順"):
             for url in await find_valid_urls(message):
                 if response := await create_tracks(self.bot.loop, url, ctx.author):
+                    if immediately:
+                        await player.register_tracks(ctx.channel, response, ctx=ctx, silent=player.queue or player.is_playing)
+                    tracks += response
                     description = f"メッセージ : **{message_count}** / {n}\n\n"
                     description += player.tracks_text(response, start_index=len(tracks) + 1)
                     embed.description = description
-                    tracks += response
                     await msg_loading.edit(embed=embed)
             message_count += 1
         del message_count
@@ -412,11 +415,12 @@ class CogMusic(discord.Cog):
             )
             return
         
-        if order == "ランダム":
-            random.shuffle(tracks)
+        if not immediately:
+            if order == "ランダム":
+                random.shuffle(tracks)
 
-        await msg_loading.edit(embed=self.get_loading_embed(ctx.channel, prefix="2. "))
-        await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
+            await msg_loading.edit(embed=self.get_loading_embed(ctx.channel, prefix="2. "))
+            await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
 
 
     # /play-file
