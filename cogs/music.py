@@ -415,7 +415,9 @@ class CogMusic(discord.Cog):
             )
             return
         
-        if not immediately:
+        if immediately:
+            await msg_loading.delete()
+        else:
             if order == "ランダム":
                 random.shuffle(tracks)
 
