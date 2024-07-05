@@ -35,7 +35,7 @@ class CogNickChanger(discord.Cog):
     # メンバーのニックネームが変更されているか(jsonファイルに元のニックネームが保存されているか)
     def _member_is_changed(self, member: discord.Member) -> bool:
         data = self.json_loader.get_guild_data(member.guild)
-        return str(member.id) in data[str(member.guild.id)]
+        return str(member.id) in data
     
     # メンバーの元のニックネームをjsonファイルに登録
     def _save_member_old_nick(self, member: discord.Member):
