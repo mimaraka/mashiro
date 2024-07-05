@@ -11,7 +11,7 @@ from cogs.nick_changer import CogNickChanger
 from cogs.downloader import CogDownloader
 from cogs.message_sender import CogMessageSender
 from cogs.kotobagari import CogKotobagari
-from cogs.vcutil import CogVCUtil
+from cogs.vc_util import CogVCUtil
 from cogs.url_replacer import CogURLReplacer
 from cogs.others import CogOthers
 

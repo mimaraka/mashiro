@@ -10,6 +10,8 @@ from modules.util import get_member_text
 JST = timezone(timedelta(hours=9), 'JST')
 
 class CogVCUtil(discord.Cog):
+    vc = discord.SlashCommandGroup("vc", "ボイスチャット関連の機能です。")
+
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
         self.vc_info = {}
@@ -33,9 +35,9 @@ class CogVCUtil(discord.Cog):
                 if self.vc_info.get(member.guild.id):
                     self.vc_info[member.guild.id].pop(before.channel.id)
 
-    # /vcstat
-    @discord.slash_command(name='vcstat', description='先生が接続している通話の情報を表示します。')
-    async def command_vcstat(self, ctx: discord.ApplicationContext):
+    # /vc stats
+    @vc.command(name='stats', description='先生が接続している通話の情報を表示します。')
+    async def command_vc_stats(self, ctx: discord.ApplicationContext):
         if ctx.author.voice is None or ctx.author.voice.channel is None:
             await ctx.respond(
                 embed=MyEmbed(notif_type='error', description='先生がボイスチャンネルに接続されていないようです。'),
@@ -57,7 +59,8 @@ class CogVCUtil(discord.Cog):
             ephemeral=True
         )
 
-    @discord.slash_command(name='vckicktimer', description='指定した時間の経過後に先生をボイスチャンネルから切断します。')
+    # /vc kick-timer
+    @vc.command(name='kick-timer', description='指定した時間の経過後に先生をボイスチャンネルから切断します。')
     @discord.option('hours', description='時間', min_value=0, default=0)
     @discord.option('minutes', description='分', min_value=0, max_value=59, default=0)
     @discord.option('seconds', description='秒', min_value=0, max_value=59, default=0)
