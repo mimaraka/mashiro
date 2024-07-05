@@ -124,7 +124,8 @@ class CogMashiro(discord.Cog):
                                 model="gpt-3.5-turbo",
                                 messages=conversation["messages"]
                             )
-                            result = response["choices"][0]["message"]["content"]
+
+                            result = response.choices[0].message.content
                             pattern_play = re.compile(r"\{play:(.+?)\}\s*")
                             if m := re.search(pattern_play, result):
                                 query = m.group(1)
@@ -136,7 +137,7 @@ class CogMashiro(discord.Cog):
                                 await message.channel.send(r)
                         
                         # ChatGPTの回答を追加
-                        conversation["messages"].append(response["choices"][0]["message"])
+                        conversation["messages"].append(response.choices[0].message.to_dict())
                         # 会話を記録
                         g_conversations[message.channel.id] = conversation
                         return
