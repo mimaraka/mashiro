@@ -2,12 +2,13 @@ import asyncio
 import datetime
 import discord
 import json
-import openai
+import os
 import random
 import re
 import time
 import typing
 import constants as const
+from openai import OpenAI
 from modules.myembed import MyEmbed
 
 
@@ -36,6 +37,7 @@ g_conversations: typing.Dict[int, typing.List[dict]] = {}
 class CogMashiro(discord.Cog):
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
+        self.openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
     # ランダムでマシロのセリフを返す関数
@@ -117,8 +119,8 @@ class CogMashiro(discord.Cog):
 
                             # 時間を記録
                             conversation["time"] = time.time()
-                                
-                            response = openai.ChatCompletion.create(
+
+                            response = self.openai_client.chat.completions.create(
                                 model="gpt-3.5-turbo",
                                 messages=conversation["messages"]
                             )

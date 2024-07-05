@@ -1,9 +1,7 @@
 import discord
 from dotenv import load_dotenv
-import openai
 import os
 
-from modules.kotobagari import kotobagari_proc
 from modules.mashilog import mashilog
 
 from cogs.image import CogImage
@@ -22,7 +20,6 @@ load_dotenv(verbose=True)
 load_dotenv(os.path.dirname(__file__) + ".env")
 
 bot = discord.Bot(intents=discord.Intents.all())
-openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 # bot起動時のイベント
