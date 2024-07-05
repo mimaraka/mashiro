@@ -7,6 +7,8 @@ from constants import RE_PATTERN_URL_NICONICO, RE_PATTERN_URL
 
 
 class CogDownloader(discord.Cog):
+    dl = discord.SlashCommandGroup("dl", "メディアのダウンロードリンクを取得します。")
+
     def __init__(self, bot: discord.Bot) -> None:
         self.bot: discord.Bot = bot
 
@@ -100,7 +102,7 @@ class CogDownloader(discord.Cog):
             )
     
     # /dl-video
-    @discord.slash_command(name="dl-video", description="動画のダウンロードリンクを取得します。")
+    @dl.command(name="video", description="動画のダウンロードリンクを取得します。")
     @discord.option("query", description="URLまたはYouTube上で検索するキーワード")
     @discord.option("bestvideo", description="最高画質の動画のリンクを取得しますが、音声が含まれない可能性があります。", default=False)
     async def command_dl_video(self, ctx: discord.ApplicationContext, query: str, bestvideo: bool):
@@ -112,7 +114,7 @@ class CogDownloader(discord.Cog):
         await self.message_command_common(ctx, message, "video")
 
     # /dl-audio
-    @discord.slash_command(name="dl-audio", description="音声のダウンロードリンクを取得します。")
+    @dl.command(name="audio", description="音声のダウンロードリンクを取得します。")
     @discord.option("query", description="URLまたはYouTube上で検索するキーワード")
     async def command_dl_audio(self, ctx: discord.ApplicationContext, query: str):
         await self.download(ctx, "audio", query)
