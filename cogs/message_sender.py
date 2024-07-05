@@ -22,7 +22,7 @@ class CogMessageSender(discord.Cog):
 
 
     # /send_message
-    @discord.slash_command(name="send_message", description="指定した時間に指定したメッセージを送信します。")
+    @discord.slash_command(name="send-message", description="指定した時間に指定したメッセージを送信します。")
     @discord.option("channel", description="メッセージを送信するチャンネル (省略した場合はコマンドを実行したチャンネル)", default=None)
     @discord.option("day", description="送信する日付 (省略した場合は今日)", default=None, min_value=1, max_value=31)
     @discord.option("hour", description="送信する時間 (24時間表記、省略した場合は現在の時間)", default=None, min_value=0, max_value=23)
