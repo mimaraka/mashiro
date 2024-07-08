@@ -31,8 +31,8 @@ class CogMessageSender(discord.Cog):
         channel = channel or ctx.channel
         now = datetime.now(JST)
         day = day or now.day
-        hour = hour or now.hour
-        minute = minute or now.minute
+        hour = hour if hour is not None else now.hour
+        minute = minute if minute is not None else now.minute
 
         try:
             time = datetime(now.year, now.month, day, hour, minute, tzinfo=JST)
