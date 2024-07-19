@@ -35,13 +35,13 @@ class CogMusic(discord.Cog):
 
 
     # マシロをプレーヤーとしてボイスチャンネルに接続させるときの共通処理
-    async def connect(self, vc: discord.VoiceChannel):
+    async def connect(self, vc: discord.VoiceChannel, player: Player=None):
         try:
             await vc.connect()
         # 手動切断後しばらくはVCへの接続ができない場合がある
         except discord.ClientException:
             return None
-        self.__player[vc.guild.id] = Player(self.bot.loop, vc.guild.voice_client)
+        self.__player[vc.guild.id] = player or Player(self.bot.loop, vc.guild.voice_client)
         mashilog("ボイスチャンネルに正常に接続しました。")
         return self.__player[vc.guild.id]
 
@@ -139,7 +139,7 @@ class CogMusic(discord.Cog):
                 await asyncio.sleep(3)
                 if not member.guild.voice_client or not member.guild.voice_client.is_connected():
                     if member.guild.id in self.__player:
-                        if player := await self.connect(before.channel):
+                        if player := await self.connect(before.channel, player=self.__player[member.guild.id]):
                             mashilog("ボイスチャンネルに再接続しました。")
                             if player.is_playing:
                                 await player.pause()
