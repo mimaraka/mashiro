@@ -7,6 +7,8 @@ from modules.json import JSONLoader
 EMBED_NO_PERMISSION = MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。")
 
 class CogNickChanger(discord.Cog):
+    group_nick = discord.SlashCommandGroup("nick", "メンバーのニックネームの管理を行います。")
+
     # コンストラクタ
     def __init__(self, bot: discord.Bot) -> None:
         self.bot: discord.Bot = bot
@@ -114,8 +116,8 @@ class CogNickChanger(discord.Cog):
             await self._change_member_nick(member)
 
     # ギルドメンバー全員のニックネームを変更するコマンド
-    @discord.slash_command(name="change-nick", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)。")
-    async def command_change_nick(self, ctx: discord.ApplicationContext, nick: str):
+    @group_nick.command(name="change", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)。")
+    async def command_nick_change(self, ctx: discord.ApplicationContext, nick: str):
         if ctx.guild is None:
             await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
             return
@@ -141,8 +143,8 @@ class CogNickChanger(discord.Cog):
         )
 
     # ギルドメンバー全員のニックネームを元に戻すコマンド
-    @discord.slash_command(name="restore-nick", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)。")
-    async def command_restore_nick(self, ctx: discord.ApplicationContext):
+    @group_nick.command(name="restore", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)。")
+    async def command_nick_restore(self, ctx: discord.ApplicationContext):
         if ctx.guild is None:
             await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
             return
@@ -172,9 +174,9 @@ class CogNickChanger(discord.Cog):
                 delete_after=10
             )
 
-    @discord.slash_command(name="remove-nick", description="指定されたニックネームを削除します (管理者のみ実行可)。")
+    @group_nick.command(name="remove", description="指定されたニックネームを削除します (管理者のみ実行可)。")
     @discord.option("nick", description="削除するニックネーム")
-    async def command_remove_nick(self, ctx: discord.ApplicationContext, nick: str):
+    async def command_nick_remove(self, ctx: discord.ApplicationContext, nick: str):
         if ctx.guild is None:
             await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
             return
