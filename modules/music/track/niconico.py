@@ -26,10 +26,10 @@ class NicoNicoTrack(BaseTrack):
                 video = data.get("video")
                 assert video is not None
 
-        if thumbnails := video.get("thumbnail") is not None:
+        if (thumbnails := video.get("thumbnail")) is not None:
             thumbnail = thumbnails.get("ogp") or thumbnails.get("player") or thumbnails.get("largeUrl") or thumbnails.get("middleUrl") or thumbnails.get("url")
 
-        if owner := data.get("owner") is not None:
+        if (owner := data.get("owner")) is not None:
             artist = owner.get("nickname")
 
         return cls(
