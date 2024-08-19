@@ -37,6 +37,9 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             # RIFF直リンクの場合
             elif await get_mimetype(query) in ["audio/wav", "audio/x-wav"] and await bin_startswith(query, b"RIFF"):
                 return [await RIFFTrack.from_url(query, member)]
+            # ニコニコの場合
+            elif re.search(RE_PATTERN_URL_NICONICO, query):
+                return [await NicoNicoTrack.from_url(query, member)]
         # URLが見つからない場合
         except aiohttp.ClientResponseError:
             return None
@@ -60,37 +63,17 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
     result = []
     for i in info_list:
         if i:
-            # ニコニコの場合
-            # ニコニコのAPIは現在使用不可能
-            if re.search(RE_PATTERN_URL_NICONICO, i.get("original_url")):
-                # if i.get("_api_data") and i["_api_data"].get("series"):
-                #     series_title = i["_api_data"]["series"].get("title")
-                # else:
-                #     series_title = None
-                # result.append(
-                #     NicoNicoTrack(
-                #         member=member,
-                #         title=i.get("title"),
-                #         original_url=i.get("webpage_url") or i.get("original_url"),
-                #         duration=i.get("duration") and Duration(i.get("duration")),
-                #         artist=i.get("uploader"),
-                #         album=series_title,
-                #         thumbnail=i.get("thumbnail")
-                #     )
-                # )
-                pass
-            else:
-                result.append(
-                    YTDLTrack(
-                        loop,
-                        member=member,
-                        title=i.get("title"),
-                        source_url=i.get("url"),
-                        original_url=i.get("webpage_url") or i.get("original_url"),
-                        duration=i.get("duration") and Duration(i.get("duration")),
-                        artist=i.get("artist") or i.get("uploader"),
-                        album=i.get("album"),
-                        thumbnail=i.get("thumbnail")
-                    )
+            result.append(
+                YTDLTrack(
+                    loop,
+                    member=member,
+                    title=i.get("title"),
+                    source_url=i.get("url"),
+                    original_url=i.get("webpage_url") or i.get("original_url"),
+                    duration=i.get("duration") and Duration(i.get("duration")),
+                    artist=i.get("artist") or i.get("uploader"),
+                    album=i.get("album"),
+                    thumbnail=i.get("thumbnail")
                 )
+            )
     return result

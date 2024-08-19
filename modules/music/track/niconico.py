@@ -1,46 +1,44 @@
+import aiohttp
 import discord
-from constants import FFMPEG_OPTIONS
-from niconico import NicoNico
+import random
+import re
+import string
 from .base import BaseTrack
 from ...duration import Duration
 
 
 class NicoNicoTrack(BaseTrack):
-    def __init__(
-            self,
-            member: discord.Member,
-            title: str,
-            original_url: str,
-            duration: Duration | None=None,
-            artist: str | None=None,
-            album: str | None=None,
-            thumbnail: str | None=None
-    ) -> None:
-        self.__video = None
-        super().__init__(
+    @classmethod
+    async def from_url(cls, url: str, member: discord.Member):
+        video = None
+        thumbnail = None
+        artist = None
+        video_id = re.search(r"sm\d+", url).group()
+        track_id_list = [random.choice(string.ascii_letters) for _ in range(10)] + ["_"] + [random.choice(string.digits) for _ in range(13)]
+        track_id = "".join(track_id_list)
+        api_endpoint = f"https://www.nicovideo.jp/api/watch/v3_guest/{video_id}?_frontendId=70&_frontendVersion=0&actionTrackId={track_id}"
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_endpoint) as response:
+                info = await response.json()
+                data = info.get("data")
+                assert data is not None
+                video = data.get("video")
+                assert video is not None
+
+        if thumbnails := video.get("thumbnail") is not None:
+            thumbnail = thumbnails.get("ogp") or thumbnails.get("player") or thumbnails.get("largeUrl") or thumbnails.get("middleUrl") or thumbnails.get("url")
+
+        if owner := data.get("owner") is not None:
+            artist = owner.get("nickname")
+
+        return cls(
             member=member,
-            title=title,
-            source_url=None,
-            original_url=original_url,
-            duration=duration,
+            title=video.get("title"),
+            source_url=f"https://nicovideodl.jp/cdn/filename/{video_id}.mp3",
+            original_url=url,
+            duration=Duration(video.get("duration")),
             artist=artist,
-            album=album,
+            album=None,
             thumbnail=thumbnail
         )
-        
-    # video.connect() ~ video.close_connection()の間のみURLが有効？
-    async def create_source(self, volume: int):
-        nc_client = NicoNico()
-        self.__video = nc_client.video.get_video(self.original_url)
-        self.__video.connect()
-        self.source_url = self.__video.download_link
-        self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.source_url, **FFMPEG_OPTIONS),
-            volume=volume
-        )
-
-    async def release_source(self):
-        self.__video.close()
-        self.__video = None
-        self.source = None
-        self.source_url = None
