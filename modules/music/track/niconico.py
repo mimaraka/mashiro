@@ -19,6 +19,8 @@ class NicoNicoTrack(BaseTrack):
         api_endpoint = f"https://www.nicovideo.jp/api/watch/v3_guest/{video_id}?_frontendId=70&_frontendVersion=0&actionTrackId={track_id}"
         
         async with aiohttp.ClientSession() as session:
+            async with session.get("https://nicovideodl.jp/download/" + video_id) as response:
+                response.raise_for_status()
             async with session.get(api_endpoint) as response:
                 info = await response.json()
                 data = info.get("data")
