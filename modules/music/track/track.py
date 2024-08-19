@@ -14,6 +14,7 @@ from .niconico import NicoNicoTrack
 from .local import LocalTrack
 from modules.http import bin_startswith
 from modules.http import get_mimetype
+from modules.mashilog import mashilog
 from ...duration import Duration
 
 
@@ -42,6 +43,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
                 return [await NicoNicoTrack.from_url(query, member)]
         # URLが見つからない場合
         except aiohttp.ClientResponseError:
+            mashilog(e, log_type="error")
             return None
 
     # その他はyt-dlpで処理
