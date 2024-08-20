@@ -308,7 +308,7 @@ class Player:
             # サムネイルを表示
             if thumbnail := self.__current_track.thumbnail:
                 # URLの場合
-                if util.is_full_url(thumbnail):
+                if util.is_url(thumbnail):
                     embed.set_image(url=thumbnail)
                 # ローカルファイルのパスの場合
                 else:

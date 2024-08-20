@@ -25,9 +25,6 @@ def truncate_text(text: str, length: int):
 def is_url(text: str):
     return re.match(const.RE_PATTERN_URL, text)
 
-def is_full_url(text: str):
-    return re.match(const.RE_PATTERN_FULL_URL, text)
-
 def is_youtube_url(text: str):
     return re.match(const.RE_PATTERN_URL_YOUTUBE, text)
 
