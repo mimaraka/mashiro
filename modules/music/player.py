@@ -193,6 +193,7 @@ class Player:
         self.__current_track = self.__playlist[self.__current_index]
 
         await self.__current_track.create_source(self.__volume)
+        self.__current_track.source.read()
 
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
