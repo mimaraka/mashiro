@@ -2,7 +2,13 @@ URL_IMAGE_HISSU_01 = "https://media.discordapp.net/attachments/11423189758296761
 URL_IMAGE_HISSU_02 = "https://media.discordapp.net/attachments/1142318975829676104/1142460849580167188/hissu_02.jpg?width=196&height=535"
 URL_IMAGE_ICECREAM = "https://media.discordapp.net/attachments/1142318975829676104/1142460904777195570/ice.gif?width=1153&height=662"
 
-RE_PATTERN_URL = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
+URL_ICON_YOUTUBE = "https://media.discordapp.net/attachments/1142318975829676104/1275345998356418602/image.png?ex=66c58e04&is=66c43c84&hm=2d6fdca4daabce990d6b2073e59a6b2eef9640e0c214eb924c315ebeb489d3ef&=&format=webp&quality=lossless&width=640&height=640"
+URL_ICON_SOUNDCLOUD = "https://media.discordapp.net/attachments/1142318975829676104/1275344983884562513/soundcloud_512_24339.png?ex=66c58d12&is=66c43b92&hm=64491109a1296a06a797c7f3df77cec4cb73b96c8cae774fa8056965e8a4267e&=&format=webp&quality=lossless&width=640&height=640"
+URL_ICON_NICONICO = "https://media.discordapp.net/attachments/1142318975829676104/1275345260062576672/lMfN7ih0afMsHzmMfSlJNbOexI6sRNG7LgcwJmgAx8CPvvcCLrf4zOxoHDa_jk68DXw.png?ex=66c58d54&is=66c43bd4&hm=2c5680e3f4027f4b768d318b6b93e32f44666505b123e840a4e5f1f6d6022411&=&format=webp&quality=lossless&width=640&height=640"
+
+RE_PATTERN_URL = r"^(https?://)?[\w/:%#\$&\?\(\)~\.=\+\-]+"
+RE_PATTERN_URL_YOUTUBE = r"^(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+(&list=)?[\w-]*"
+RE_PATTERN_URL_SOUNDCLOUD = r"^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/"
 RE_PATTERN_URL_NICONICO = r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+"
 
 # 音ブルアカ鯖のギルドID

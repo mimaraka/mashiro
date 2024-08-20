@@ -39,7 +39,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             elif await get_mimetype(query) in ["audio/wav", "audio/x-wav"] and await bin_startswith(query, b"RIFF"):
                 return [await RIFFTrack.from_url(query, member)]
             # ニコニコの場合
-            elif re.search(RE_PATTERN_URL_NICONICO, query):
+            elif util.is_niconico_url(query):
                 return [await NicoNicoTrack.from_url(query, member)]
         # URLが見つからない場合
         except aiohttp.ClientResponseError:
