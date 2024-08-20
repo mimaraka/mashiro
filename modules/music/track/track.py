@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import discord
-import re
+import os
 import yt_dlp
 import modules.util as util
 from constants import YTDL_FORMAT_OPTIONS, RE_PATTERN_URL_NICONICO
@@ -47,6 +47,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             return None
 
     # その他はyt-dlpで処理
+    print(os.getcwd())
     with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
         try:
             info = await loop.run_in_executor(
