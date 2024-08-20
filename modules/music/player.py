@@ -114,10 +114,10 @@ class Player:
 
     # トラック情報のテキストを生成
     @staticmethod
-    def track_text(track: Track, italic: bool=False, queue: bool=False):
+    def track_text(track: Track, italic: bool=False, link: bool=False, queue: bool=False):
         max_title = 40 if queue else 100
         title = util.truncate_text(re.sub(r"(https?)://", "\\1:𝘐𝘐", track.title.translate(str.maketrans({"*": "∗", "[": "［", "]": "］"}))), max_title)
-        if track.original_url is not None:
+        if link and track.original_url is not None:
             max_title_url = 145 if queue else 1000
             if len(title) + len(track.original_url) > max_title_url:
                 url = util.shorten_url(track.original_url)
@@ -127,7 +127,7 @@ class Player:
         else:
             result = title
         decoration = "***" if italic else "**"
-        result = f"{decoration}{result}{decoration}"
+        result = decoration + result + decoration
         if track.duration is not None:
             result += f" | {str(track.duration)}"
         return result
@@ -293,7 +293,7 @@ class Player:
                 title = "⏸️ 一時停止中です……。"
                 notif_type = "inactive"
             title += f" (🔊 {self.__voice_client.channel.name})"
-            description = f"🎶 {self.track_text(self.__current_track, italic=True)}\n"
+            description = f"🎶 {self.track_text(self.__current_track, link=True, italic=True)}\n"
             description += f"👤 {util.truncate_text(self.__current_track.artist or '-', 72)}\n"
             description += f"💿 {util.truncate_text(self.__current_track.album or '-', 72)}"
             embed = MyEmbed(notif_type=notif_type, title=title, description=description)
