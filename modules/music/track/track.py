@@ -42,7 +42,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             elif util.is_niconico_url(query):
                 return [await NicoNicoTrack.from_url(query, member)]
         # URLが見つからない場合
-        except aiohttp.ClientResponseError:
+        except aiohttp.ClientResponseError as e:
             mashilog(e, log_type="error")
             return None
 
