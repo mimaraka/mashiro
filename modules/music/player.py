@@ -338,7 +338,8 @@ class Player:
         else:
             author_name = "🎵 " + author_name
 
-        embed.set_author(name=author_name, url=author_url, icon_url=author_icon)
+        #embed.set_author(name=author_name, url=author_url, icon_url=author_icon)
+        embed.set_author(name="🎵 プレイヤー")
         member = self.__current_track.member
         embed.set_footer(text=f"{get_member_text(member, decoration=False)}が追加", icon_url=member.display_avatar.url)
 
