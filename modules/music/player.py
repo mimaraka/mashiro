@@ -210,6 +210,7 @@ class Player:
                     return
                 except discord.errors.NotFound:
                     pass
+            print(controller)
             self.__controller_msg = await self.__channel.send(**controller)
 
 
@@ -316,7 +317,6 @@ class Player:
                     file = discord.File(fp=thumbnail, filename=filename)
                     url = f"attachment://{filename}"
                     embed.set_image(url=url)
-                    print(url)
             
             # ボタンを表示
             view = PlayerView(self)
