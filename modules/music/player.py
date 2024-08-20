@@ -210,7 +210,7 @@ class Player:
                     return
                 except discord.errors.NotFound:
                     pass
-            print(controller)
+            print(controller.get("embed").image.url)
             self.__controller_msg = await self.__channel.send(**controller)
 
 
