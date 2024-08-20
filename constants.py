@@ -7,6 +7,7 @@ URL_ICON_SOUNDCLOUD = "https://media.discordapp.net/attachments/1142318975829676
 URL_ICON_NICONICO = "https://media.discordapp.net/attachments/1142318975829676104/1275345260062576672/lMfN7ih0afMsHzmMfSlJNbOexI6sRNG7LgcwJmgAx8CPvvcCLrf4zOxoHDa_jk68DXw.png?ex=66c58d54&is=66c43bd4&hm=2c5680e3f4027f4b768d318b6b93e32f44666505b123e840a4e5f1f6d6022411&=&format=webp&quality=lossless&width=640&height=640"
 
 RE_PATTERN_URL = r"^(https?://)?[\w/:%#\$&\?\(\)~\.=\+\-]+"
+RE_PATTERN_FULL_URL = r"^https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
 RE_PATTERN_URL_YOUTUBE = r"^(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+(&list=)?[\w-]*"
 RE_PATTERN_URL_SOUNDCLOUD = r"^(https?://)?(www\.)?(soundcloud\.com|snd\.sc)/"
 RE_PATTERN_URL_NICONICO = r"^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+"

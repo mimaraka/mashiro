@@ -210,7 +210,6 @@ class Player:
                     return
                 except discord.errors.NotFound:
                     pass
-            print(controller.get("embed").image.url)
             self.__controller_msg = await self.__channel.send(**controller)
 
 
@@ -309,7 +308,7 @@ class Player:
             # サムネイルを表示
             if thumbnail := self.__current_track.thumbnail:
                 # URLの場合
-                if re.fullmatch(const.RE_PATTERN_URL, thumbnail):
+                if util.is_full_url(thumbnail):
                     embed.set_image(url=thumbnail)
                 # ローカルファイルのパスの場合
                 else:
@@ -325,23 +324,22 @@ class Player:
             embed = MyEmbed(notif_type="inactive", title="再生していません……。")
             view = None
 
-        # author_name = "プレイヤー"
-        # author_url = None
-        # author_icon = None
-        # if util.is_youtube_url(self.__current_track.original_url):
-        #     author_url = "https://www.youtube.com/"
-        #     author_icon = const.URL_ICON_YOUTUBE
-        # elif util.is_soundcloud_url(self.__current_track.original_url):
-        #     author_url = "https://soundcloud.com/"
-        #     author_icon = const.URL_ICON_SOUNDCLOUD
-        # elif util.is_niconico_url(self.__current_track.original_url):
-        #     author_url = "https://www.nicovideo.jp/"
-        #     author_icon = const.URL_ICON_NICONICO
-        # else:
-        #     author_name = "🎵 " + author_name
+        author_name = "プレイヤー"
+        author_url = None
+        author_icon = None
+        if util.is_youtube_url(self.__current_track.original_url):
+            author_url = "https://www.youtube.com/"
+            author_icon = const.URL_ICON_YOUTUBE
+        elif util.is_soundcloud_url(self.__current_track.original_url):
+            author_url = "https://soundcloud.com/"
+            author_icon = const.URL_ICON_SOUNDCLOUD
+        elif util.is_niconico_url(self.__current_track.original_url):
+            author_url = "https://www.nicovideo.jp/"
+            author_icon = const.URL_ICON_NICONICO
+        else:
+            author_name = "🎵 " + author_name
 
-        #embed.set_author(name=author_name, url=author_url, icon_url=author_icon)
-        embed.set_author(name="🎵 プレイヤー")
+        embed.set_author(name=author_name, url=author_url, icon_url=author_icon)
         member = self.__current_track.member
         embed.set_footer(text=f"{get_member_text(member, decoration=False)}が追加", icon_url=member.display_avatar.url)
 

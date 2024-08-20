@@ -1,7 +1,7 @@
 import discord
 import re
 from pyshorteners import Shortener
-from constants import RE_PATTERN_URL, RE_PATTERN_URL_YOUTUBE, RE_PATTERN_URL_SOUNDCLOUD, RE_PATTERN_URL_NICONICO
+import constants as const
 
 
 # Discordの文字装飾のエスケープ
@@ -23,16 +23,19 @@ def truncate_text(text: str, length: int):
 
 
 def is_url(text: str):
-    return re.match(RE_PATTERN_URL, text)
+    return re.match(const.RE_PATTERN_URL, text)
+
+def is_full_url(text: str):
+    return re.match(const.RE_PATTERN_FULL_URL, text)
 
 def is_youtube_url(text: str):
-    return re.match(RE_PATTERN_URL_YOUTUBE, text)
+    return re.match(const.RE_PATTERN_URL_YOUTUBE, text)
 
 def is_soundcloud_url(text: str):
-    return re.match(RE_PATTERN_URL_SOUNDCLOUD, text)
+    return re.match(const.RE_PATTERN_URL_SOUNDCLOUD, text)
 
 def is_niconico_url(text: str):
-    return re.match(RE_PATTERN_URL_NICONICO, text)
+    return re.match(const.RE_PATTERN_URL_NICONICO, text)
 
 def shorten_url(url: str):
     return Shortener().tinyurl.short(url)
