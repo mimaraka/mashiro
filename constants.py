@@ -43,8 +43,8 @@ YTDL_FORMAT_OPTIONS = {
     "no_warnings": True,
     "default_search": "auto",                                   # 非URLのテキストが投げられたときにキーワード検索をしてくれる
     "source_address": "0.0.0.0",                                # bind to ipv4 since ipv6 addresses cause issues sometimes
-    "netrc": True,
-    "netrc_location": "/bot/.netrc",
+    "username": "oauth2",
+    "password": "",
 }
 
 FFMPEG_OPTIONS = {
