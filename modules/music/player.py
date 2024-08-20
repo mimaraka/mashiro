@@ -314,7 +314,9 @@ class Player:
                 else:
                     filename = "thumbnail" + os.path.splitext(thumbnail)[-1]
                     file = discord.File(fp=thumbnail, filename=filename)
-                    embed.set_image(url=f"attachment://{filename}")
+                    url = f"attachment://{filename}"
+                    embed.set_image(url=url)
+                    print(url)
             
             # ボタンを表示
             view = PlayerView(self)
