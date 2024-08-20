@@ -39,7 +39,7 @@ YTDL_FORMAT_OPTIONS = {
     "nocheckcertificate": True,
     "ignoreerrors": True,
     "logtostderr": False,
-    "quiet": True,
+    "quiet": False,
     "no_warnings": True,
     "default_search": "auto",                                   # 非URLのテキストが投げられたときにキーワード検索をしてくれる
     "source_address": "0.0.0.0",                                # bind to ipv4 since ipv6 addresses cause issues sometimes
