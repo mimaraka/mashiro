@@ -1,8 +1,6 @@
 import aiohttp
-import aiofiles
 import discord
 import re
-import requests
 import typing
 from modules.myembed import MyEmbed
 from modules.http import get_mimetype
@@ -10,8 +8,8 @@ from modules.http import get_mimetype
 
 # URLが有効ならメッセージのオブジェクトを返し、無効ならNoneを返す
 async def get_message_from_url(mes_url: str, bot: discord.Bot) -> discord.Message | None:
-    if re.fullmatch(r"^https://discord.com/channels/\d+/\d+/\d+$", mes_url):
-        parts = mes_url.split("/")
+    if re.fullmatch(r'^https://discord.com/channels/\d+/\d+/\d+$', mes_url):
+        parts = mes_url.split('/')
         channel_id = int(parts[-2])
         message_id = int(parts[-1])
         channel = bot.get_channel(channel_id)
@@ -25,7 +23,7 @@ async def get_message_from_url(mes_url: str, bot: discord.Bot) -> discord.Messag
 
 # メッセージから有効なURLを探す関数
 async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typing.List[str] | None:
-    matches = re.findall(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", message.content)
+    matches = re.findall(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+', message.content)
     urls = []
     valid_urls = []
     # リンク先のメッセージにファイルが添付されていた場合
@@ -42,15 +40,15 @@ async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typi
     return valid_urls
 
 
-# MediaType = typing.Literal["image", "gif", "audio", "video"]
+# MediaType = typing.Literal['image', 'gif', 'audio', 'video']
 
 # 添付ファイルを取得する関数
 async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_url: str=None, return_url=False):
     # media_mime = {
-    #     "image":            ["image/png", "image/pjpeg", "image/jpeg", "image/x-icon", "image/bmp"],
-    #     "gif":              ["image/gif"],
-    #     "audio":            ["audio/wav", "audio/x-wav", "audio/mpeg", "audio/aac", "audio/ogg", "audio/flac"],
-    #     "video":            ["video/mpeg", "video/mp4", "video/webm", "video/quicktime", "video/x-msvideo"]
+    #     'image':            ['image/png', 'image/pjpeg', 'image/jpeg', 'image/x-icon', 'image/bmp'],
+    #     'gif':              ['image/gif'],
+    #     'audio':            ['audio/wav', 'audio/x-wav', 'audio/mpeg', 'audio/aac', 'audio/ogg', 'audio/flac'],
+    #     'video':            ['video/mpeg', 'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo']
     # }
     
     if type(mimetypes) is str:
@@ -65,8 +63,8 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
         if not message:
             await ctx.respond(
                 embed=MyEmbed(
-                    notif_type="error",
-                    description="リンクからのメッセージの取得に失敗しました。"
+                    notif_type='error',
+                    description='リンクからのメッセージの取得に失敗しました。'
                 ),
                 ephemeral=True
             )
@@ -76,8 +74,8 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
         if not valid_urls:
             await ctx.respond(
                 embed=MyEmbed(
-                    notif_type="error",
-                    description="リンク先のメッセージにファイルやURLが添付されていないようです。"
+                    notif_type='error',
+                    description='リンク先のメッセージにファイルやURLが添付されていないようです。'
                 ),
                 ephemeral=True
             )
@@ -93,8 +91,8 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
         #どちらも存在しない場合
         else:
             embed = MyEmbed(
-                notif_type="error",
-                description="ファイルやURLが添付されたメッセージの近くでコマンドを実行するか、メッセージのリンクを指定してください。"
+                notif_type='error',
+                description='ファイルやURLが添付されたメッセージの近くでコマンドを実行するか、メッセージのリンクを指定してください。'
             )
             await ctx.respond(embed=embed, ephemeral=True)
             return None

@@ -28,22 +28,22 @@ class ID3V2Track(BaseTrack):
 
         audio = MP3(header)
 
-        if (apic := audio.tags.get("APIC:")) is not None:
+        if (apic := audio.tags.get('APIC:')) is not None:
             img = Image.open(BytesIO(apic.data))
-            ext = apic.mime.split('/')[-1] if apic.mime else "jpeg"
-            thumbnail = make_filename_by_seq(f"data/temp/cover_{member.guild.id}.{ext}")
+            ext = apic.mime.split('/')[-1] if apic.mime else 'jpeg'
+            thumbnail = make_filename_by_seq(f'data/temp/cover_{member.guild.id}.{ext}')
             img.save(thumbnail)
         else:
             thumbnail = None
 
-        filename = os.path.splitext(url.split("/")[-1])[0]
+        filename = os.path.splitext(url.split('/')[-1])[0]
         return cls(
             member=member,
-            title=str(audio.tags.get("TIT2")) or filename,
+            title=str(audio.tags.get('TIT2')) or filename,
             source_url=url,
             original_url=url,
             duration=Duration(audio.info.length),
-            artist=str(audio.tags.get("TPE1")),
-            album=str(audio.tags.get("TALB")),
+            artist=str(audio.tags.get('TPE1')),
+            album=str(audio.tags.get('TALB')),
             thumbnail=thumbnail
         )

@@ -1,12 +1,13 @@
 import json
 import discord
 import re
+from character_config import CHARACTER_TEXT
 from .myembed import MyEmbed
 from .util import get_member_text
 
 
 class URLReplacer:
-    JSON_PATH = "data/saves/url_replacer.json"
+    JSON_PATH = 'data/saves/url_replacer.json'
 
     def __init__(self, name: str, url_pattern: re.Pattern, replacing_pattern : re.Pattern, replaced_str: str, link_text: str) -> None:
         self._name: str = name
@@ -24,7 +25,7 @@ class URLReplacer:
         return root.get(self._name)
         
     def _get_root(self) -> dict:
-        with open(self.JSON_PATH, "r") as f:
+        with open(self.JSON_PATH, 'r') as f:
             try:
                 ret = json.load(f)
             except json.decoder.JSONDecodeError:
@@ -33,29 +34,29 @@ class URLReplacer:
 
     def _save_data(self, data):
         root = self._get_root()
-        with open(self.JSON_PATH, "w") as f:
+        with open(self.JSON_PATH, 'w') as f:
             root[self._name] = data
             json.dump(root, f, indent=4)
 
     def is_enabled(self, guild_id: int):
         data = self._get_data()
-        return data and guild_id in data.get("guilds")
+        return data and guild_id in data.get('guilds')
 
     async def switch_replacer(self, ctx: discord.ApplicationContext, switch: bool):
-        data = self._get_data() or {"guilds": []}
+        data = self._get_data() or {'guilds': []}
 
         if switch:
-            if not data.get("guilds"):
-                data["guilds"] = []
-            if ctx.guild.id not in data["guilds"]:
-                data["guilds"].append(ctx.guild.id)
-            embed = MyEmbed(notif_type="succeeded", title="URL変換を有効化しました。")
+            if not data.get('guilds'):
+                data['guilds'] = []
+            if ctx.guild.id not in data['guilds']:
+                data['guilds'].append(ctx.guild.id)
+            embed = MyEmbed(notif_type='succeeded', title='URL変換を有効化しました。')
             embed.set_author(name=self._name)
             await ctx.respond(embed=embed, delete_after=10)
         else:
-            if data.get("guilds"):
-                data["guilds"] = [id for id in data.get("guilds") if id != ctx.guild.id]
-            embed = MyEmbed(title="URL変換を無効化しました。")
+            if data.get('guilds'):
+                data['guilds'] = [id for id in data.get('guilds') if id != ctx.guild.id]
+            embed = MyEmbed(title='URL変換を無効化しました。')
             embed.set_author(name=self._name)
             await ctx.respond(embed=embed, delete_after=10)
 
@@ -78,7 +79,7 @@ class URLReplacer:
         for new_url in new_urls:
             link = f'[{self._link_text}]({new_url})'
             if deleted:
-                result = f'{get_member_text(message.author)}が共有しました！ | {link}'
+                result = f'{get_member_text(message.author)}{CHARACTER_TEXT['url_replacer_suffix']} | {link}'
                 await message.channel.send(result)
             else:
                 await message.reply(link, mention_author=False)

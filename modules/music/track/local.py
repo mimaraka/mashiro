@@ -19,6 +19,6 @@ class LocalTrack(BaseTrack):
 
     async def create_source(self, volume: float):
         self.source = discord.PCMVolumeTransformer(
-            original=discord.FFmpegPCMAudio(self.source_url, options="-vn"),
+            original=discord.FFmpegPCMAudio(self.source_url, options='-vn'),
             volume=volume
         )

@@ -6,7 +6,7 @@ class Duration:
 
     @classmethod
     def from_text(cls, text: str):
-        hms = text.split(":")
+        hms = text.split(':')
         result = 0
         for i, s in enumerate(hms[::-1]):
             result += int(s) * (60 ** i)
@@ -25,9 +25,9 @@ class Duration:
     def __str__(self):
         h, m, s = self.get_hms()
         if h:
-            result = f"{h}:{str(m).zfill(2)}:{str(s).zfill(2)}"
+            result = f'{h}:{str(m).zfill(2)}:{str(s).zfill(2)}'
         else:
-            result = f"{m}:{str(s).zfill(2)}"
+            result = f'{m}:{str(s).zfill(2)}'
         return result
     
     def __add__(self, other):

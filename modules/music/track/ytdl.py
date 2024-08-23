@@ -3,7 +3,7 @@ import asyncio
 import discord
 import yt_dlp
 from constants import YTDL_FORMAT_OPTIONS, FFMPEG_OPTIONS
-from modules.mashilog import mashilog
+from modules.mylog import mylog
 from .base import BaseTrack
 from ...duration import Duration
 
@@ -42,12 +42,12 @@ class YTDLTrack(BaseTrack):
                     resp.raise_for_status()
         # URLが切れている場合、再生成
         except aiohttp.ClientResponseError:
-            mashilog("YTDLSourceを再度生成します。")
+            mylog('YTDLSourceを再度生成します。')
             with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
                 info = await self.loop.run_in_executor(
                     None, lambda: ytdl.extract_info(self.original_url, download=False)
                 )
-                self.source_url = info.get("url")
+                self.source_url = info.get('url')
         self.source = discord.PCMVolumeTransformer(
             original=discord.FFmpegPCMAudio(self.source_url, **FFMPEG_OPTIONS),
             volume=volume

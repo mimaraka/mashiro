@@ -1,18 +1,18 @@
 import discord
-import json
+import modules.util as util
 from modules.common_embed import *
 from modules.json import JSONLoader
 
 
-EMBED_NO_PERMISSION = MyEmbed(notif_type="error", description="私にこのサーバーのメンバーのニックネームを変更する権限がありません。")
+EMBED_NO_PERMISSION = MyEmbed(notif_type='error', description='私にこのサーバーのメンバーのニックネームを変更する権限がありません。')
 
 class CogNickChanger(discord.Cog):
-    group_nick = discord.SlashCommandGroup("nick", "メンバーのニックネームの管理を行います。")
+    group_nick = discord.SlashCommandGroup('nick', 'メンバーのニックネームの管理を行います。')
 
     # コンストラクタ
     def __init__(self, bot: discord.Bot) -> None:
         self.bot: discord.Bot = bot
-        self.json_loader = JSONLoader("old_nicks")
+        self.json_loader = JSONLoader('old_nicks')
             
     # 指定したギルドメンバーのニックネームに任意の文字列を設定する
     async def _set_member_nick(self, member: discord.Member, nick: str) -> bool:
@@ -52,14 +52,14 @@ class CogNickChanger(discord.Cog):
         data = self.json_loader.get_guild_data(guild)
         if data is None:
             return None
-        return data.get("nick")
+        return data.get('nick')
 
     # ギルド毎の置き換え後のニックネームをjsonファイルに登録
     def _set_guild_replaced_nick(self, guild: discord.Guild, nick: str) -> None:
         data = self.json_loader.get_guild_data(guild)
         if data is None:
             data = {}
-        data["nick"] = nick
+        data['nick'] = nick
         self.json_loader.set_guild_data(data, guild)
 
     # 指定したギルドのメンバー全員のニックネームを変更
@@ -87,7 +87,7 @@ class CogNickChanger(discord.Cog):
         self.json_loader.set_root(root)
 
         for key, old_nick in old_nicks.items():
-            if key != "nick":
+            if key != 'nick':
                 if (member := guild.get_member(int(key))) is not None:
                     await self._set_member_nick(member, old_nick)
         return True
@@ -116,10 +116,10 @@ class CogNickChanger(discord.Cog):
             await self._change_member_nick(member)
 
     # ギルドメンバー全員のニックネームを変更するコマンド
-    @group_nick.command(name="change", description="サーバーメンバー全員のニックネームを変更します (管理者のみ実行可)。")
+    @group_nick.command(**util.make_command_args(['nick', 'change']))
     async def command_nick_change(self, ctx: discord.ApplicationContext, nick: str):
         if ctx.guild is None:
-            await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
             return
 
         can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
@@ -135,18 +135,18 @@ class CogNickChanger(discord.Cog):
         await self._change_guild_nick(ctx.guild, nick)
         await ctx.respond(
             embed=MyEmbed(
-                notif_type="succeeded",
-                title="ニックネームを変更しました！",
-                description=f"サーバーメンバーのニックネームを\n**{nick}**\nに変更しました。"
+                notif_type='succeeded',
+                title='ニックネームを変更しました！',
+                description=f'サーバーメンバーのニックネームを\n**{nick}**\nに変更しました。'
             ),
             delete_after=10
         )
 
     # ギルドメンバー全員のニックネームを元に戻すコマンド
-    @group_nick.command(name="restore", description="サーバーメンバー全員のニックネームを元に戻します (管理者のみ実行可)。")
+    @group_nick.command(**util.make_command_args(['nick', 'restore']))
     async def command_nick_restore(self, ctx: discord.ApplicationContext):
         if ctx.guild is None:
-            await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
             return
         
         can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
@@ -163,22 +163,22 @@ class CogNickChanger(discord.Cog):
         if not await self._restore_guild_nick(ctx.guild):
             await ctx.respond(
                 embed=MyEmbed(
-                    notif_type="error",
-                    description="ニックネームは変更されていません。"
+                    notif_type='error',
+                    description='ニックネームは変更されていません。'
                 ),
                 ephemeral=True
             )
         else:
             await ctx.respond(
-                embed=MyEmbed(notif_type="succeeded", title="ニックネームを元に戻しました。"),
+                embed=MyEmbed(notif_type='succeeded', title='ニックネームを元に戻しました。'),
                 delete_after=10
             )
 
-    @group_nick.command(name="remove", description="指定されたニックネームを削除します (管理者のみ実行可)。")
-    @discord.option("nick", description="削除するニックネーム")
+    @group_nick.command(**util.make_command_args(['nick', 'remove']))
+    @discord.option('nick', description='削除するニックネーム')
     async def command_nick_remove(self, ctx: discord.ApplicationContext, nick: str):
         if ctx.guild is None:
-            await ctx.respond(embed=EMBED_DIRECT_MESSAGE, ephemeral=True)
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
             return
 
         can_bot_manage_nicknames = any([role.permissions.manage_nicknames for role in ctx.me.roles])
@@ -195,6 +195,6 @@ class CogNickChanger(discord.Cog):
         for member in ctx.guild.members:
             await self._set_member_nick(member, None)
         await ctx.respond(
-            embed=MyEmbed(notif_type="succeeded", title=f"ニックネーム「{nick}」を削除しました。"),
+            embed=MyEmbed(notif_type='succeeded', title=f'ニックネーム「{nick}」を削除しました。'),
             delete_after=10
         )

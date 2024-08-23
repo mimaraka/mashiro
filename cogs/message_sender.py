@@ -1,5 +1,7 @@
 import asyncio
 import discord
+import modules.util as util
+from character_config import CHARACTER_TEXT
 from datetime import datetime, timezone, timedelta
 
 from discord.ui.input_text import InputText
@@ -22,11 +24,11 @@ class CogMessageSender(discord.Cog):
 
 
     # /send_message
-    @discord.slash_command(name="send-message", description="指定した時間に指定したメッセージを送信します。")
-    @discord.option("channel", description="メッセージを送信するチャンネル (省略した場合はコマンドを実行したチャンネル)", default=None)
-    @discord.option("day", description="送信する日付 (省略した場合は今日)", default=None, min_value=1, max_value=31)
-    @discord.option("hour", description="送信する時間 (24時間表記、省略した場合は現在の時間)", default=None, min_value=0, max_value=23)
-    @discord.option("minute", description="送信する分 (省略した場合は現在の分)", default=None, min_value=0, max_value=59)
+    @discord.slash_command(**util.make_command_args('send-message'))
+    @discord.option('channel', description='メッセージを送信するチャンネル (省略した場合はコマンドを実行したチャンネル)', default=None)
+    @discord.option('day', description='送信する日付 (省略した場合は今日)', default=None, min_value=1, max_value=31)
+    @discord.option('hour', description='送信する時間 (24時間表記、省略した場合は現在の時間)', default=None, min_value=0, max_value=23)
+    @discord.option('minute', description='送信する分 (省略した場合は現在の分)', default=None, min_value=0, max_value=59)
     async def command_send_message(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, day: int, hour: int, minute: int):
         channel = channel or ctx.channel
         now = datetime.now(JST)
@@ -37,25 +39,25 @@ class CogMessageSender(discord.Cog):
         try:
             time = datetime(now.year, now.month, day, hour, minute, tzinfo=JST)
         except ValueError:
-            await ctx.respond(embed=MyEmbed(notif_type="error", description="日時の指定が無効です。"), ephemeral=True)
+            await ctx.respond(embed=MyEmbed(notif_type='error', description=CHARACTER_TEXT['error_invalid_datetime']), ephemeral=True)
             return
 
         class MessageModal(discord.ui.Modal):
             def __init__(self_) -> None:
-                super().__init__(title="メッセージの設定", timeout=None)
+                super().__init__(title='メッセージの設定', timeout=None)
             
                 # content
                 self_.input_content = InputText(
-                    label="メッセージの内容",
+                    label='メッセージの内容',
                     required=False,
                     style=discord.InputTextStyle.paragraph,
                     max_length=2000,
-                    placeholder="ユーザーメンション：<@!ユーザーID>\nロールメンション：<@&ロールID>\nカスタム絵文字：<:絵文字名:絵文字ID>\nチャンネルへのリンク：<#チャンネルID>"
+                    placeholder='ユーザーメンション：<@!ユーザーID>\nロールメンション：<@&ロールID>\nカスタム絵文字：<:絵文字名:絵文字ID>\nチャンネルへのリンク：<#チャンネルID>'
                 )
 
                 # embed_title
                 self_.input_embed_title = InputText(
-                    label="埋め込みのタイトル",
+                    label='埋め込みのタイトル',
                     required=False,
                     style=discord.InputTextStyle.short,
                     max_length=256
@@ -63,7 +65,7 @@ class CogMessageSender(discord.Cog):
 
                 # embed_description
                 self_.input_embed_description = InputText(
-                    label="埋め込みの説明",
+                    label='埋め込みの説明',
                     required=False,
                     style=discord.InputTextStyle.paragraph
                 )
@@ -83,14 +85,14 @@ class CogMessageSender(discord.Cog):
                     embed = None
 
                 if not content and not embed:
-                    await inter.response.send_message(embed=MyEmbed(notif_type="error", description="送信する文章と埋め込みの内容のいずれか一方を必ず指定してください。"), ephemeral=True)
+                    await inter.response.send_message(embed=MyEmbed(notif_type='error', description=CHARACTER_TEXT['error_no_content_or_embed']), ephemeral=True)
                     return
 
                 await inter.response.send_message(
                     embed=MyEmbed(
-                        notif_type="succeeded",
-                        title="メッセージの送信を設定しました！",
-                        description=f"指定したメッセージは`{time.strftime('%H:%M:%S (%m/%d/%Y)')}`に <#{channel.id}> にて送信されます。"
+                        notif_type='succeeded',
+                        title=CHARACTER_TEXT['scheduled_message'],
+                        description=f'指定したメッセージは`{time.strftime('%H:%M:%S (%m/%d/%Y)')}`に <#{channel.id}> にて送信されます。'
                     ),
                     delete_after=10
                 )

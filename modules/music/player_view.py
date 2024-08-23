@@ -4,16 +4,16 @@ import time
 from discord.enums import ButtonStyle
 from modules.music.errors import *
 from modules.myembed import MyEmbed
-from modules.vc_common import EMBED_NOT_PLAYING
+from modules.common_embed import EMBED_NOT_PLAYING
 
-EMBED_PERMISSON_DENIED = MyEmbed(notif_type="error", description="このトラックを追加したユーザー以外は操作できません。")
+EMBED_PERMISSON_DENIED = MyEmbed(notif_type='error', description='このトラックを追加したユーザー以外は操作できません。')
 
 
 # 前のトラックに戻るボタン
 class ButtonBack(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
-        super().__init__(style=ButtonStyle.primary, emoji="⏮️")
+        super().__init__(style=ButtonStyle.primary, emoji='⏮️')
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.member.id != inter.user.id:
@@ -33,7 +33,7 @@ class ButtonBack(discord.ui.Button):
 class ButtonPlay(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
-        super().__init__(style=ButtonStyle.primary, emoji="▶️")
+        super().__init__(style=ButtonStyle.primary, emoji='▶️')
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.member.id != inter.user.id:
@@ -51,7 +51,7 @@ class ButtonPlay(discord.ui.Button):
 class ButtonPause(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
-        super().__init__(style=ButtonStyle.primary, emoji="⏸️")
+        super().__init__(style=ButtonStyle.primary, emoji='⏸️')
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.member.id != inter.user.id:
@@ -69,7 +69,7 @@ class ButtonPause(discord.ui.Button):
 class ButtonSkip(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
-        super().__init__(style=ButtonStyle.primary, emoji="⏭️")
+        super().__init__(style=ButtonStyle.primary, emoji='⏭️')
 
     async def callback(self, inter: discord.Interaction) -> Any:
         if self.__player.current_track.member.id != inter.user.id:
@@ -89,7 +89,7 @@ class ButtonShuffle(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
         style = ButtonStyle.primary if player.shuffle else ButtonStyle.secondary
-        super().__init__(style=style, emoji="🔀")
+        super().__init__(style=style, emoji='🔀')
 
     async def callback(self, inter: discord.Interaction) -> Any:
         self.__player.shuffle = not self.__player.shuffle
@@ -101,9 +101,9 @@ class ButtonRepeat(discord.ui.Button):
     def __init__(self, player):
         self.__player = player
         style = ButtonStyle.primary
-        emoji = "🔁"
+        emoji = '🔁'
         if player.repeat == 2:
-            emoji = "🔂"
+            emoji = '🔂'
         elif player.repeat == 0:
             style = ButtonStyle.secondary
         super().__init__(style=style, emoji=emoji)
