@@ -123,7 +123,7 @@ class CogMusic(discord.Cog):
         if member.id == self.bot.user.id:
             # 自分がボイスチャンネルに接続したとき
             if after.channel is not None and before.channel is None:
-                mylog(f'ボイスチャンネルに接続しました。', guild=member.guild, channel=after.channel)
+                mylog('ボイスチャンネルに接続しました。', guild=member.guild, channel=after.channel)
                 # time_bot_onlyの辞書があれば削除
                 if member.guild.id in self.__time_bot_only:
                     self.__time_bot_only.pop(member.guild.id)
@@ -134,7 +134,7 @@ class CogMusic(discord.Cog):
                     mylog('playerオブジェクトが作成されていないため、作成しました。')
             # 自分がボイスチャンネルから切断した/されたとき
             if after.channel is None and before.channel is not None:
-                mylog(f'ボイスチャンネルから切断しました。', guild=member.guild, channel=before.channel)
+                mylog('ボイスチャンネルから切断しました。', guild=member.guild, channel=before.channel)
 
                 # Playerオブジェクトが消去されておらず、3秒経っても再接続されない場合は手動での再接続を試みる
                 await asyncio.sleep(3)
@@ -158,7 +158,7 @@ class CogMusic(discord.Cog):
 
         # 自身が現在接続しているボイスチャンネルでメンバーが抜けた場合
         if member.guild.voice_client.channel == before.channel and member.guild.voice_client.channel != after.channel:
-            mylog(f'ボイスチャンネルから1人のメンバーが切断しました。', guild=member.guild, channel=before.channel)
+            mylog('ボイスチャンネルから1人のメンバーが切断しました。', guild=member.guild, channel=before.channel)
 
             # ボイスチャンネルにBotしかいない場合
             if self.vc_is_bot_only(member.guild.voice_client.channel):
@@ -173,7 +173,7 @@ class CogMusic(discord.Cog):
                     else:
                         await player.update_controller()
                 else:
-                    mylog(f'現在、ボイスチャンネルはBotのみです。', guild=member.guild, channel=before.channel)
+                    mylog('現在、ボイスチャンネルはBotのみです。', guild=member.guild, channel=before.channel)
                     # Unix時間を記録
                     self.__time_bot_only[member.guild.id] = time.time()
                     # 1分待つ
@@ -189,7 +189,7 @@ class CogMusic(discord.Cog):
                                 await self.disconnect(member.guild)
         # 自身が現在接続しているボイスチャンネルにメンバーが入った場合
         elif member.guild.voice_client.channel != before.channel and member.guild.voice_client.channel == after.channel:
-            mylog(f'ボイスチャンネルに1人のメンバーが接続しました。', guild=member.guild, channel=after.channel)
+            mylog('ボイスチャンネルに1人のメンバーが接続しました。', guild=member.guild, channel=after.channel)
             # それまでボイスチャンネルにBotしかおらず、新たに入ったメンバーがBotでない場合
             if member.guild.id in self.__time_bot_only and not member.bot:
                 # 辞書を削除
@@ -201,7 +201,7 @@ class CogMusic(discord.Cog):
     async def on_message_delete(self, message: discord.Message):
         for player in self.__player.values():
             if player.controller_msg and message.id == player.controller_msg.id and not player.is_stopped:
-                mylog(f'プレイヤーメッセージが削除されました。再生成します。', guild=message.guild)
+                mylog('プレイヤーメッセージが削除されました。再生成します。', guild=message.guild)
                 await player.regenerate_controller(message.channel)
 
 
@@ -660,7 +660,7 @@ class CogMusic(discord.Cog):
             volume_icon = '🔉'
         else:
             volume_icon = '🔊'
-        description = f'{volume_icon} **{new_volume}**\n🔈 0 {'-' * (new_volume // 2)}●{'-' * (50 - new_volume // 2)} 🔊 100'
+        description = f'{volume_icon} **{new_volume}**\n🔈 0 {"-" * (new_volume // 2)}●{"-" * (50 - new_volume // 2)} 🔊 100'
         if not player.is_stopped and volume is not None:
             remark = ' (次回再生時に適応されます)'
         else:

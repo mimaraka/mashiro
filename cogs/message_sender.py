@@ -92,7 +92,7 @@ class CogMessageSender(discord.Cog):
                     embed=MyEmbed(
                         notif_type='succeeded',
                         title=CHARACTER_TEXT['scheduled_message'],
-                        description=f'指定したメッセージは`{time.strftime('%H:%M:%S (%m/%d/%Y)')}`に <#{channel.id}> にて送信されます。'
+                        description=f'指定したメッセージは`{time.strftime("%H:%M:%S (%m/%d/%Y)")}`に <#{channel.id}> にて送信されます。'
                     ),
                     delete_after=10
                 )

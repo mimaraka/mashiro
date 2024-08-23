@@ -32,7 +32,7 @@ class CogDownloader(discord.Cog):
                 info = info.get('entries')[0]
 
             if re.search(RE_PATTERN_URL_NICONICO, query):
-                url = f'https://www.nicovideodl.jp/watch/{info.get('webpage_url_basename')}'
+                url = f'https://www.nicovideodl.jp/watch/{info.get("webpage_url_basename")}'
             else:
                 url = info.get('url')
                 if len(url) > 512:
@@ -72,7 +72,7 @@ class CogDownloader(discord.Cog):
 
         embed = MyEmbed(
             title=info.get('title'),
-            description=f'👤 {info.get('uploader') or '-'}',
+            description=f'👤 {info.get("uploader") or "-"}',
             url=info.get('webpage_url'),
             image=info.get('thumbnail')
         )

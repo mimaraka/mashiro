@@ -295,8 +295,8 @@ class Player:
                 notif_type = 'inactive'
             title += f' (🔊 {self.__voice_client.channel.name})'
             description = f'🎶 {self.track_text(self.__current_track, link=True, italic=True)}\n'
-            description += f'👤 {util.truncate_text(self.__current_track.artist or '-', 72)}\n'
-            description += f'💿 {util.truncate_text(self.__current_track.album or '-', 72)}'
+            description += f'👤 {util.truncate_text(self.__current_track.artist or "-", 72)}\n'
+            description += f'💿 {util.truncate_text(self.__current_track.album or "-", 72)}'
             embed = MyEmbed(notif_type=notif_type, title=title, description=description)
             # 再生キューにトラックが入っている場合
             if self.__queue_idcs:
@@ -403,7 +403,7 @@ class Player:
         if self.queue:
             page = min(max(page, 1), n_pages)
             start_index = (page - 1) * 10
-            description = f'{'⏸️' if self.is_paused else '▶️'} {self.track_text(self.current_track, italic=True, queue=True)}\n\n'
+            description = f'{"⏸️" if self.is_paused else "▶️"} {self.track_text(self.current_track, italic=True, queue=True)}\n\n'
             description += self.tracks_text(self.queue[start_index:start_index + 10], start_index=start_index + 1)
             if len(self.queue) > 10:
                 description += f'\n\n**{page}** / {n_pages}ページ'
