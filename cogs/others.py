@@ -25,12 +25,13 @@ class CogOthers(discord.Cog):
         for item in self.bot.walk_application_commands():
             if type(item) == discord.SlashCommand:
                 name = item.name
+                description = item.description
                 while item.parent is not None:
                     item = item.parent
                     name = item.name + ' ' + name
                 commands.append({
                     'name': name,
-                    'description': item.description
+                    'description': description
                 })
 
         n_pages = math.ceil(len(commands) / 10)
