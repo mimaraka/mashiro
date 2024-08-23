@@ -79,7 +79,7 @@ class URLReplacer:
         for new_url in new_urls:
             link = f'[{self._link_text}]({new_url})'
             if deleted:
-                result = f'{get_member_text(message.author)}{CHARACTER_TEXT['url_replacer_suffix']} | {link}'
+                result = f'{get_member_text(message.author)}{CHARACTER_TEXT["url_replacer_suffix"]} | {link}'
                 await message.channel.send(result)
             else:
                 await message.reply(link, mention_author=False)

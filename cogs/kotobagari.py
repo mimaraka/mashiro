@@ -94,5 +94,5 @@ class CogKotobagari(discord.Cog):
         self.json_loader.set_guild_data(disabled_channels, ctx.guild)
 
         await ctx.respond(
-            embed=MyEmbed(title=f'{CHARACTER_TEXT['kotobagari_prefix']}{'有効' if switch else '無効'}{CHARACTER_TEXT['kotobagari_suffix']}')
+            embed=MyEmbed(title=f'{CHARACTER_TEXT["kotobagari_prefix"]}{"有効" if switch else "無効"}{CHARACTER_TEXT["kotobagari_suffix"]}')
         )

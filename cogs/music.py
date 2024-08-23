@@ -110,7 +110,7 @@ class CogMusic(discord.Cog):
             emoji = '⌛'
         embed = MyEmbed(
             notif_type='inactive',
-            title=f'{emoji} {prefix}{CHARACTER_TEXT['processing']}',
+            title=f'{emoji} {prefix}{CHARACTER_TEXT["processing"]}',
             description=CHARACTER_TEXT['hang_on']
         )
         return embed
@@ -228,7 +228,7 @@ class CogMusic(discord.Cog):
         if not player:
             return
         await ctx.respond(
-            embed=MyEmbed(notif_type='succeeded', title=f'{CHARACTER_TEXT['on_connect']} (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})'),
+            embed=MyEmbed(notif_type='succeeded', title=f'{CHARACTER_TEXT["on_connect"]} (🔊 {util.escape_markdown(ctx.author.voice.channel.name)})'),
             delete_after=10
         )
         # 0.5秒後にランダムにボイスを再生する
@@ -387,7 +387,7 @@ class CogMusic(discord.Cog):
         if not player:
             return
         
-        embed = MyEmbed(notif_type='inactive', title=f'🔎 1. {CHARACTER_TEXT['searching']}')
+        embed = MyEmbed(notif_type='inactive', title=f'🔎 1. {CHARACTER_TEXT["searching"]}')
         inter = await ctx.respond(embed=embed)
         msg_loading = await inter.original_response()
 
@@ -541,7 +541,7 @@ class CogMusic(discord.Cog):
             player.skip()
         except NotPlayingError:
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
-        await ctx.respond(embed=MyEmbed(title=f'⏭️ {CHARACTER_TEXT['skipped']}'), delete_after=10)
+        await ctx.respond(embed=MyEmbed(title=f'⏭️ {CHARACTER_TEXT["skipped"]}'), delete_after=10)
 
 
     # /replay
@@ -552,7 +552,7 @@ class CogMusic(discord.Cog):
             return
         try:
             await player.replay()
-            await ctx.respond(embed=MyEmbed(notif_type='succeeded', title=f'🔄 {CHARACTER_TEXT['replay_start']}'), delete_after=10)
+            await ctx.respond(embed=MyEmbed(notif_type='succeeded', title=f'🔄 {CHARACTER_TEXT["replay_start"]}'), delete_after=10)
         except PlayerError as e:
             await ctx.respond(embed=MyEmbed(notif_type='error', description=e), ephemeral=True)
 
@@ -582,7 +582,7 @@ class CogMusic(discord.Cog):
                 player.repeat = 2
             else:
                 player.repeat = 0
-            embed = MyEmbed(notif_type='succeeded', title=f'{ICON} {CHARACTER_TEXT['repeat_mode_changed']}', description=option)
+            embed = MyEmbed(notif_type='succeeded', title=f'{ICON} {CHARACTER_TEXT["repeat_mode_changed"]}', description=option)
             await player.update_controller()
         await ctx.respond(embed=embed, delete_after=10)
 
@@ -599,14 +599,14 @@ class CogMusic(discord.Cog):
         if switch is None:
             player.shuffle = player.shuffle
             if player.shuffle:
-                embed=MyEmbed(title=f'{ICON} {CHARACTER_TEXT['shuffle_queue']}')
+                embed=MyEmbed(title=f'{ICON} {CHARACTER_TEXT["shuffle_queue"]}')
                 if player.controller_msg is not None:
                     await player.update_controller()
             else:
-                embed=MyEmbed(title=f'{ICON} {CHARACTER_TEXT['shuffle_off']}')
+                embed=MyEmbed(title=f'{ICON} {CHARACTER_TEXT["shuffle_off"]}')
         else:
             player.shuffle = switch
-            embed=MyEmbed(notif_type='succeeded', title=f'{ICON} {CHARACTER_TEXT['shuffle_prefix']}{'オン' if switch else 'オフ'}{CHARACTER_TEXT['shuffle_suffix']}')
+            embed=MyEmbed(notif_type='succeeded', title=f'{ICON} {CHARACTER_TEXT["shuffle_prefix"]}{"オン" if switch else "オフ"}{CHARACTER_TEXT["shuffle_suffix"]}')
             if player.controller_msg is not None:
                 await player.update_controller()
 
