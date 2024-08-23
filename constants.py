@@ -16,6 +16,10 @@ EMOJI_ID_LOADING = 1154011417029128242
 RE_PATTERN_URL = r'^https?://[\w/:%#\$&\?\(\)~\.=\+\-]+'
 RE_PATTERN_URL_NICONICO = r'^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+'
 
+FAVICON = {
+
+}
+
 # yt_dlp
 YTDL_OPTIONS = {
     'format': 'ba/b*[acodec!=none]/b*',
@@ -30,6 +34,9 @@ YTDL_OPTIONS = {
     'source_address': '0.0.0.0',                                # bind to ipv4 since ipv6 addresses cause issues sometimes
     'usenetrc': True,
     'netrc_location': './.netrc',
+    'http_headers': {
+        'Accept-Language': 'ja-JP'
+    }
 }
 
 FFMPEG_OPTIONS = {
