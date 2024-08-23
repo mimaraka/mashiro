@@ -1,7 +1,6 @@
 import discord
 import re
 from pyshorteners import Shortener
-from typing import List
 from urllib.parse import urlparse
 import constants as const
 from character_config import COMMAND_DESCRIPTION, DEFAULT_MEMBER_SUFFIX
@@ -25,8 +24,8 @@ def truncate_text(text: str, length: int):
     return result
 
 
-def make_command_args(command: List | str):
-    if type(command) == List:
+def make_command_args(command: list | str):
+    if type(command) == list:
         name = command[-1]
         key = ' '.join(command)
     else:
