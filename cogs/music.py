@@ -361,7 +361,7 @@ class CogMusic(discord.Cog):
     @discord.option('n', description='検索するメッセージの件数 (デフォルト: 20件)', min_value=1, default=20)
     @discord.option('immediately', description='トラックを取得し次第、逐次再生・キューに追加します', default=True)
     @discord.option('order', description='再生キューに追加するトラックの順番 ("immediately"がTrueの場合、"ランダム"は使用できません)', choices=['新しい順', '古い順', 'ランダム'], default=None)
-    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel | None, channel_url: str | None, n: int, immediately: bool, order: str):
+    async def command_play_channel(self, ctx: discord.ApplicationContext, channel: discord.TextChannel, channel_url: str, n: int, immediately: bool, order: str):
         # コマンドを送ったメンバーがボイスチャンネルに居ない場合
         if ctx.author.voice is None:
             await ctx.respond(embed=EMBED_AUTHOR_NOT_CONNECTED, ephemeral=True)
@@ -560,7 +560,7 @@ class CogMusic(discord.Cog):
     # /repeat
     @discord.slash_command(name='repeat', description='リピート再生の設定を変更します。')
     @discord.option('option', description='リピート再生のオプション', choices=['オフ', 'プレイリスト', 'トラック'], required=False)
-    async def command_repeat(self, ctx: discord.ApplicationContext, option: str | None=None): 
+    async def command_repeat(self, ctx: discord.ApplicationContext, option: str=None): 
         player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
@@ -590,7 +590,7 @@ class CogMusic(discord.Cog):
     # /shuffle
     @discord.slash_command(**util.make_command_args('shuffle'))
     @discord.option('switch', description='シャッフル再生のオン/オフ [True/False] (シャッフル再生がオンで、この引数を省略した場合、再生キューが再度シャッフルされます)', required=False)
-    async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool | None=None):
+    async def command_shuffle(self, ctx: discord.ApplicationContext, switch: bool=None):
         player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
@@ -641,7 +641,7 @@ class CogMusic(discord.Cog):
     # /volume
     @discord.slash_command(**util.make_command_args('volume'))
     @discord.option('volume', description='ボリューム [0～100] (指定なしで現在のボリュームを表示)', max_value=100, min_value=0, required=False)
-    async def command_volume(self, ctx: discord.ApplicationContext, volume: int | None=None):
+    async def command_volume(self, ctx: discord.ApplicationContext, volume: int=None):
         player = await self.get_player(ctx.guild, ctx=ctx)
         if not player:
             return
