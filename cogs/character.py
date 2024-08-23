@@ -115,7 +115,7 @@ class CogCharacter(discord.Cog):
                         await message.channel.send(r)
                 
                 # ChatGPTの回答を追加
-                conversation['messages'].append(response.choices[0].message.to_dict())
+                conversation['messages'].append(response.choices[0].message.to_json())
                 # 会話を記録
                 g_conversations[message.channel.id] = conversation
                 return
