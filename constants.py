@@ -17,8 +17,8 @@ RE_PATTERN_URL = r'^https?://[\w/:%#\$&\?\(\)~\.=\+\-]+'
 RE_PATTERN_URL_NICONICO = r'^(https?://)?(www\.|sp\.)?(nicovideo\.jp/watch|nico\.ms)/sm\d+'
 
 # yt_dlp
-YTDL_FORMAT_OPTIONS = {
-    'format': 'best*[acodec!=none]',
+YTDL_OPTIONS = {
+    'format': 'ba/b*[acodec!=none]/b*',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,

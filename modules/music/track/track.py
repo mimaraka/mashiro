@@ -3,7 +3,7 @@ import asyncio
 import discord
 import yt_dlp
 import modules.util as util
-from constants import YTDL_FORMAT_OPTIONS
+from constants import YTDL_OPTIONS
 from typing import List
 from .id3v2 import ID3V2Track
 from .flac import FLACTrack
@@ -46,7 +46,7 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
             return None
 
     # その他はyt-dlpで処理
-    with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
+    with yt_dlp.YoutubeDL(YTDL_OPTIONS) as ytdl:
         try:
             info = await loop.run_in_executor(
                 None, lambda: ytdl.extract_info(query, download=False)

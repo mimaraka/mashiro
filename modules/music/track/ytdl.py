@@ -2,7 +2,7 @@ import aiohttp
 import asyncio
 import discord
 import yt_dlp
-from constants import YTDL_FORMAT_OPTIONS, FFMPEG_OPTIONS
+from constants import YTDL_OPTIONS, FFMPEG_OPTIONS
 from modules.mylog import mylog
 from .base import BaseTrack
 from ...duration import Duration
@@ -43,7 +43,7 @@ class YTDLTrack(BaseTrack):
         # URLが切れている場合、再生成
         except aiohttp.ClientResponseError:
             mylog('YTDLSourceを再度生成します。')
-            with yt_dlp.YoutubeDL(YTDL_FORMAT_OPTIONS) as ytdl:
+            with yt_dlp.YoutubeDL(YTDL_OPTIONS) as ytdl:
                 info = await self.loop.run_in_executor(
                     None, lambda: ytdl.extract_info(self.original_url, download=False)
                 )
