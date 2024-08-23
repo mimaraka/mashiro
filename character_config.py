@@ -105,7 +105,7 @@ CHARACTER_ICON = {
     'warning': 'https://media.discordapp.net/attachments/1142318975829676104/1142793794518003762/mashiro_warning.png?width=662&height=662'
 }
 
-CHARACTER_QUOTES = {
+CHARACTER_QUOTES = [
     '……これですか？普通のアイスキャンディーですよ？',
     '水着くらい、黒じゃなくても良かったかな……',
     '心は水面のように。揺れを徐々に、静かに……',
@@ -156,7 +156,7 @@ CHARACTER_QUOTES = {
     'ご期待に答えてみせます。',
     'ターゲット補足…距離は十分です。',
     'たまにはこういうとこも悪くないですね。'
-}
+]
 
 CHARACTER_QUOTES_BIRTHDAY = [
     'そうですか。今日が私の誕生日だったんですね…。すっかり忘れてました。気にかけてくださって、ありがとうございます。',
