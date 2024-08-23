@@ -51,7 +51,7 @@ def get_domain(url: str):
     return f'{urlparse(url).scheme}://{urlparse(url).netloc}'
 
 def get_favicon_url(url: str):
-    return f'https://www.google.com/s2/favicons?domain={get_domain(url)}&size=64'
+    return f'https://www.google.com/s2/favicons?sz=256&domain={urlparse(url).netloc}'
 
 
 def get_member_text(member: discord.Member, bold: bool=True, decoration: bool=True, suffix: str=DEFAULT_MEMBER_SUFFIX):
