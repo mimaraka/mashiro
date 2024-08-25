@@ -329,7 +329,7 @@ class Player:
         author_icon = util.get_favicon_url(self.__current_track.original_url)
 
         # faviconが取得できない場合
-        if not await is_url_valid(self.__current_track.original_url):
+        if self.__current_track.original_url is None or not await is_url_valid(self.__current_track.original_url):
             author_icon = None
             author_name = '🎵 ' + author_name
 
