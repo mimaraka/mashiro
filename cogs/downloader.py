@@ -14,16 +14,18 @@ class CogDownloader(discord.Cog):
         self.bot: discord.Bot = bot
 
     async def get_info(self, query: str, format: str | None=None):
-        options = {
+        OPTIONS = {
             'format': format,
             'quiet': True,
             'ignoreerrors': True,
             'default_search': 'auto',
-            'source_address': '0.0.0.0'
+            'source_address': '0.0.0.0',
+            'usenetrc': True,
+            'netrc_location': './.netrc',
         }
         
         try:
-            with yt_dlp.YoutubeDL(options) as ytdl:
+            with yt_dlp.YoutubeDL(OPTIONS) as ytdl:
                 info = await self.bot.loop.run_in_executor(
                     None, lambda: ytdl.extract_info(query, download=False)
                 )
