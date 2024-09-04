@@ -1,7 +1,7 @@
 aiofiles==24.1.0
 aiohttp==3.10.5
 ffmpeg-python==0.2.0
-g4f[all]==0.3.2.4
+g4f[all]==0.3.2.5
 jaconv==0.4.0
 mutagen==1.47.0
 pillow==10.4.0
