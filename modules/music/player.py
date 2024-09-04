@@ -325,12 +325,19 @@ class Player:
             view = None
 
         author_name = 'プレイヤー'
-        author_url = util.get_domain(self.__current_track.original_url)
-        author_icon = util.get_favicon_url(self.__current_track.original_url)
 
-        # faviconが取得できない場合
-        if self.__current_track.original_url is None or not await is_url_valid(self.__current_track.original_url):
+        # original_urlが存在しない場合
+        if self.__current_track.original_url is None:
             author_icon = None
+            author_url = None
+        else:
+            if not await is_url_valid(self.__current_track.original_url):
+                author_icon = None
+            else:
+                author_icon = util.get_favicon_url(self.__current_track.original_url)
+            author_url = util.get_domain(self.__current_track.original_url)
+
+        if author_icon is None:
             author_name = '🎵 ' + author_name
 
         embed.set_author(name=author_name, url=author_url, icon_url=author_icon)
