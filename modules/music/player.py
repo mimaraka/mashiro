@@ -197,6 +197,13 @@ class Player:
 
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
+        mylog(
+            'トラックの再生を開始します。',
+            guild=self.__voice_client.guild,
+            channel=self.__voice_client.channel,
+            title=self.__current_track.title,
+            url=self.__current_track.original_url
+        )
 
         self.__time_started = time.time()
         if msg_loading:
