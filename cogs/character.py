@@ -7,7 +7,9 @@ import re
 import time
 import typing
 import character_config as cc
+import constants as const
 import modules.util as util
+from modules.attachments import find_valid_urls
 from modules.myembed import MyEmbed
 
 
@@ -63,12 +65,24 @@ class CogCharacter(discord.Cog):
         # メッセージにBotへのメンションが含まれているとき
         if self.bot.user.id in [m.id for m in message.mentions]:
             # メンションの後に何か文字があった場合、ChatGPTにより返答
-            if content := re.sub(r'[#*_\-|~]{0,2}<@\d+>[*_\-|~]{0,2}\s*', '', message.content):
+            if content := re.sub(rf'[#*_\-|~]{{0,2}}<@{const.BOT_USER_ID}>[*_\-|~]{{0,2}}\s*', '', message.content):
                 global g_conversations
                 conversation = {}
+                prompt_content = [
+                    {'type': 'text', 'text': content}
+                ]
+
                 async with message.channel.typing():
                     if g_conversations.get(message.channel.id):
                         conversation = g_conversations.pop(message.channel.id)
+
+                    # Vision
+                    if valid_urls := await find_valid_urls(message, const.MIMETYPES_IMAGE):
+                        for url in valid_urls:
+                            prompt_content.append({
+                                'type': 'image_url',
+                                'image_url': {'url': url}
+                            })
 
                     # 過去の会話が存在しないか、最後の回答から12時間以上経過した場合
                     if not conversation.get('messages') or time.time() - conversation['time'] > 43200:
@@ -80,7 +94,7 @@ class CogCharacter(discord.Cog):
                         conversation['messages'] = [initial_message]
                     conversation['messages'].append({
                         'role': 'user',
-                        'content': content
+                        'content': prompt_content
                     })
 
                     # 時間を記録

@@ -43,7 +43,7 @@ async def find_valid_urls(message: discord.Message, mimetypes_list=None) -> typi
 # MediaType = typing.Literal['image', 'gif', 'audio', 'video']
 
 # 添付ファイルを取得する関数
-async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_url: str=None, return_url=False):
+async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_url: str=None, return_url=False, silent=False):
     # media_mime = {
     #     'image':            ['image/png', 'image/pjpeg', 'image/jpeg', 'image/x-icon', 'image/bmp'],
     #     'gif':              ['image/gif'],
@@ -61,24 +61,26 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
         message = await get_message_from_url(message_url, ctx.bot)
         # メッセージURLが無効の場合
         if not message:
-            await ctx.respond(
-                embed=MyEmbed(
-                    notif_type='error',
-                    description='リンクからのメッセージの取得に失敗しました。'
-                ),
-                ephemeral=True
-            )
+            if not silent:
+                await ctx.respond(
+                    embed=MyEmbed(
+                        notif_type='error',
+                        description='リンクからのメッセージの取得に失敗しました。'
+                    ),
+                    ephemeral=True
+                )
             return None
         valid_urls = await find_valid_urls(message, mimetypes)
         # リンク先のメッセージにファイルやURLが添付されていなかった場合
         if not valid_urls:
-            await ctx.respond(
-                embed=MyEmbed(
-                    notif_type='error',
-                    description='リンク先のメッセージにファイルやURLが添付されていないようです。'
-                ),
-                ephemeral=True
-            )
+            if not silent:
+                await ctx.respond(
+                    embed=MyEmbed(
+                        notif_type='error',
+                        description='リンク先のメッセージにファイルやURLが添付されていないようです。'
+                    ),
+                    ephemeral=True
+                )
             return None
 
     else:
@@ -90,11 +92,12 @@ async def get_attachments(ctx: discord.ApplicationContext, mimetypes, message_ur
                 break
         #どちらも存在しない場合
         else:
-            embed = MyEmbed(
-                notif_type='error',
-                description='ファイルやURLが添付されたメッセージの近くでコマンドを実行するか、メッセージのリンクを指定してください。'
-            )
-            await ctx.respond(embed=embed, ephemeral=True)
+            if not silent:
+                embed = MyEmbed(
+                    notif_type='error',
+                    description='ファイルやURLが添付されたメッセージの近くでコマンドを実行するか、メッセージのリンクを指定してください。'
+                )
+                await ctx.respond(embed=embed, ephemeral=True)
             return None
 
     # URLのリストを返す

@@ -2,6 +2,7 @@
 # Botに関する設定
 ################################################################################
 
+BOT_USER_ID = 1105880759857860709
 GITHUB_REPOSITORY_URL = 'https://github.com/mimaraka/mashiro'
 
 # ローディングアイコンの絵文字ID
@@ -43,6 +44,8 @@ FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3',
     'options': '-vn',
 }
+
+MIMETYPES_IMAGE = ['image/png', 'image/pjpeg', 'image/jpeg', 'image/x-icon', 'image/bmp']
 
 MIMETYPES_FFMPEG = [
     'audio/aac',
