@@ -5,6 +5,13 @@
 BOT_USER_ID = 1105880759857860709
 GITHUB_REPOSITORY_URL = 'https://github.com/mimaraka/mashiro'
 
+OPENAI_AVAILABLE_GUILDS = [
+    732902508787269655, # Mimaraka server
+    1134922279051075724, # Kochiyoko server
+    733998377074688050, # RRUM server
+    911795089355964438, # BlueArchive OtoMAD server
+]
+
 # ローディングアイコンの絵文字ID
 EMOJI_ID_LOADING = 1154011417029128242
 

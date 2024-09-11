@@ -2,6 +2,8 @@ import asyncio
 import datetime
 import discord
 import g4f.client
+import openai
+import os
 import random
 import re
 import time
@@ -18,7 +20,12 @@ g_conversations: typing.Dict[int, typing.List[dict]] = {}
 class CogCharacter(discord.Cog):
     def __init__(self, bot) -> None:
         self.bot: discord.Bot = bot
+        self.openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
         self.g4f_client = g4f.client.Client()
+
+    
+    def is_openai_available(self, guild: discord.Guild | None) -> bool:
+        return guild.id in const.OPENAI_AVAILABLE_GUILDS
 
 
     # ランダムでキャラクターのセリフを返す関数
@@ -71,13 +78,16 @@ class CogCharacter(discord.Cog):
                 prompt_content = [
                     {'type': 'text', 'text': content}
                 ]
+                use_vision = False
 
                 async with message.channel.typing():
                     if g_conversations.get(message.channel.id):
                         conversation = g_conversations.pop(message.channel.id)
 
                     # Vision
-                    if valid_urls := await find_valid_urls(message, const.MIMETYPES_IMAGE):
+                    # g4fではToken Limitに達してしまうため公式APIを用いる
+                    if self.is_openai_available(message.guild) and (valid_urls := await find_valid_urls(message, const.MIMETYPES_IMAGE)):
+                        use_vision = True
                         for url in valid_urls:
                             prompt_content.append({
                                 'type': 'image_url',
@@ -100,12 +110,16 @@ class CogCharacter(discord.Cog):
                     # 時間を記録
                     conversation['time'] = time.time()
 
-                    print(conversation['messages'])
-
-                    response = self.g4f_client.chat.completions.create(
-                        model='gpt-4o-mini',
-                        messages=conversation['messages']
-                    )
+                    if use_vision and self.is_openai_available(message.guild):
+                        response = self.openai_client.chat.completions.create(
+                            model='gpt-4o-mini-2024-07-18',
+                            messages=conversation['messages']
+                        )
+                    else:
+                        response = self.g4f_client.chat.completions.create(
+                            model='gpt-4o-mini',
+                            messages=conversation['messages']
+                        )
 
                     result = response.choices[0].message.content
 
