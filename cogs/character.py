@@ -100,6 +100,8 @@ class CogCharacter(discord.Cog):
                     # 時間を記録
                     conversation['time'] = time.time()
 
+                    print(conversation['messages'])
+
                     response = self.g4f_client.chat.completions.create(
                         model='gpt-4o-mini',
                         messages=conversation['messages']
