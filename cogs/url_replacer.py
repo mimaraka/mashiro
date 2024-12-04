@@ -16,14 +16,14 @@ class CogURLReplacer(discord.Cog):
             url_pattern=re.compile(r'https?://(?:x|twitter).com/\w+/status/\d+(?:\?[\w=&\-]*)?'),
             replacing_pattern=re.compile(r'(x|twitter).com'),
             replaced_str='vxtwitter.com',
-            link_text='ポストを表示する'
+            link_text='ポストを表示'
         )
         self.replacer_phixiv = URLReplacer(
             name='phixiv',
             url_pattern=re.compile(r'https?://(?:www\.)?pixiv.net/(?:en/)?artworks/\d+'),
             replacing_pattern=re.compile(r'pixiv.net'),
             replaced_str='phixiv.net',
-            link_text='作品を表示する'
+            link_text='作品を表示'
         )
 
 
