@@ -1,7 +1,7 @@
 aiofiles==24.1.0
 aiohttp==3.11.11
 ffmpeg-python==0.2.0
-g4f[all]==0.4.1.2
+g4f[all]==0.4.3.4
 jaconv==0.4.0
 mutagen==1.47.0
 openai==1.60.2
