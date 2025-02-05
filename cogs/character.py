@@ -25,7 +25,7 @@ class CogCharacter(discord.Cog):
 
     
     def is_openai_available(self, guild: discord.Guild | None) -> bool:
-        return guild.id in const.OPENAI_AVAILABLE_GUILDS
+        return guild and guild.id in const.OPENAI_AVAILABLE_GUILDS
 
 
     # ランダムでキャラクターのセリフを返す関数
