@@ -4,7 +4,7 @@ ffmpeg-python==0.2.0
 g4f[all]==0.4.7.4
 jaconv==0.4.0
 mutagen==1.47.0
-openai==1.64.0
+openai==1.65.2
 pillow==11.1.0
 py-cord[voice]==2.6.1
 pyshorteners==1.0.1
