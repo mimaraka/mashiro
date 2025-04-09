@@ -42,6 +42,7 @@ YTDL_OPTIONS = {
     'source_address': '0.0.0.0',                                # bind to ipv4 since ipv6 addresses cause issues sometimes
     # 'usenetrc': True,
     # 'netrc_location': './.netrc',
+    'cookiefile': './cookies.txt',
     'http_headers': {
         'Accept-Language': 'ja-JP'
     }
