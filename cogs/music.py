@@ -4,7 +4,6 @@ import random
 import re
 import time
 from typing import Dict, List
-from youtubesearchpython import VideosSearch
 
 import constants as const
 import modules.util as util
@@ -20,12 +19,7 @@ from modules.common_embed import *
 
 
 async def autocomp_yt_title(ctx: discord.AutocompleteContext):
-    if not ctx.value:
-        return []
-    search_result = await ctx.bot.loop.run_in_executor(
-        None, lambda: VideosSearch(ctx.value, limit=6)
-    )
-    return [info.get('title') for info in search_result.result().get('result')]
+    return [info.get('title') for info in await util.search_youtube(ctx.bot.loop, ctx.value)]
 
 
 class CogMusic(discord.Cog):
@@ -239,6 +233,10 @@ class CogMusic(discord.Cog):
     # /disconnect
     @discord.slash_command(**util.make_command_args('disconnect'))
     async def command_disconnect(self, ctx: discord.ApplicationContext):
+        if ctx.guild is None:
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
+            return
+
         key = ctx.guild.id
         # Botがボイスチャンネルに居ない場合
         if ctx.voice_client is None or not ctx.voice_client.is_connected():
@@ -303,12 +301,20 @@ class CogMusic(discord.Cog):
     @discord.option('query', description='再生したい曲のURL、またはYouTube上で検索するタイトル', autocomplete=autocomp_yt_title)
     @discord.option('interrupt', description='キューを無視して割り込み再生をします', required=False, default=False)
     async def command_play(self, ctx: discord.ApplicationContext, query: str, interrupt: bool):
+        if ctx.guild is None:
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
+            return
+
         await self.play(ctx.channel, ctx.author, [query], ctx=ctx, interrupt=interrupt)
 
 
     # メッセージコマンド(再生する)
     @discord.message_command(name='再生する')
     async def message_command_play(self, ctx: discord.ApplicationContext, message: discord.Message):
+        if ctx.guild is None:
+            await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
+            return
+
         if message.attachments:
             queries = [a.url for a in message.attachments]
             await self.play(ctx.channel, ctx.author, queries, ctx=ctx)
@@ -337,15 +343,12 @@ class CogMusic(discord.Cog):
         
         inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
         msg_loading = await inter.original_response()
-        
-        search_result = await self.bot.loop.run_in_executor(
-            None, lambda: VideosSearch(keyword, limit=limit)
-        )
-        videos = search_result.result().get('result')
+
+        videos = await util.search_youtube(self.bot.loop, keyword, limit)
         
         tracks = []
         for video in videos:
-            tracks += await create_tracks(self.bot.loop, video.get('link'), ctx.author)
+            tracks += await create_tracks(self.bot.loop, video.get('url'), ctx.author)
 
         if not tracks:
             await msg_loading.delete()
