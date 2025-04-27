@@ -1,5 +1,5 @@
 aiofiles==24.1.0
-aiohttp==3.11.16
+aiohttp==3.11.18
 ffmpeg-python==0.2.0
 g4f[all]==0.5.2.0
 jaconv==0.4.0
