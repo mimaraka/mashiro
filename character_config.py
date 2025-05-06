@@ -195,7 +195,7 @@ KOTOBAGARI_CONFIG = [
             'https://media.discordapp.net/attachments/1142318975829676104/1142460904777195570/ice.gif?width=1153&height=662'
         ],
         'looseness': 0,
-        'ignore_katahira': False,
+        'ignore_katahira': True,
         'ignore_dakuten': False
     }
 ]
