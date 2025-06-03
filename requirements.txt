@@ -11,4 +11,4 @@ pyshorteners==1.0.1
 python-dotenv==1.1.0
 requests==2.32.3
 typing_extensions==4.13.2
-yt-dlp[default]==2025.4.30
+yt-dlp[default]==2025.5.22
