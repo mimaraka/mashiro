@@ -14,7 +14,7 @@ class ChatClient:
 
         self.g4f_client = g4f.client.Client()
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-        self.gemini_pro = genai.GenerativeModel(model_name='gemini-pro', system_instruction=[CHATBOT_SYSTEM_INSTRUCTION])
+        self.gemini_pro = genai.GenerativeModel(model_name='gemini-1.5-pro', system_instruction=[CHATBOT_SYSTEM_INSTRUCTION])
 
     def is_gemini_available(self, channel: discord.TextChannel | None) -> bool:
         """Check if Gemini is available for the given guild."""
