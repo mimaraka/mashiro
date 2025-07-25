@@ -60,9 +60,12 @@ class CogCharacter(discord.Cog):
 
     @discord.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
+
         if self.bot.user.id in [m.id for m in message.mentions]:
             prompt = re.sub(rf'[#*_\-|~]{{0,2}}<@{const.BOT_USER_ID}>[*_\-|~]{{0,2}}\s*', '', message.content)
-        elif message.guild is None:
+        elif type(message.channel) is discord.DMChannel:
             # DMの場合、メッセージの内容をそのままプロンプトとして使用
             prompt = message.content
         else:
