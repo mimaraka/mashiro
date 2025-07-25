@@ -70,6 +70,8 @@ class CogCharacter(discord.Cog):
             prompt = message.content
         else:
             return
+
+        print(f'prompt: {prompt}')
         
         if prompt:
             async with message.channel.typing():
