@@ -16,9 +16,9 @@ class ChatClient:
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
         self.gemini_pro = genai.GenerativeModel(model_name='gemini-1.5-pro', system_instruction=[CHATBOT_SYSTEM_INSTRUCTION])
 
-    def is_gemini_available(self, channel: discord.TextChannel | None) -> bool:
+    def is_gemini_available(self, channel: discord.TextChannel | discord.DMChannel | None) -> bool:
         """Check if Gemini is available for the given guild."""
-        return channel and channel.guild and channel.guild.id in GEMINI_AVAILABLE_GUILDS
+        return channel and type(channel) == discord.TextChannel and channel.guild.id in GEMINI_AVAILABLE_GUILDS
 
 
     def start_conversation(self, channel: discord.TextChannel):
