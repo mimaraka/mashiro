@@ -5,7 +5,7 @@ g4f[all]==0.6.2.8
 google-generativeai==0.8.5
 jaconv==0.4.0
 mutagen==1.47.0
-openai==1.101.0
+openai==1.107.3
 pillow==11.3.0
 py-cord[voice]==2.6.1
 pyshorteners==1.0.1
