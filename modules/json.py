@@ -19,13 +19,18 @@ class JSONLoader:
         with open(self.path, 'w', encoding='shift-jis') as f:
             json.dump(data, f, indent=4)
 
-    def get_guild_data(self, guild: discord.Guild=None):
+    def get_guild_data(self, guild: discord.Guild=None) -> dict | None:
         root = self.get_root()
-        return root.get(str(guild.id or self.guild.id))
+        g = guild or self.guild
+        if g:
+            return root.get(str(g.id))
+        return None
     
-    def set_guild_data(self, data, guild: discord.Guild=None) -> None:
+    def set_guild_data(self, data: dict, guild: discord.Guild=None) -> None:
         root = self.get_root()
-        root[str(guild.id or self.guild.id)] = data
-        self.set_root(root)
+        g = guild or self.guild
+        if g:
+            root[str(g.id)] = data
+            self.set_root(root)
 
     
