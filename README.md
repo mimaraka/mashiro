@@ -1,28 +1,99 @@
-<h1>Mashiro</h1>
+# Mashiro
 
-> **_トリニティの正義実現委員会１年、マシロ。どんな場所でも、いついかなる状況でも、全力で先生のことを支援します。_**
+A multi-purpose Discord bot for personal use. It combines a fully featured music player, an in-character AI chatbot, a media downloader, and a handful of server-utility commands.
 
-## 概要
+## Features
 
-静山マシロの Discord Bot です。音楽再生をはじめとした様々な機能を搭載しています。
+### 🎵 Music player
 
-## 導入
+- `/play [URL/keyword]` — play audio from a URL or by searching YouTube. Powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp), so YouTube, Niconico, SoundCloud, BiliBili and [many other sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) are supported.
+- `/play-file` — upload a local audio/video file and play it.
+- `/play-channel` — collect links posted in a given channel and queue them as a playlist.
+- `/search` — browse YouTube search results and pick a track to play.
+- Queue management: `/queue`, `/clear`, `/shuffle`, `/repeat`.
+- Playback control: `/pause`, `/resume`, `/stop`, `/skip`, `/replay`, `/volume`, plus an interactive player message and `/player` to move it.
+- `/connect` / `/disconnect` to manage the voice connection, and `/voice` to hear Mashiro speak.
 
-[こちらのリンク](https://discord.com/api/oauth2/authorize?client_id=1105880759857860709&permissions=48794539912272&scope=applications.commands+bot)からサーバーに導入してください。
+### 💬 AI chatbot
 
-## 使い方
+Mention the bot or DM it to chat with Mashiro in character. Responses are generated with Google **Gemini 1.5 Pro** on whitelisted guilds, falling back to a free GPT-4o-mini backend ([g4f](https://github.com/xtekky/gpt4free)) elsewhere. Conversations are kept per-channel and expire after inactivity; reset them with `/reset-conversation`. The model can also trigger actions inline — e.g. start playing a requested song or send a selfie.
 
-`/play [URL/キーワード]`で、URL やキーワードから音楽を再生することができます。  
-YouTube、ニコニコ動画、SoundCloud、BiliBili など多数の動画・音楽サイトに対応しています。
+### ⬇️ Media downloader
 
-また、`/play-file`コマンドで、ローカルの音声ファイルをアップロードして再生することもできます。
+- `/dl video` / `/dl audio` — get a direct download link for a video or its audio (also available as message context-menu commands).
 
-詳細は`/help`コマンドからご確認ください。
+### 🔗 URL replacement
 
-## 利用規約・プライバシーポリシー
+- `/replace-url vxtwitter` — auto-convert X (Twitter) links to `vxtwitter.com` for rich embeds.
+- `/replace-url phixiv` — auto-convert Pixiv links to `phixiv.net`.
 
-本 Bot を利用する際は、以下のドキュメントをご確認ください。
+### 🛠️ Server utilities
 
-- [利用規約](TERMS_OF_SERVICE.md)
-- [プライバシーポリシー](PRIVACY_POLICY.md)
+- `/send-message` — schedule a message to be sent at a specific date/time.
+- `/nick change` / `/nick restore` / `/nick remove` — bulk-manage member nicknames (admin only).
+- `/vc stats` — show information about your current voice channel; `/vc kick-timer` — auto-disconnect yourself after a set duration.
+- `/kotobagari` — toggle word-filtering in the current channel (admin only).
+- `/mashiro` — get a random character quote.
+- `/ping`, `/help`.
 
+Run `/help` in Discord for the full, up-to-date command list.
+
+## How to Install
+
+Click the [link](https://discord.com/api/oauth2/authorize?client_id=1105880759857860709&permissions=48794539912272&scope=applications.commands+bot) to install the bot on your guilds.
+
+## Tech stack
+
+- **Python 3.10**
+- [Pycord](https://docs.pycord.dev/) for the Discord API
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp) + **FFmpeg** for media
+- [google-generativeai](https://github.com/google-gemini/generative-ai-python) / [g4f](https://github.com/xtekky/gpt4free) for chat
+- Docker for deployment
+
+## Setup
+
+### Prerequisites
+
+- Python 3.10+ and FFmpeg installed (the provided Docker image bundles FFmpeg for you).
+- A Discord bot token with the necessary intents enabled.
+
+### Environment variables
+
+Create a `.env` file in the project root:
+
+```env
+DISCORD_BOT_TOKEN=your-discord-bot-token
+GOOGLE_API_KEY=your-google-generative-ai-key   # optional; required only for Gemini-backed chat
+```
+
+### Run with Docker
+
+```bash
+docker build -t mashiro .
+docker run --env-file .env mashiro
+```
+
+### Run locally
+
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+## Project structure
+
+```
+main.py              # Entry point: loads cogs and starts the bot
+constants.py         # Bot IDs, regex patterns, yt-dlp/FFmpeg options, etc.
+character_config.py  # Character persona, command descriptions, response text
+cogs/                # Feature modules (music, character/chat, downloader, ...)
+modules/             # Shared helpers (chat client, embeds, music engine, ...)
+data/                # Assets (selfies, voice clips) and saved/temp state
+```
+
+## License & policies
+
+When using this bot, please review the following documents:
+
+- [Terms of Service](TERMS_OF_SERVICE.md)
+- [Privacy Policy](PRIVACY_POLICY.md)
