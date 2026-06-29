@@ -68,8 +68,8 @@ class CogKotobagari(discord.Cog):
         if message.author == self.bot.user:
             return
         if message.guild is not None:
-            disabled_channels = self.json_loader.get_guild_data(message.guild) or []
-            if message.channel.id in disabled_channels:
+            enabled_channels = self.json_loader.get_guild_data(message.guild) or []
+            if message.channel.id not in enabled_channels:
                 return
         await self.kotobagari(message)
 
@@ -84,14 +84,15 @@ class CogKotobagari(discord.Cog):
             await ctx.respond(embed=EMBED_NOT_ADMINISTRATOR, ephemeral=True)
             return
         
-        disabled_channels = self.json_loader.get_guild_data(ctx.guild) or []
+        enabled_channels = self.json_loader.get_guild_data(ctx.guild) or []
 
         if switch:
-            disabled_channels = [ch for ch in disabled_channels if ch != ctx.channel.id]
-        elif ctx.channel.id not in disabled_channels:
-            disabled_channels.append(ctx.channel.id)
+            if ctx.channel.id not in enabled_channels:
+                enabled_channels.append(ctx.channel.id)
+        else:
+            enabled_channels = [ch for ch in enabled_channels if ch != ctx.channel.id]
 
-        self.json_loader.set_guild_data(disabled_channels, ctx.guild)
+        self.json_loader.set_guild_data(enabled_channels, ctx.guild)
 
         await ctx.respond(
             embed=MyEmbed(title=f'{CHARACTER_TEXT["kotobagari_prefix"]}{"有効" if switch else "無効"}{CHARACTER_TEXT["kotobagari_suffix"]}')
