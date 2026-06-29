@@ -1,6 +1,6 @@
 services:
   mashiro:
-    build: .
+    image: ghcr.io/mimaraka/mashiro:latest
     env_file: .env
     environment:
       # PO Token生成サーバー(bgutil-provider)のベースURL
@@ -8,6 +8,8 @@ services:
     volumes:
       # ブラウザからエクスポートした cookies.txt をマウントする (無ければこの行を削除)
       - ./cookies.txt:/bot/cookies.txt:ro
+      # /dl 用の認証情報 .netrc をマウントする (無ければこの行を削除)
+      - ./.netrc:/bot/.netrc:ro
     depends_on:
       - bgutil-provider
     restart: unless-stopped

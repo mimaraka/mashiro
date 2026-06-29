@@ -86,9 +86,12 @@ log "設定ファイルをクローンへ反映します..."
 # .env: docker compose の env_file が参照 (クローン直下に必要)
 cp -f "$SCRIPT_DIR/.env" "$APP_DIR/.env"
 
-# .netrc: ビルド時に /bot/.netrc としてイメージへ取り込まれる
+# .netrc: docker-compose.yml が ./.netrc を /bot/.netrc に read-only マウントする
 if [ -f "$SCRIPT_DIR/.netrc" ]; then
     cp -f "$SCRIPT_DIR/.netrc" "$APP_DIR/.netrc"
+else
+    # 実体が無いと docker が空ディレクトリを作ってしまうため、空ファイルを用意する。
+    : > "$APP_DIR/.netrc"
 fi
 
 # cookies.txt: docker-compose.yml が ./cookies.txt をマウントする
@@ -116,8 +119,11 @@ YAML
 # 4. docker compose で起動
 ################################################################################
 
-log "docker compose で起動します (ビルド込み)..."
-( cd "$APP_DIR" && "${COMPOSE[@]}" up -d --build )
+log "GitHub Packages からイメージを取得します..."
+( cd "$APP_DIR" && "${COMPOSE[@]}" pull )
+
+log "docker compose で起動します..."
+( cd "$APP_DIR" && "${COMPOSE[@]}" up -d )
 
 log "起動しました。状態:"
 ( cd "$APP_DIR" && "${COMPOSE[@]}" ps )
