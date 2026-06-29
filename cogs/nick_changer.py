@@ -192,9 +192,25 @@ class CogNickChanger(discord.Cog):
             return
 
         await ctx.defer(ephemeral=True)
+
+        data = self.json_loader.get_guild_data(ctx.guild) or {}
+        restored = 0
         for member in ctx.guild.members:
-            await self._set_member_nick(member, None)
+            # 指定したニックネームと一致するメンバーのみ、保存済みの元のニックネームに復元
+            if member.nick == nick:
+                old_nick = data.get(str(member.id))
+                if await self._set_member_nick(member, old_nick):
+                    data.pop(str(member.id), None)
+                    restored += 1
+        self.json_loader.set_guild_data(data, ctx.guild)
+
+        if restored == 0:
+            await ctx.respond(
+                embed=MyEmbed(notif_type='error', description=f'ニックネーム「{nick}」のメンバーはいませんでした。'),
+                ephemeral=True
+            )
+            return
         await ctx.respond(
-            embed=MyEmbed(notif_type='succeeded', title=f'ニックネーム「{nick}」を削除しました。'),
+            embed=MyEmbed(notif_type='succeeded', title=f'ニックネーム「{nick}」を削除しました。', description=f'{restored}人のニックネームを元に戻しました。'),
             delete_after=10
         )

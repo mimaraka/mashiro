@@ -47,6 +47,9 @@ class CogURLReplacer(discord.Cog):
         # とりあえずループしないようにする
         if message.author.bot:
             return
+        # DM等、ギルドに紐づかないメッセージは対象外
+        if message.guild is None:
+            return
         flag_delete_msg = False
         enabled_vxtwitter = self.replacer_vxtwitter.is_enabled(message.guild.id)
         enabled_phixiv = self.replacer_phixiv.is_enabled(message.guild.id)
@@ -62,9 +65,9 @@ class CogURLReplacer(discord.Cog):
                 flag_delete_msg = True
 
         if flag_delete_msg:
-            manage_messages = message.channel.permissions_for(message.guild.me)
+            permissions = message.channel.permissions_for(message.guild.me)
             # attachmentsがなく、Botにメッセージ管理権限がある場合、元のメッセージを削除
-            if manage_messages and not message.attachments:
+            if permissions.manage_messages and not message.attachments:
                 try:
                     await message.delete()
                 except discord.Forbidden:

@@ -287,7 +287,8 @@ class CogMusic(discord.Cog):
                 tracks += result
 
         if not tracks:
-            await msg_loading.delete()
+            if msg_loading:
+                await msg_loading.delete()
             if ctx:
                 await ctx.respond(embed=EMBED_FAILED_TO_CREATE_TRACKS, ephemeral=True)
             else:
@@ -544,6 +545,7 @@ class CogMusic(discord.Cog):
             player.skip()
         except NotPlayingError:
             await ctx.respond(embed=EMBED_NOT_PLAYING, ephemeral=True)
+            return
         await ctx.respond(embed=MyEmbed(title=f'⏭️ {CHARACTER_TEXT["skipped"]}'), delete_after=10)
 
 

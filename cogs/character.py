@@ -50,11 +50,10 @@ class CogCharacter(discord.Cog):
 
     @discord.slash_command(**util.make_command_args('reset-conversation'))
     async def command_reset_conversation(self, ctx: discord.ApplicationContext):
-        global g_conversations
-        if not ctx.channel_id in g_conversations:
+        if ctx.channel.id not in self.chat_client.conversations:
             await ctx.respond(embed=MyEmbed(notif_type='error', description=cc.CHARACTER_TEXT['error_no_conversation']), ephemeral=True)
             return
-        g_conversations.pop(ctx.channel.id)
+        self.chat_client.reset_conversation(ctx.channel)
         await ctx.respond(embed=MyEmbed(title=cc.CHARACTER_TEXT['reset_conversation']), delete_after=10)
 
 
@@ -73,7 +72,9 @@ class CogCharacter(discord.Cog):
         
         if prompt:
             async with message.channel.typing():
-                response = self.chat_client.generate_response(message.channel, prompt)
+                response = await self.bot.loop.run_in_executor(
+                    None, self.chat_client.generate_response, message.channel, prompt
+                )
 
                 # 回答文のコマンド処理
                 # {play:曲名}が含まれている場合、音楽再生

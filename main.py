@@ -17,7 +17,7 @@ from cogs.others import CogOthers
 
 
 load_dotenv(verbose=True)
-load_dotenv(os.path.dirname(__file__) + '.env')
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 bot = discord.Bot(intents=discord.Intents.all())
 

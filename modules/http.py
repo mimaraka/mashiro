@@ -2,9 +2,12 @@ import aiohttp
 
 
 async def is_url_valid(url: str):
-    async with aiohttp.ClientSession() as session:
-        async with session.head(url, headers={'User-Agent': 'Mashiro'}) as resp:
-            return resp.status == 200
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.head(url, headers={'User-Agent': 'Mashiro'}) as resp:
+                return resp.status < 400
+    except aiohttp.ClientError:
+        return False
 
 
 async def get_range_data(session: aiohttp.ClientSession, url: str, start: int, end: int):

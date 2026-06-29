@@ -33,7 +33,7 @@ class CogVCUtil(discord.Cog):
             # 移動前のチャンネルからメンバーがいなくなった場合
             if before.channel and len(before.channel.members) == 0:
                 if self.vc_info.get(member.guild.id):
-                    self.vc_info[member.guild.id].pop(before.channel.id)
+                    self.vc_info[member.guild.id].pop(before.channel.id, None)
 
     # /vc stats
     @vc.command(**util.make_command_args(['vc', 'stats']))
@@ -45,13 +45,21 @@ class CogVCUtil(discord.Cog):
             )
             return
 
-        start_time: datetime = self.vc_info[ctx.guild.id][ctx.author.voice.channel.id]['time']
+        info = self.vc_info.get(ctx.guild.id, {}).get(ctx.author.voice.channel.id)
+        if info is None:
+            await ctx.respond(
+                embed=MyEmbed(notif_type='error', description='このボイスチャンネルの通話開始情報が記録されていません。'),
+                ephemeral=True
+            )
+            return
+
+        start_time: datetime = info['time']
         duration = Duration((datetime.now(JST) - start_time).total_seconds())
 
         embed = MyEmbed(title=f'ボイスチャット情報 (🔊 {ctx.author.voice.channel.name})')
         embed.add_field(name='通話開始時刻(JST)', value=start_time.strftime('%H:%M:%S (%m/%d/%Y)'), inline=False)
         embed.add_field(name='通話時間', value=duration.japanese_str() or '-', inline=False)
-        member = self.vc_info[ctx.guild.id][ctx.author.voice.channel.id]['member']
+        member = info['member']
         embed.add_field(name='通話を開始した先生', value=util.get_member_text(member, bold=False, suffix=None), inline=False)
 
         await ctx.respond(

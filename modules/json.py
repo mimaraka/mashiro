@@ -8,16 +8,19 @@ class JSONLoader:
         self.guild = guild
 
     def get_root(self) -> dict:
-        with open(self.path, 'r', encoding='shift-jis') as f:
-            try:
-                ret = json.load(f)
-            except json.decoder.JSONDecodeError:
-                ret = {}
-            return ret
+        try:
+            with open(self.path, 'r', encoding='utf-8') as f:
+                try:
+                    ret = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    ret = {}
+                return ret
+        except FileNotFoundError:
+            return {}
 
     def set_root(self, data: dict) -> None:
-        with open(self.path, 'w', encoding='shift-jis') as f:
-            json.dump(data, f, indent=4)
+        with open(self.path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
     def get_guild_data(self, guild: discord.Guild=None) -> dict | None:
         root = self.get_root()

@@ -37,6 +37,8 @@ class CogDownloader(discord.Cog):
                 url = f'https://www.nicovideodl.jp/watch/{info.get("webpage_url_basename")}'
             else:
                 url = info.get('url')
+                if url is None:
+                    return None
                 if len(url) > 512:
                     url = util.shorten_url(url)
             

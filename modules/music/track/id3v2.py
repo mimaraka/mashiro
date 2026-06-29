@@ -15,10 +15,11 @@ class ID3V2Track(BaseTrack):
     @classmethod
     async def from_url(cls, url: str, member: discord.Member):
         async with aiohttp.ClientSession() as session:
-            if (size_data := await get_range_data(session, url, 0, 10)) is None:
+            if (size_data := await get_range_data(session, url, 0, 9)) is None:
                 return None
 
-            size_encorded = bytearray(size_data[6:])
+            # ID3v2ヘッダの6〜9バイト目がsynchsafe形式のタグサイズ
+            size_encorded = bytearray(size_data[6:10])
             size = reduce(lambda a, b: a * 128 + b, size_encorded, 0)
 
             header = BytesIO()
@@ -37,13 +38,18 @@ class ID3V2Track(BaseTrack):
             thumbnail = None
 
         filename = os.path.splitext(url.split('/')[-1])[0]
+
+        def tag_str(key):
+            value = audio.tags.get(key)
+            return str(value) if value is not None else None
+
         return cls(
             member=member,
-            title=str(audio.tags.get('TIT2')) or filename,
+            title=tag_str('TIT2') or filename,
             source_url=url,
             original_url=url,
             duration=Duration(audio.info.length),
-            artist=str(audio.tags.get('TPE1')),
-            album=str(audio.tags.get('TALB')),
+            artist=tag_str('TPE1'),
+            album=tag_str('TALB'),
             thumbnail=thumbnail
         )

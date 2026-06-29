@@ -25,18 +25,21 @@ class URLReplacer:
         return root.get(self._name)
         
     def _get_root(self) -> dict:
-        with open(self.JSON_PATH, 'r') as f:
-            try:
-                ret = json.load(f)
-            except json.decoder.JSONDecodeError:
-                ret = {}
-            return ret
+        try:
+            with open(self.JSON_PATH, 'r', encoding='utf-8') as f:
+                try:
+                    ret = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    ret = {}
+                return ret
+        except FileNotFoundError:
+            return {}
 
     def _save_data(self, data):
         root = self._get_root()
-        with open(self.JSON_PATH, 'w') as f:
+        with open(self.JSON_PATH, 'w', encoding='utf-8') as f:
             root[self._name] = data
-            json.dump(root, f, indent=4)
+            json.dump(root, f, indent=4, ensure_ascii=False)
 
     def is_enabled(self, guild_id: int):
         data = self._get_data()
