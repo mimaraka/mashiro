@@ -54,9 +54,27 @@ YTDL_EXTRACTOR_ARGS = {
 # マウントされた cookies.txt (docker-compose の :ro マウント) をそのまま渡すと
 # OCI 等の環境で OSError: Read-only file system になる。
 # 書き込み可能な一時ファイルへコピーして、そのコピーを使わせることで回避する。
+#
+# yt-dlp (Python標準の MozillaCookieJar) は先頭行が Netscape ヘッダで始まる
+# ファイルしか受け付けない。空ファイルや非Netscape形式を渡すと LoadError になるため、
+# 事前に検証して不正なら cookiefile を使わない (None を返す)。
+def _looks_like_netscape_cookiefile(path):
+    try:
+        with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+            first_line = f.readline()
+    except OSError:
+        return False
+    # 標準ライブラリの magic 判定 "#( Netscape)? HTTP Cookie File" と同等
+    return 'HTTP Cookie File' in first_line
+
+
 def _prepare_cookiefile():
     source = './cookies.txt'
     if not os.path.isfile(source):
+        return None
+    # 空 or 非Netscape形式の cookies.txt は「Cookie無し」として扱う
+    # (deploy.sh が docker の空ディレクトリ生成を避けるために空ファイルを置くケースに対応)
+    if not _looks_like_netscape_cookiefile(source):
         return None
     try:
         fd, dest = tempfile.mkstemp(prefix='ytdl_cookies_', suffix='.txt')
