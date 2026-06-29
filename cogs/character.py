@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import discord
+import glob
 import random
 import re
 import typing
@@ -89,9 +90,10 @@ class CogCharacter(discord.Cog):
                 pattern_selfie = re.compile(r'\{selfie\}\s*')
                 if re.search(pattern_selfie, response):
                     response = re.sub(pattern_selfie, '', response)
-                    images = ['selfie_01.png', 'selfie_02.png', 'selfie_03.png', 'selfie_04.png']
+                    # selfie ディレクトリ内の3桁ゼロパディング画像 (000.png 等) からランダムで送信
+                    images = glob.glob('data/assets/selfie/*.*')
                     await asyncio.sleep(3)
-                    await message.channel.send(file=discord.File(f'data/assets/{random.choice(images)}'))
+                    await message.channel.send(file=discord.File(random.choice(images)))
 
                 response_list = [response[i:i + 2000] for i in range(0, len(response), 2000)]
                 for r in response_list:
