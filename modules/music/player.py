@@ -1,6 +1,7 @@
 import asyncio
 import discord
 import glob
+import json
 import math
 import os
 import random
@@ -522,16 +523,24 @@ class Player:
 
     # マシロのボイスをランダムで再生する
     async def play_random_voice(self, ctx: discord.ApplicationContext, on_connect=False, msg_loading: discord.Message=None):
-        # 入室時のボイス
-        if on_connect:
-            voices = glob.glob('data/assets/voices/on_connect/*.*')
-        else:
-            voices = glob.glob('data/assets/voices/**/*.*', recursive=True)
+        voice_dir = 'data/assets/voice'
 
-        picked_voice = random.choice(voices)
+        # セリフのインデックス・テキスト・入室時フラグを保持したマニフェストを読み込む
+        with open(f'{voice_dir}/voices.json', encoding='utf-8') as f:
+            voices = json.load(f)
+
+        # 入室時は on_connect=True のセリフのみ、/voice は全セリフが対象
+        candidates = [
+            i for i, v in enumerate(voices)
+            if not on_connect or v.get('on_connect', False)
+        ]
+        picked_index = random.choice(candidates)
+
+        # 音声ファイルは3桁ゼロパディングのインデックス名 (例: 002.ogg)。拡張子は問わない。
+        picked_voice = glob.glob(f'{voice_dir}/{picked_index:03d}.*')[0]
         await self.register_tracks(
             ctx.channel,
-            [LocalTrack(member=ctx.author, filepath=picked_voice)],
+            [LocalTrack(member=ctx.author, filepath=picked_voice, title=voices[picked_index]['title'])],
             ctx=ctx,
             silent=on_connect,
             msg_loading=msg_loading

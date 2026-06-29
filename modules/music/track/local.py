@@ -4,8 +4,10 @@ from .base import BaseTrack
 
 
 class LocalTrack(BaseTrack):
-    def __init__(self, member: discord.Member, filepath: str) -> None:
-        title = os.path.splitext(os.path.basename(filepath))[0]
+    def __init__(self, member: discord.Member, filepath: str, title: str | None = None) -> None:
+        # title が指定されなければファイル名(拡張子除く)から生成する
+        if title is None:
+            title = os.path.splitext(os.path.basename(filepath))[0]
         super().__init__(
             member=member,
             title=title,
