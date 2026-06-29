@@ -68,10 +68,11 @@ GOOGLE_API_KEY=your-google-generative-ai-key   # optional; required only for Gem
 
 ### Run with Docker
 
-The bot runs alongside a [PO Token provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) so that YouTube playback works from datacenter/VPS IPs (otherwise YouTube responds with "Sign in to confirm you're not a bot"). Use Docker Compose to start both services:
+The bot runs alongside a [PO Token provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) so that YouTube playback works from datacenter/VPS IPs (otherwise YouTube responds with "Sign in to confirm you're not a bot"). The image is built by GitHub Actions and published to GitHub Packages (`ghcr.io/mimaraka/mashiro`). Use Docker Compose to pull it and start both services:
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 #### YouTube cookies (recommended)
