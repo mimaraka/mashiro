@@ -63,7 +63,8 @@ async def create_tracks(loop: asyncio.AbstractEventLoop, query: str, member: dis
 
     result = []
     for i in info_list:
-        if i:
+        # ignoreerrors により抽出失敗時はurlが欠落したinfoが返り得るため除外
+        if i and i.get('url'):
             result.append(
                 YTDLTrack(
                     loop,

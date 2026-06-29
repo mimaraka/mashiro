@@ -1,3 +1,5 @@
+import os
+
 ################################################################################
 # Botに関する設定
 ################################################################################
@@ -42,11 +44,15 @@ YTDL_OPTIONS = {
     'source_address': '0.0.0.0',                                # bind to ipv4 since ipv6 addresses cause issues sometimes
     # 'usenetrc': True,
     # 'netrc_location': './.netrc',
-    'cookiefile': './cookies.txt',
     'http_headers': {
         'Accept-Language': 'ja-JP'
     }
 }
+
+# cookies.txt が存在する場合のみ cookiefile を指定する
+# (存在しないパスを指定すると無駄な副作用やエラーの原因になるため)
+if os.path.isfile('./cookies.txt'):
+    YTDL_OPTIONS['cookiefile'] = './cookies.txt'
 
 FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3',

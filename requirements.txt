@@ -7,9 +7,9 @@ jaconv==0.5.0
 mutagen==1.47.0
 openai==2.28.0
 pillow==12.0.0
-py-cord[voice]==2.7.1
+py-cord[voice]==2.8.0
 pyshorteners==1.0.1
 python-dotenv==1.2.2
 requests==2.32.5
 typing_extensions==4.15.0
-yt-dlp[default]==2026.3.13
+yt-dlp[default]==2026.6.9

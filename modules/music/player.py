@@ -193,7 +193,6 @@ class Player:
         self.__current_track = self.__playlist[self.__current_index]
 
         await self.__current_track.create_source(self.__volume)
-        self.__current_track.source.read()
 
         after = lambda e: asyncio.run_coroutine_threadsafe(self.__after_callback(e), self.__loop)
         self.__voice_client.play(self.__current_track.source, after=after)
@@ -208,6 +207,9 @@ class Player:
         self.__time_started = time.time()
         if msg_loading:
             await msg_loading.delete()
+        # 再生失敗等でawait中に__after_callbackが走り、カレントトラックがクリアされた場合
+        if self.__current_track is None:
+            return
         # コントローラーの更新
         if not silent:
             controller = await self.get_controller()
@@ -238,8 +240,16 @@ class Player:
         if error:
             mylog('音声の再生中にエラーが発生しました。', log_type='error')
             traceback.print_exception(error)
+            # ユーザーに再生失敗を通知し、再生情報をリセットする
+            if self.__channel is not None:
+                try:
+                    embed = MyEmbed(notif_type='error', title='再生中にエラーが発生しました……。')
+                    await self.__channel.send(embed=embed, delete_after=10)
+                except discord.errors.HTTPException:
+                    pass
+            await self.__clear_data()
             return
-        
+
         # 中断により停止された場合
         if self.__flag_aborted:
             mylog('再生を中断しました。', guild=self.__voice_client.guild)
@@ -292,6 +302,10 @@ class Player:
     # コントローラーを取得
     async def get_controller(self):
         file = None
+        # カレントトラックが存在しない場合(再生失敗やコールバックによるクリア後)
+        if self.__current_track is None:
+            embed = MyEmbed(notif_type='inactive', title='再生していません……。')
+            return {'embed': embed, 'view': None}
         # 再生中または一時停止中の場合
         if self.is_playing or self.is_paused:
             if self.is_playing:

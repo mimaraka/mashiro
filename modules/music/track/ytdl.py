@@ -37,11 +37,12 @@ class YTDLTrack(BaseTrack):
     async def create_source(self, volume: int):
         # 以前に生成したURLがまだ使えるか試してみる
         try:
-            async with aiohttp.ClientSession() as session:
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
                 async with session.get(self.source_url) as resp:
                     resp.raise_for_status()
-        # URLが切れている場合、再生成
-        except aiohttp.ClientResponseError:
+        # URLが切れている / 接続できない / タイムアウトした場合、再生成
+        except (aiohttp.ClientError, asyncio.TimeoutError):
             mylog('YTDLSourceを再度生成します。')
             with yt_dlp.YoutubeDL(YTDL_OPTIONS) as ytdl:
                 info = await self.loop.run_in_executor(
