@@ -1,0 +1,19 @@
+services:
+  mashiro:
+    build: .
+    env_file: .env
+    environment:
+      # PO Token生成サーバー(bgutil-provider)のベースURL
+      YTDLP_POT_BASE_URL: http://bgutil-provider:4416
+    volumes:
+      # ブラウザからエクスポートした cookies.txt をマウントする (無ければこの行を削除)
+      - ./cookies.txt:/bot/cookies.txt:ro
+    depends_on:
+      - bgutil-provider
+    restart: unless-stopped
+
+  # YouTubeのbot検出回避用 PO Token (GVS PO Token) 生成サーバー
+  bgutil-provider:
+    image: brainicism/bgutil-ytdlp-pot-provider:1.3.1
+    init: true
+    restart: unless-stopped

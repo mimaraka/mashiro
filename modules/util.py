@@ -72,11 +72,15 @@ def get_member_text(member: discord.Member, bold: bool=True, decoration: bool=Tr
 async def search_youtube(loop: asyncio.AbstractEventLoop, query: str, max_results: int=5):
     if not query:
         return []
-    with yt_dlp.YoutubeDL({
+    options = {
         'quiet': True,
         'skip_download': True,
-        'extract_flat': 'in_playlist'
-    }) as ytdl:
+        'extract_flat': 'in_playlist',
+        'extractor_args': const.YTDL_EXTRACTOR_ARGS,
+    }
+    if const.YTDL_COOKIEFILE:
+        options['cookiefile'] = const.YTDL_COOKIEFILE
+    with yt_dlp.YoutubeDL(options) as ytdl:
         search_url = f'ytsearch{max_results}:{query}'
         result = await loop.run_in_executor(
             None, lambda: ytdl.extract_info(search_url, download=False)

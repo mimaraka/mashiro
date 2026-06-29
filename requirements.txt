@@ -13,3 +13,4 @@ python-dotenv==1.2.2
 requests==2.33.1
 typing_extensions==4.15.0
 yt-dlp[default]==2026.6.9
+bgutil-ytdlp-pot-provider==1.3.1

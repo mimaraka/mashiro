@@ -31,6 +31,24 @@ FAVICON = {
 }
 
 # yt_dlp
+
+# データセンターIP(OCI等)ではYouTubeのbot検出を回避するためPO Tokenが必要。
+# bgutil-ytdlp-pot-provider のトークン生成サーバーのベースURLを指定する。
+# docker-compose のサービス名を既定とし、環境変数で上書き可能にする。
+YTDLP_POT_BASE_URL = os.getenv('YTDLP_POT_BASE_URL', 'http://bgutil-provider:4416')
+
+# yt-dlp の extractor_args（全YoutubeDL呼び出しで共有）
+# 値はリストで渡すのがyt-dlpの仕様。別コンテナのサーバーを参照するため base_url の明示が必須。
+YTDL_EXTRACTOR_ARGS = {
+    'youtubepot-bgutilhttp': {
+        'base_url': [YTDLP_POT_BASE_URL],
+    },
+}
+
+# cookies.txt が存在する場合のみ cookiefile を指定する
+# (存在しないパスを指定すると無駄な副作用やエラーの原因になるため)
+YTDL_COOKIEFILE = './cookies.txt' if os.path.isfile('./cookies.txt') else None
+
 YTDL_OPTIONS = {
     'format': 'ba/b*[acodec!=none]/b*',
     'restrictfilenames': True,
@@ -44,15 +62,14 @@ YTDL_OPTIONS = {
     'source_address': '0.0.0.0',                                # bind to ipv4 since ipv6 addresses cause issues sometimes
     # 'usenetrc': True,
     # 'netrc_location': './.netrc',
+    'extractor_args': YTDL_EXTRACTOR_ARGS,
     'http_headers': {
         'Accept-Language': 'ja-JP'
     }
 }
 
-# cookies.txt が存在する場合のみ cookiefile を指定する
-# (存在しないパスを指定すると無駄な副作用やエラーの原因になるため)
-if os.path.isfile('./cookies.txt'):
-    YTDL_OPTIONS['cookiefile'] = './cookies.txt'
+if YTDL_COOKIEFILE:
+    YTDL_OPTIONS['cookiefile'] = YTDL_COOKIEFILE
 
 FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3',

@@ -68,10 +68,17 @@ GOOGLE_API_KEY=your-google-generative-ai-key   # optional; required only for Gem
 
 ### Run with Docker
 
+The bot runs alongside a [PO Token provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider) so that YouTube playback works from datacenter/VPS IPs (otherwise YouTube responds with "Sign in to confirm you're not a bot"). Use Docker Compose to start both services:
+
 ```bash
-docker build -t mashiro .
-docker run --env-file .env mashiro
+docker compose up -d --build
 ```
+
+#### YouTube cookies (recommended)
+
+For age-restricted videos or when the PO Token alone is not enough, place a `cookies.txt` (Netscape format, exported from a logged-in browser via an extension such as "Get cookies.txt LOCALLY") in the project root. It is auto-detected and mounted by `docker-compose.yml`. If you don't use cookies, remove the `./cookies.txt` volume line from `docker-compose.yml`.
+
+> ⚠️ Using a logged-in account's cookies from a datacenter IP carries an account-ban risk; prefer a throwaway account.
 
 ### Run locally
 

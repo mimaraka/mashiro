@@ -4,7 +4,7 @@ import yt_dlp
 import modules.util as util
 from character_config import CHARACTER_TEXT
 from modules.myembed import MyEmbed
-from constants import RE_PATTERN_URL_NICONICO, RE_PATTERN_URL
+from constants import RE_PATTERN_URL_NICONICO, RE_PATTERN_URL, YTDL_EXTRACTOR_ARGS, YTDL_COOKIEFILE
 
 
 class CogDownloader(discord.Cog):
@@ -22,8 +22,11 @@ class CogDownloader(discord.Cog):
             'source_address': '0.0.0.0',
             'usenetrc': True,
             'netrc_location': './.netrc',
+            'extractor_args': YTDL_EXTRACTOR_ARGS,
         }
-        
+        if YTDL_COOKIEFILE:
+            OPTIONS['cookiefile'] = YTDL_COOKIEFILE
+
         try:
             with yt_dlp.YoutubeDL(OPTIONS) as ytdl:
                 info = await self.bot.loop.run_in_executor(
