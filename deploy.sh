@@ -15,7 +15,7 @@
 #   1. リポジトリを ./app にクローン (既にあれば最新へ更新)
 #   2. 上記の外部ファイルをクローンへ注入
 #   3. saves/ を永続ボリュームとしてマウントする override を生成
-#   4. docker compose up -d --build で起動
+#   4. ghcr.io からイメージを pull して docker compose up -d で起動
 #
 set -euo pipefail
 
