@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 
 ################################################################################
 # Botに関する設定
@@ -47,7 +49,25 @@ YTDL_EXTRACTOR_ARGS = {
 
 # cookies.txt が存在する場合のみ cookiefile を指定する
 # (存在しないパスを指定すると無駄な副作用やエラーの原因になるため)
-YTDL_COOKIEFILE = './cookies.txt' if os.path.isfile('./cookies.txt') else None
+#
+# yt-dlp は close() 時に cookiefile へクッキーを書き戻すため、読み取り専用で
+# マウントされた cookies.txt (docker-compose の :ro マウント) をそのまま渡すと
+# OCI 等の環境で OSError: Read-only file system になる。
+# 書き込み可能な一時ファイルへコピーして、そのコピーを使わせることで回避する。
+def _prepare_cookiefile():
+    source = './cookies.txt'
+    if not os.path.isfile(source):
+        return None
+    try:
+        fd, dest = tempfile.mkstemp(prefix='ytdl_cookies_', suffix='.txt')
+        os.close(fd)
+        shutil.copyfile(source, dest)
+        return dest
+    except OSError:
+        # コピーに失敗した場合は元ファイルを使用する (読み取り専用でなければ動作する)
+        return source
+
+YTDL_COOKIEFILE = _prepare_cookiefile()
 
 YTDL_OPTIONS = {
     'format': 'ba/b*[acodec!=none]/b*',
