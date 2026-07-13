@@ -11,6 +11,6 @@ py-cord[voice]==2.8.0
 pyshorteners==1.0.1
 python-dotenv==1.2.2
 requests==2.34.2
-typing_extensions==4.15.0
+typing_extensions==4.16.0
 yt-dlp[default]==2026.6.9
 bgutil-ytdlp-pot-provider==1.3.1
