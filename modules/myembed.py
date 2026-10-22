@@ -32,6 +32,7 @@ class MyEmbed(discord.Embed):
         # 基底クラスの初期化
         super().__init__(colour=color, color=color, title=title_, type=type, url=url, description=description, timestamp=timestamp)
 
-        self.set_thumbnail(url=CHARACTER_ICON[custom_icon or notif_type])
+        if icon := CHARACTER_ICON[custom_icon or notif_type]:
+            self.set_thumbnail(url=icon)
         if image:
             self.set_image(url=image)

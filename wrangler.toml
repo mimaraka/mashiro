@@ -1,0 +1,7 @@
+# キャラクターのアイコン画像などを配信する静的サイト (Cloudflare Workers)
+# assets/ はgitignoreしているため、ローカルから `npx wrangler deploy` でデプロイする
+name = "mashiro-assets"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./data/assets"

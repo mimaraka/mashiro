@@ -11,3 +11,6 @@ cookies.txt
 docker-compose.override.yml
 README.md
 deploy.sh
+assets
+.wrangler
+wrangler.toml

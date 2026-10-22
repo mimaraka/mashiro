@@ -1,17 +1,21 @@
 import discord
+import os
 import jaconv
 import random
 import re
 import modules.util as util
-from character_config import KOTOBAGARI_CONFIG
+from character_config import WORDHUNT_CONFIG
 from modules.common_embed import *
 from modules.json import JSONLoader
 
 
-class CogKotobagari(discord.Cog):
+class CogWordhunt(discord.Cog):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
-        self.json_loader = JSONLoader('kotobagari')
+        # 旧名称 (kotobagari) の保存データがあれば引き継ぐ
+        if not os.path.exists('data/saves/wordhunt.json') and os.path.exists('data/saves/kotobagari.json'):
+            os.rename('data/saves/kotobagari.json', 'data/saves/wordhunt.json')
+        self.json_loader = JSONLoader('wordhunt')
 
     # 正規表現を用いた少しゆるめの検索
     def searchex(self, lis, target_text, looseness, ignore_katahira=False, ignore_dakuten=False):
@@ -57,10 +61,14 @@ class CogKotobagari(discord.Cog):
         return re.findall(pattern, target)
 
 
-    async def kotobagari(self, message: discord.Message):
-        for info in KOTOBAGARI_CONFIG:
+    async def wordhunt(self, message: discord.Message):
+        for info in WORDHUNT_CONFIG:
+            # アセットのURLが未設定の場合はNoneになるため除外する
+            messages = [m for m in info['messages'] if m]
+            if not messages:
+                continue
             for _ in self.searchex(info['keywords'], str(message.content), info['looseness'], info['ignore_katahira'], info['ignore_dakuten']):
-                await message.channel.send(random.choice(info['messages']))
+                await message.channel.send(random.choice(messages))
 
 
     @discord.Cog.listener()
@@ -71,11 +79,11 @@ class CogKotobagari(discord.Cog):
             enabled_channels = self.json_loader.get_guild_data(message.guild) or []
             if message.channel.id not in enabled_channels:
                 return
-        await self.kotobagari(message)
+        await self.wordhunt(message)
 
-    @discord.slash_command(**util.make_command_args('kotobagari'))
+    @discord.slash_command(**util.make_command_args('wordhunt'))
     @discord.option('switch', description='言葉狩りの有効化/無効化')
-    async def command_kotobagari(self, ctx: discord.ApplicationContext, switch: bool):
+    async def command_wordhunt(self, ctx: discord.ApplicationContext, switch: bool):
         if ctx.guild is None:
             await ctx.respond(embed=EMBED_GUILD_ONLY, ephemeral=True)
             return
@@ -95,5 +103,5 @@ class CogKotobagari(discord.Cog):
         self.json_loader.set_guild_data(enabled_channels, ctx.guild)
 
         await ctx.respond(
-            embed=MyEmbed(title=f'{CHARACTER_TEXT["kotobagari_prefix"]}{"有効" if switch else "無効"}{CHARACTER_TEXT["kotobagari_suffix"]}')
+            embed=MyEmbed(title=f'{CHARACTER_TEXT["wordhunt_prefix"]}{"有効" if switch else "無効"}{CHARACTER_TEXT["wordhunt_suffix"]}')
         )
