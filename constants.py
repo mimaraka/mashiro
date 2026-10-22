@@ -110,7 +110,9 @@ if YTDL_COOKIEFILE:
     YTDL_OPTIONS['cookiefile'] = YTDL_COOKIEFILE
 
 FFMPEG_OPTIONS = {
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_at_eof 1 -reconnect_delay_max 3',
+    # -reconnect_at_eof は付けない: HLS(SoundCloud等)では各セグメントの正常なEOFでも再接続を繰り返して読み込みが停滞し、
+    # 無音の後に音声が飛び飛びで再生される原因になる
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 3',
     'options': '-vn',
 }
 
