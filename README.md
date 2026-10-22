@@ -64,6 +64,15 @@ Create a `.env` file in the project root:
 ```env
 DISCORD_BOT_TOKEN=your-discord-bot-token
 GOOGLE_API_KEY=your-google-generative-ai-key   # optional; required only for Gemini-backed chat
+ICON_BASE_URL=https://mashiro-assets.<your-subdomain>.workers.dev/icon   # optional; embed thumbnails are omitted if unset
+```
+
+#### Character icons
+
+Embed thumbnail icons are served from Cloudflare Workers static assets rather than this repository. Place the images in `assets/icon/` (ignored by git) and deploy them with:
+
+```bash
+npx wrangler deploy
 ```
 
 ### Run with Docker

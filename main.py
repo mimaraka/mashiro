@@ -1,6 +1,11 @@
 import discord
 from dotenv import load_dotenv
 import os
+
+# 各モジュールのimport時に環境変数を参照するため、先に読み込む
+load_dotenv(verbose=True)
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
 from character_config import CHARACTER_TEXT
 from modules.mylog import mylog
 
@@ -14,10 +19,6 @@ from cogs.kotobagari import CogKotobagari
 from cogs.vc_util import CogVCUtil
 from cogs.url_replacer import CogURLReplacer
 from cogs.others import CogOthers
-
-
-load_dotenv(verbose=True)
-load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 bot = discord.Bot(intents=discord.Intents.all())
 

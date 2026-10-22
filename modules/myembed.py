@@ -2,7 +2,7 @@ import datetime
 import discord
 from discord.types.embed import EmbedType
 from typing import Any, Literal
-from character_config import CHARACTER_ICON, CHARACTER_TEXT
+from character_config import CHARACTER_ICON, CHARACTER_ICON_BASE_URL, CHARACTER_TEXT
 
 EMBED_COLOR = {
     'normal': 0x8d5ee6,
@@ -32,6 +32,7 @@ class MyEmbed(discord.Embed):
         # 基底クラスの初期化
         super().__init__(colour=color, color=color, title=title_, type=type, url=url, description=description, timestamp=timestamp)
 
-        self.set_thumbnail(url=CHARACTER_ICON[custom_icon or notif_type])
+        if CHARACTER_ICON_BASE_URL:
+            self.set_thumbnail(url=CHARACTER_ICON[custom_icon or notif_type])
         if image:
             self.set_image(url=image)

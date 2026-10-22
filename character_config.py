@@ -1,3 +1,6 @@
+import os
+
+
 CHARACTER_NAME = '静山マシロ'
 CHARACTER_BIRTHMONTH = 6
 CHARACTER_BIRTHDAY = 5
@@ -96,13 +99,15 @@ COMMAND_DESCRIPTION = {
 }
 
 # キャラクターのアイコン画像のURL
+# 画像はCloudflare Workers (assets/ を静的配信) に置き、ベースURLは環境変数で指定する
+CHARACTER_ICON_BASE_URL = os.getenv('ICON_BASE_URL', '').rstrip('/')
 CHARACTER_ICON = {
-    'normal': 'https://media.discordapp.net/attachments/1142318975829676104/1142319072709718036/mashiro_normal.png?width=662&height=662',
-    'error': 'https://media.discordapp.net/attachments/1142318975829676104/1142319099150598184/mashiro_error.png?width=662&height=662',
-    'inactive': 'https://media.discordapp.net/attachments/1142318975829676104/1142321489769660496/mashiro_sleeping.png?width=662&height=662',
-    'succeeded': 'https://media.discordapp.net/attachments/1142318975829676104/1142713236718887024/mashiro_smile.png?width=662&height=662',
-    'question': 'https://media.discordapp.net/attachments/1142318975829676104/1142793060128927944/mashiro_question.png?width=662&height=662',
-    'warning': 'https://media.discordapp.net/attachments/1142318975829676104/1142793794518003762/mashiro_warning.png?width=662&height=662'
+    'normal': f'{CHARACTER_ICON_BASE_URL}/mashiro_normal.png',
+    'error': f'{CHARACTER_ICON_BASE_URL}/mashiro_error.png',
+    'inactive': f'{CHARACTER_ICON_BASE_URL}/mashiro_sleeping.png',
+    'succeeded': f'{CHARACTER_ICON_BASE_URL}/mashiro_smile.png',
+    'question': f'{CHARACTER_ICON_BASE_URL}/mashiro_question.png',
+    'warning': f'{CHARACTER_ICON_BASE_URL}/mashiro_warning.png'
 }
 
 CHARACTER_QUOTES = [
