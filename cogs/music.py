@@ -96,18 +96,12 @@ class CogMusic(discord.Cog):
 
 
     # 処理中のEmbedを取得
-    def get_loading_embed(self, channel: discord.TextChannel, prefix=''):
-        external_emojis = channel.permissions_for(channel.guild.me).external_emojis
-        if external_emojis:
-            emoji = str(self.bot.get_emoji(const.EMOJI_ID_LOADING))
-        else:
-            emoji = '⌛'
-        embed = MyEmbed(
+    def get_loading_embed(self, prefix=''):
+        return MyEmbed(
             notif_type='inactive',
-            title=f'{emoji} {prefix}{CHARACTER_TEXT["processing"]}',
+            title=f'⌛ {prefix}{CHARACTER_TEXT["processing"]}',
             description=CHARACTER_TEXT['hang_on']
         )
-        return embed
 
 
     # メンバーのボイス状態が更新されたとき
@@ -274,10 +268,10 @@ class CogMusic(discord.Cog):
 
         if not silent:
             if ctx:
-                inter = await ctx.respond(embed=self.get_loading_embed(channel))
+                inter = await ctx.respond(embed=self.get_loading_embed())
                 msg_loading = await inter.original_response()
             else:
-                msg_loading = await channel.send(embed=self.get_loading_embed(channel))
+                msg_loading = await channel.send(embed=self.get_loading_embed())
         else:
             msg_loading = None
 
@@ -342,7 +336,7 @@ class CogMusic(discord.Cog):
         if not player:
             return
         
-        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        inter = await ctx.respond(embed=self.get_loading_embed())
         msg_loading = await inter.original_response()
 
         videos = await util.search_youtube(self.bot.loop, keyword, limit)
@@ -426,7 +420,7 @@ class CogMusic(discord.Cog):
             if order == 'ランダム':
                 random.shuffle(tracks)
 
-            await msg_loading.edit(embed=self.get_loading_embed(ctx.channel, prefix='2. '))
+            await msg_loading.edit(embed=self.get_loading_embed(prefix='2. '))
             await player.register_tracks(ctx.channel, tracks, ctx=ctx, msg_loading=msg_loading)
 
 
@@ -451,7 +445,7 @@ class CogMusic(discord.Cog):
             )
             return
         
-        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        inter = await ctx.respond(embed=self.get_loading_embed())
         msg_loading = await inter.original_response()
 
         tracks = await create_tracks(self.bot.loop, attachment.url, ctx.author)
@@ -474,7 +468,7 @@ class CogMusic(discord.Cog):
         if not player:
             return
         
-        inter = await ctx.respond(embed=self.get_loading_embed(ctx.channel))
+        inter = await ctx.respond(embed=self.get_loading_embed())
         msg_loading = await inter.original_response()
         
         await player.play_random_voice(ctx, msg_loading=msg_loading)
