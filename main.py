@@ -15,7 +15,7 @@ from cogs.music import CogMusic
 from cogs.nick_changer import CogNickChanger
 from cogs.downloader import CogDownloader
 from cogs.message_sender import CogMessageSender
-from cogs.kotobagari import CogKotobagari
+from cogs.wordhunt import CogWordhunt
 from cogs.vc_util import CogVCUtil
 from cogs.url_replacer import CogURLReplacer
 from cogs.others import CogOthers
@@ -38,7 +38,7 @@ bot.add_cog(CogMusic(bot))
 bot.add_cog(CogNickChanger(bot))
 bot.add_cog(CogDownloader(bot))
 bot.add_cog(CogMessageSender(bot))
-bot.add_cog(CogKotobagari(bot))
+bot.add_cog(CogWordhunt(bot))
 bot.add_cog(CogVCUtil(bot))
 bot.add_cog(CogURLReplacer(bot))
 bot.add_cog(CogOthers(bot))

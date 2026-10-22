@@ -32,7 +32,7 @@ Mention the bot or DM it to chat with Mashiro in character. Responses are genera
 - `/send-message` — schedule a message to be sent at a specific date/time.
 - `/nick change` / `/nick restore` / `/nick remove` — bulk-manage member nicknames (admin only).
 - `/vc stats` — show information about your current voice channel; `/vc kick-timer` — auto-disconnect yourself after a set duration.
-- `/kotobagari` — toggle word-filtering in the current channel (admin only).
+- `/wordhunt` — toggle word-filtering in the current channel (admin only).
 - `/mashiro` — get a random character quote.
 - `/ping`, `/help`.
 
@@ -64,12 +64,12 @@ Create a `.env` file in the project root:
 ```env
 DISCORD_BOT_TOKEN=your-discord-bot-token
 GOOGLE_API_KEY=your-google-generative-ai-key   # optional; required only for Gemini-backed chat
-ICON_BASE_URL=https://mashiro-assets.<your-subdomain>.workers.dev/icon   # optional; embed thumbnails are omitted if unset
+ASSETS_BASE_URL=https://mashiro-assets.<your-subdomain>.workers.dev   # optional; embed thumbnails and word-hunt images are omitted if unset
 ```
 
-#### Character icons
+#### Image assets
 
-Embed thumbnail icons are served from Cloudflare Workers static assets rather than this repository. Place the images in `assets/icon/` (ignored by git) and deploy them with:
+Embed thumbnail icons and word-hunt images are served from Cloudflare Workers static assets rather than this repository. Place the images in `assets/icon/` and `assets/wordhunt/` (ignored by git) and deploy them with:
 
 ```bash
 npx wrangler deploy

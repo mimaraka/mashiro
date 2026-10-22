@@ -56,8 +56,8 @@ CHARACTER_TEXT = {
     'scheduled_message': 'メッセージの送信を設定しました！',
     'reset_conversation': '会話をリセットしました。',
     'url_replacer_suffix': 'が共有しました！',
-    'kotobagari_prefix': 'このチャンネルでの言葉狩りを',
-    'kotobagari_suffix': 'にしました。',
+    'wordhunt_prefix': 'このチャンネルでの言葉狩りを',
+    'wordhunt_suffix': 'にしました。',
 }
 
 COMMAND_DESCRIPTION = {
@@ -79,7 +79,7 @@ COMMAND_DESCRIPTION = {
     'repeat': 'リピート再生の設定を変更します。',
     'volume': '現在のボリュームを表示・変更します。',
     'player': 'プレイヤー操作メッセージをコマンドを送信したチャンネルに移動させます。',
-    'kotobagari': '現在のチャンネルでの言葉狩りの有効/無効を切り替えます (管理者のみ実行可)。',
+    'wordhunt': '現在のチャンネルでの言葉狩りの有効/無効を切り替えます (管理者のみ実行可)。',
     'send-message': '指定した時間に指定したメッセージを送信します。',
     'dl': 'メディアのダウンロードリンクを取得します。',
     'dl audio': '音声のダウンロードリンクを取得します。',
@@ -98,16 +98,21 @@ COMMAND_DESCRIPTION = {
     'help': '何かお困りですか？',
 }
 
+# 画像などのアセットを配信するURL
+# assets/ をCloudflare Workersで静的配信し、ベースURLは環境変数で指定する
+ASSETS_BASE_URL = os.getenv('ASSETS_BASE_URL', '').rstrip('/')
+
+def asset_url(path: str) -> str | None:
+    return f'{ASSETS_BASE_URL}/{path}' if ASSETS_BASE_URL else None
+
 # キャラクターのアイコン画像のURL
-# 画像はCloudflare Workers (assets/ を静的配信) に置き、ベースURLは環境変数で指定する
-CHARACTER_ICON_BASE_URL = os.getenv('ICON_BASE_URL', '').rstrip('/')
 CHARACTER_ICON = {
-    'normal': f'{CHARACTER_ICON_BASE_URL}/mashiro_normal.png',
-    'error': f'{CHARACTER_ICON_BASE_URL}/mashiro_error.png',
-    'inactive': f'{CHARACTER_ICON_BASE_URL}/mashiro_sleeping.png',
-    'succeeded': f'{CHARACTER_ICON_BASE_URL}/mashiro_smile.png',
-    'question': f'{CHARACTER_ICON_BASE_URL}/mashiro_question.png',
-    'warning': f'{CHARACTER_ICON_BASE_URL}/mashiro_warning.png'
+    'normal': asset_url('icon/mashiro_normal.png'),
+    'error': asset_url('icon/mashiro_error.png'),
+    'inactive': asset_url('icon/mashiro_sleeping.png'),
+    'succeeded': asset_url('icon/mashiro_smile.png'),
+    'question': asset_url('icon/mashiro_question.png'),
+    'warning': asset_url('icon/mashiro_warning.png')
 }
 
 CHARACTER_QUOTES = [
@@ -183,12 +188,12 @@ CHARACTER_QUOTES_NEWYEAR = [
 ]
 
 # 言葉狩りの設定
-KOTOBAGARI_CONFIG = [
+WORDHUNT_CONFIG = [
     {
         'keywords': ['ひつす', '必須'],
         'messages': [
-            'https://media.discordapp.net/attachments/1142318975829676104/1142460814163460240/hissu_01.jpg?width=200&height=267',
-            'https://media.discordapp.net/attachments/1142318975829676104/1142460849580167188/hissu_02.jpg?width=196&height=535'
+            asset_url('wordhunt/hissu_01.jpg'),
+            asset_url('wordhunt/hissu_02.jpg')
         ],
         'looseness': 0,
         'ignore_katahira': True,
@@ -197,7 +202,7 @@ KOTOBAGARI_CONFIG = [
     {
         'keywords': ['あいす', 'ふえら'],
         'messages': [
-            'https://media.discordapp.net/attachments/1142318975829676104/1142460904777195570/ice.gif?width=1153&height=662'
+            asset_url('wordhunt/ice.gif')
         ],
         'looseness': 0,
         'ignore_katahira': True,
