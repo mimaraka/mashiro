@@ -6,7 +6,7 @@ A multi-purpose Discord bot for personal use. It combines a fully featured music
 
 ### 🎵 Music player
 
-- `/play [URL/keyword]` — play audio from a URL or by searching YouTube. Powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp), so YouTube, Niconico, SoundCloud, BiliBili and [many other sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) are supported.
+- `/play [URL/keyword]` — play audio from a URL or by searching YouTube. Powered by [yt-dlp](https://github.com/yt-dlp/yt-dlp), so YouTube, ~~Niconico~~ (currently unavailable), SoundCloud, BiliBili and [many other sites](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) are supported.
 - `/play-file` — upload a local audio/video file and play it.
 - `/play-channel` — collect links posted in a given channel and queue them as a playlist.
 - `/search` — browse YouTube search results and pick a track to play.
