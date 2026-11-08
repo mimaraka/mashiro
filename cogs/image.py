@@ -5,7 +5,6 @@ from typing import List
 from modules.http import get_mimetype
 from modules.myembed import MyEmbed
 from modules.attachments import get_attachments
-from PIL import Image
 
 
 MIMETYPES_REMBG = ['image/png', 'image/pjpeg', 'image/jpeg', 'image/x-icon', 'image/bmp']

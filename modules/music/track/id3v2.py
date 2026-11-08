@@ -4,7 +4,6 @@ import os
 from functools import reduce
 from io import BytesIO
 from mutagen.mp3 import MP3
-from PIL import Image
 from modules.file import make_filename_by_seq
 from modules.http import get_range_data
 from .base import BaseTrack
@@ -30,10 +29,10 @@ class ID3V2Track(BaseTrack):
         audio = MP3(header)
 
         if (apic := audio.tags.get('APIC:')) is not None:
-            img = Image.open(BytesIO(apic.data))
             ext = apic.mime.split('/')[-1] if apic.mime else 'jpeg'
             thumbnail = make_filename_by_seq(f'data/temp/cover_{member.guild.id}.{ext}')
-            img.save(thumbnail)
+            with open(thumbnail, 'wb') as f:
+                f.write(apic.data)
         else:
             thumbnail = None
 

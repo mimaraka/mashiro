@@ -2,8 +2,6 @@ import aiohttp
 import discord
 import os
 import re
-from io import BytesIO
-from PIL import Image
 from modules.http import get_range_data
 from modules.file import make_filename_by_seq
 from .base import BaseTrack
@@ -79,10 +77,10 @@ class FLACTrack(BaseTrack):
                 description_length = int.from_bytes(data[8 + mimetype_length:12 + mimetype_length], 'big')
                 image_size = int.from_bytes(data[28 + mimetype_length + description_length:32 + mimetype_length + description_length], 'big')
                 image_data = data[32 + mimetype_length + description_length:32 + mimetype_length + description_length + image_size]
-                img = Image.open(BytesIO(image_data))
                 ext = mimetype.split('/')[-1] if mimetype else 'jpeg'
                 thumbnail = make_filename_by_seq(f'data/temp/cover_{member.guild.id}.{ext}')
-                img.save(thumbnail)
+                with open(thumbnail, 'wb') as f:
+                    f.write(image_data)
         
         filename = os.path.splitext(url.split('/')[-1])[0]
         return cls(
