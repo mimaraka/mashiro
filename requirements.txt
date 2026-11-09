@@ -11,5 +11,5 @@ pyshorteners==1.0.1
 python-dotenv==1.2.4
 requests==2.34.2
 typing_extensions==4.16.0
-yt-dlp[default]==2026.10.21
+yt-dlp[default]==2026.10.26
 bgutil-ytdlp-pot-provider==2.0.2
